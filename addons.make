@@ -1,0 +1,2 @@
+ofxOpenNI
+ofxSQLite
