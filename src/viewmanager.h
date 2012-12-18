@@ -13,6 +13,7 @@ class ViewManager
 public:
     ViewManager();
     void setCursor(HandCursor &_cursor);
+    enum_views currentView;
 
 protected:
 private:
@@ -24,7 +25,7 @@ private:
     MainMenu* m_view;
     Overview* o_view;
     WorldView* w_view;
-    enum_views currentView;
+
     HandCursor* cursor;
 };
 

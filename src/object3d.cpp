@@ -29,9 +29,11 @@ void Object3D::draw()
 
 void Object3D::drawNear()
 {
+    ofNoFill();
     ofColor color(255, 0, 0);
     ofSetColor(color);
     ofSphere(x, y, z, size * 1.05);
+    ofFill();
 }
 
 ofVec3f Object3D::getPostion()

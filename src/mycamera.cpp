@@ -41,8 +41,6 @@ MyCamera::~MyCamera()
 
 void MyCamera::update()
 {
-
-
     makerotations();
     kinectRotations();
     freecam.rotate(ofRadToDeg(rotationLeftSpeed), ofVec3f(0,0,1));
@@ -50,11 +48,9 @@ void MyCamera::update()
     freecam.tilt(ofRadToDeg(rotationUpSpeed));
     freecam.tilt(ofRadToDeg(-rotationDownSpeed));
 
-
     makecontrols(freecam);
     kinectForward(freecam);
     camera.setParent(freecam);
-
 }
 
 //--------------------------------------------------------------

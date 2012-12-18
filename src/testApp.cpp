@@ -25,7 +25,7 @@ void testApp::setup()
         openNIDevice.addDepthGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
-        openNIDevice.setMaxNumUsers(1);
+        openNIDevice.setMaxNumUsers(3);
         openNIDevice.start();
     }
 
@@ -96,12 +96,42 @@ void testApp::update()
             }
         }
         cursor.kinectMovement.set(kinectMovementX, kinectMovementY, kinectMovementZ);
+
+        // get number of current hands
+        int numHands = openNIDevice.getNumTrackedHands();
+        // when no hand is tracked, dissappear handCurosr
+        if(numHands == 0)
+        {
+            trackingHand = false;
+            cursorXPos = -50;
+        }
+        // iterate through users
+        for (int i = 0; i < numHands; i++)
+        {
+            // set tracking user to true
+            trackingHand = true;
+
+            // get a reference to this user
+            ofxOpenNIHand & hand = openNIDevice.getTrackedHand(i);
+            ofPoint & handPosition = hand.getPosition();
+
+            // set cursor Position & adjust to screensize
+            cursorXPos = ( handPosition.x / (600 / 100) ) * (ofGetWidth() / 100);
+            cursorYPos = ( handPosition.y / (440 / 100) ) * (ofGetHeight() / 100);
+        }
+        // upadte cursor position
+        cursor.update(cursorXPos, cursorYPos);
     }
 }
 
 void testApp::draw()
 {
     garamondRegularH1.drawString("User: " + userInfo, 550, 45);
+    if(viewmanager.currentView != WORLDVIEW)
+    {
+        cursor.draw();
+    }
+
 }
 
 void testApp::exit()

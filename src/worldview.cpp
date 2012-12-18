@@ -7,7 +7,7 @@ WorldView::WorldView()
     ofAddListener(ofEvents().update, this, &WorldView::update);
     ofAddListener(ofEvents().keyPressed, this, &WorldView::keyPressed);
     ofBackground(240,240,240);
-    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 25);
+    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 22);
 
     // environment setup
     ofSetVerticalSync(true);
@@ -25,14 +25,13 @@ WorldView::WorldView()
     camera.setDecelerationRotate(0.9);
     camera.setButtonsMovement('w', 's', 'a', 'd', 'u', 'j');
 
-    for(int i = 0; i < 30; i++)
+    for(int i = 0; i < 50; i++)
     {
-        int x = ofRandom(-2000, 2000);
-        int y = ofRandom(-2000, 2000);
-        int z = ofRandom(-2000, 2000);
+        int x = ofRandom(-4000, 4000);
+        int y = ofRandom(-4000, 4000);
+        int z = ofRandom(-2000, 800);
         mySphere[i].setup(x,y,z, 80);
     }
-
 }
 
 WorldView::~WorldView()
@@ -51,7 +50,7 @@ void WorldView::update(ofEventArgs &e)
     int x = camera.getCamera().getGlobalPosition().x;
     int y = camera.getCamera().getGlobalPosition().y;
     int z = camera.getCamera().getGlobalPosition().z;
-    if (x > 8000 || y > 8000 || z > 8000 || x < -8000 || y < -8000 || z < -8000)
+    if (x > 4000 || y > 4000 || z > 800 || x < -4000 || y < -4000 || z < -2000)
     {
         cout << "reset position" << endl;
         camera.setPosition(0,0,0);
@@ -65,19 +64,24 @@ void WorldView::setCursor(HandCursor *c)
 
 void WorldView::draw(ofEventArgs &e)
 {
-    ofSetColor(150, 150, 150);
+    ofSetColor(0,0,0);
     ofDrawBitmapString("WorldView", 15, 15);
 
     int x = camera.getCamera().getGlobalPosition().x;
     int y = camera.getCamera().getGlobalPosition().y;
     int z = camera.getCamera().getGlobalPosition().z;
 
-    garamondRegularH1.drawString("Speed: " + ofToString(cursor->kinectMovement.z), 10, 40);
-    garamondRegularH1.drawString("Rotation: " + ofToString(cursor->kinectMovement.x), 10, 80);
-    garamondRegularH1.drawString("X: " + ofToString(x) + " Y:" + ofToString(y) + " Z: " + ofToString(z), 10, ofGetHeight() - 40);
+    garamondRegularH1.drawString("Speed: " + ofToString(cursor->kinectMovement.z), 10, 20);
+    garamondRegularH1.drawString("Rotation: " + ofToString(cursor->kinectMovement.x), 10, 50);
+    garamondRegularH1.drawString("Sphere ID: " + sphereInfo, 10, 80);
+
+
+    garamondRegularH1.drawString("X: " + ofToString(x) + " Y:" + ofToString(y) + " Z: " + ofToString(z), 10, ofGetHeight() - 20);
+    ofSetColor(255, 255, 255);
+    ofRect(0, ofGetHeight() - 50, ofGetWidth(), 50);
 
     camera.begin();
-    ofFill();
+//    ofFill();
     for(int i = 0; i < 30; i++)
     {
 
@@ -91,7 +95,7 @@ void WorldView::draw(ofEventArgs &e)
         if(distance < 800)
         {
             mySphere[i].drawNear();
-            garamondRegularH1.drawString("Sphere ID: " + ofToString(mySphere[i].id), 300, 400);
+            sphereInfo = ofToString(mySphere[i].id);
         }
         else
         {
@@ -99,11 +103,12 @@ void WorldView::draw(ofEventArgs &e)
         }
     }
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 40; i++)
     {
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < 40; j++)
         {
-            ofBox(i*300,j*300,200,200);
+
+            ofBox(-4000 + (i*300),-4000 + (j*300),-2200,80);
         }
     }
     camera.end();

@@ -16,6 +16,7 @@ public:
     WorldView();
     virtual ~WorldView();
     void setCursor(HandCursor *cursor);
+
 protected:
 private:
     void draw(ofEventArgs &e);
@@ -26,11 +27,12 @@ private:
     float speed;
     float dollyAmount;
     ofTrueTypeFont garamondRegularH1;
+    std::string sphereInfo;
 
     MyCamera camera;
     ofLight light;
     HandCursor* cursor;
-    Object3D mySphere[30];
+    Object3D mySphere[50];
 };
 
 #endif // WORLDVIEW_H
