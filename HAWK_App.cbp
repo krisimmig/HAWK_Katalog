@@ -6,7 +6,7 @@
 		<Option makefile="makefile" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="addons\;src\;addons\ofxOpenNI\src\;addons\ofxSQLite\src\lib\sqlite\;addons\ofxSQLite\src\;src\models\;src\views\;src\controller\;" />
+		<Option virtualFolders="addons\;src\;addons\ofxOpenNI\src\;addons\ofxSQLite\src\lib\sqlite\;addons\ofxSQLite\src\;src\models\;src\views\;src\controller\;addons\ofxFEngine\;addons\ofxFEngine\src\;" />
 		<Build>
 			<Target title="release">
 				<Option output="bin\$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
@@ -75,6 +75,7 @@
 			<Add directory="..\..\..\addons\ofxSQLite\src\lib\sqlite" />
 			<Add directory="..\..\..\addons\ofxOpenNI\include\openni" />
 			<Add directory="..\..\..\addons\ofxOpenNI\include\nite" />
+			<Add directory="..\..\..\addons\ofxFEngine3DCore\src" />
 		</Compiler>
 		<Linker>
 			<Add library="..\..\..\libs\FreeImage\lib\win_cb\FreeImage.lib" />
@@ -118,6 +119,21 @@
 			<Add after='cmd /c if not exist &quot;$(PROJECT_DIR)bin/data&quot; mkdir &quot;$(PROJECT_DIR)bin/data&quot;' />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngine3DCore.h">
+			<Option virtualFolder="addons\ofxFEngine\src\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineEnvironment.cpp">
+			<Option virtualFolder="addons\ofxFEngine\src\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineEnvironment.h">
+			<Option virtualFolder="addons\ofxFEngine\src\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineFreeCam.cpp">
+			<Option virtualFolder="addons\ofxFEngine\src\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineFreeCam.h">
+			<Option virtualFolder="addons\ofxFEngine\src\" />
+		</Unit>
 		<Unit filename="..\..\..\addons\ofxOpenNI\src\ofxOpenNI.cpp">
 			<Option virtualFolder="addons\ofxOpenNI\src" />
 		</Unit>
@@ -233,6 +249,18 @@
 		<Unit filename="src\mainmenu.h">
 			<Option virtualFolder="src\views\" />
 		</Unit>
+		<Unit filename="src\my3dnode.cpp">
+			<Option virtualFolder="src\views\" />
+		</Unit>
+		<Unit filename="src\my3dnode.h">
+			<Option virtualFolder="src\views\" />
+		</Unit>
+		<Unit filename="src\object3d.cpp">
+			<Option virtualFolder="src\views\" />
+		</Unit>
+		<Unit filename="src\object3d.h">
+			<Option virtualFolder="src\views\" />
+		</Unit>
 		<Unit filename="src\overview.cpp">
 			<Option virtualFolder="src\views\" />
 		</Unit>
@@ -257,10 +285,10 @@
 		<Unit filename="src\testApp.h">
 			<Option virtualFolder="src" />
 		</Unit>
-		<Unit filename="src\view.cpp">
+		<Unit filename="src\viewchangebutton.cpp">
 			<Option virtualFolder="src\views\" />
 		</Unit>
-		<Unit filename="src\view.h">
+		<Unit filename="src\viewchangebutton.h">
 			<Option virtualFolder="src\views\" />
 		</Unit>
 		<Unit filename="src\viewmanager.cpp">
@@ -268,6 +296,12 @@
 		</Unit>
 		<Unit filename="src\viewmanager.h">
 			<Option virtualFolder="src\controller\" />
+		</Unit>
+		<Unit filename="src\worldview.cpp">
+			<Option virtualFolder="src\views\" />
+		</Unit>
+		<Unit filename="src\worldview.h">
+			<Option virtualFolder="src\views\" />
 		</Unit>
 		<Extensions>
 			<code_completion />

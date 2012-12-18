@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1353790151 source:c:\openframework\of_v0072\addons\ofxopenni\src\ofxopenni.cpp
+1355628155 source:c:\openframework\of_v0072\addons\ofxopenni\src\ofxopenni.cpp
 	"ofxOpenNI.h"
 	<stdio.h>
 	<stdlib.h>
@@ -1495,17 +1495,14 @@
 	"ofCamera.h"
 	"ofEvents.h"
 
-1355079563 c:\openframework\of_v0072\apps\myapps\hawk_app\src\testapp.h
+1355858144 c:\openframework\of_v0072\apps\myapps\hawk_app\src\testapp.h
 	"constants.h"
 	"ofMain.h"
 	"cursor.h"
 	"ofxOpenNI.h"
 	"viewmanager.h"
-	"mainmenu.h"
-	"overview.h"
-	"singleview.h"
 
-1354980842 c:\openframework\of_v0072\apps\myapps\hawk_app\src\constants.h
+1355531863 c:\openframework\of_v0072\apps\myapps\hawk_app\src\constants.h
 
 1326197622 c:\openframework\of_v0072\addons\ofxsqlite\src\ofxsqliteheaders.h
 	"ofxSQLite.h"
@@ -1517,14 +1514,15 @@
 	"ofxSQLiteType.h"
 	"ofxSQLiteTypeNow.h"
 
-1355064694 c:\openframework\of_v0072\apps\myapps\hawk_app\src\students.h
+1355446114 c:\openframework\of_v0072\apps\myapps\hawk_app\src\students.h
 	"constants.h"
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1355081623 c:\openframework\of_v0072\apps\myapps\hawk_app\src\button.h
+1355531236 c:\openframework\of_v0072\apps\myapps\hawk_app\src\button.h
 	"ofMain.h"
 	"constants.h"
+	"customevent.h"
 
 1353706859 c:\openframework\of_v0072\apps\myapps\hawk_app\src\myball.h
 	"ofMain.h"
@@ -1543,32 +1541,30 @@
 	"ofPoint.h"
 	"ofTypes.h"
 
-1355080991 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\testapp.cpp
+1355858580 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\testapp.cpp
 	"testApp.h"
 	"stdio.h"
 
 1354983590 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\schalterrect.cpp
 	"schalterrect.h"
 
-1354977576 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\students.cpp
+1355447173 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\students.cpp
 	"students.h"
 
-1355064709 c:\openframework\of_v0072\apps\myapps\hawk_app\src\cursor.h
+1355857238 c:\openframework\of_v0072\apps\myapps\hawk_app\src\cursor.h
 	"ofMain.h"
 
 1354979982 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\cursor.cpp
 	"cursor.h"
 
-1355079586 c:\openframework\of_v0072\apps\myapps\hawk_app\src\mainmenu.h
+1355534665 c:\openframework\of_v0072\apps\myapps\hawk_app\src\mainmenu.h
 	"ofMain.h"
 	"constants.h"
+	"viewchangebutton.h"
 	"button.h"
-	"view.h"
-	"singleview.h"
-	"viewmanager.h"
 	"customevent.h"
 
-1355080902 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\mainmenu.cpp
+1355583172 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\mainmenu.cpp
 	"mainmenu.h"
 
 1355058498 c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewswitcher.h
@@ -1577,26 +1573,23 @@
 1355058533 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewswitcher.cpp
 	"viewswitcher.h"
 
-1355082006 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\overview.cpp
+1355583253 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\overview.cpp
 	"overview.h"
 
-1355081971 c:\openframework\of_v0072\apps\myapps\hawk_app\src\overview.h
+1355534763 c:\openframework\of_v0072\apps\myapps\hawk_app\src\overview.h
 	"ofMain.h"
-	"view.h"
 	"customevent.h"
 	"button.h"
+	"viewchangebutton.h"
+	"students.h"
 
 1354827847 c:\openframework\of_v0072\apps\myapps\hawk_app\src\various.h
 
-1355081752 c:\openframework\of_v0072\apps\myapps\hawk_app\src\singleview.h
+1355527948 c:\openframework\of_v0072\apps\myapps\hawk_app\src\singleview.h
 	"constants.h"
 	"ofMain.h"
-	"view.h"
-	"students.h"
-	"button.h"
-	"customevent.h"
 
-1355081951 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\singleview.cpp
+1355527951 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\singleview.cpp
 	"singleview.h"
 
 1355064247 c:\openframework\of_v0072\apps\myapps\hawk_app\src\view.h
@@ -1606,22 +1599,27 @@
 1355058505 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\view.cpp
 	"view.h"
 
-1355079879 c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewmanager.h
+1355858369 c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewmanager.h
 	"ofMain.h"
 	"constants.h"
+	"customevent.h"
+	"mainmenu.h"
+	"overview.h"
+	"worldview.h"
 
-1355080028 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewmanager.cpp
+1355858757 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewmanager.cpp
 	"viewmanager.h"
 
-1355081575 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\button.cpp
+1355535071 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\button.cpp
 	"button.h"
 
 1355078306 c:\openframework\of_v0072\apps\myapps\hawk_app\src\customevents.h
 
-1355093104 c:\openframework\of_v0072\apps\myapps\hawk_app\src\customevent.h
+1355421670 c:\openframework\of_v0072\apps\myapps\hawk_app\src\customevent.h
 	"ofMain.h"
+	"constants.h"
 
-1355079573 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\customevent.cpp
+1355415681 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\customevent.cpp
 	"customevent.h"
 
 1353790151 source:d:\openframework\of_v0072\addons\ofxopenni\src\ofxopenni.cpp
@@ -3228,4 +3226,300 @@
 
 1355146272 source:d:\openframework\of_v0072\apps\myapps\hawk_app\src\viewmanager.cpp
 	"viewmanager.h"
+
+1355155939 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\button.cpp
+	"button.h"
+
+1355156202 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\button.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1354980842 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\constants.h
+
+1354979982 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\cursor.cpp
+	"cursor.h"
+
+1355064709 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\cursor.h
+	"ofMain.h"
+
+1355079573 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\customevent.cpp
+	"customevent.h"
+
+1355093104 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\customevent.h
+	"ofMain.h"
+
+1354980875 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\main.cpp
+	"ofMain.h"
+	"testApp.h"
+	"ofAppGlutWindow.h"
+
+1355156983 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\testapp.h
+	"constants.h"
+	"ofMain.h"
+	"cursor.h"
+	"ofxOpenNI.h"
+	"viewmanager.h"
+	"mainmenu.h"
+	"overview.h"
+	"singleview.h"
+
+1355156118 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewmanager.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355156661 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\mainmenu.h
+	"ofMain.h"
+	"constants.h"
+	"button.h"
+	"view.h"
+	"singleview.h"
+	"viewmanager.h"
+	"customevent.h"
+
+1355064247 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\view.h
+	"viewmanager.h"
+	"cursor.h"
+
+1355145750 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\singleview.h
+	"constants.h"
+	"ofMain.h"
+	"view.h"
+	"students.h"
+	"button.h"
+	"customevent.h"
+
+1355064694 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\students.h
+	"constants.h"
+	"ofMain.h"
+	"ofxSQLiteHeaders.h"
+
+1355081971 d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\overview.h
+	"ofMain.h"
+	"view.h"
+	"customevent.h"
+	"button.h"
+
+1355156661 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\mainmenu.cpp
+	"mainmenu.h"
+
+1355082006 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\overview.cpp
+	"overview.h"
+
+1355146101 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\singleview.cpp
+	"singleview.h"
+
+1355146072 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\students.cpp
+	"students.h"
+
+1355058505 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\view.cpp
+	"view.h"
+
+1355156136 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewmanager.cpp
+	"viewmanager.h"
+
+1355156786 source:d:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\testapp.cpp
+	"testApp.h"
+	"stdio.h"
+
+1355446954 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\button.cpp
+	"button.h"
+
+1355439000 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\button.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355526721 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\constants.h
+
+1355421670 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\customevent.h
+	"ofMain.h"
+	"constants.h"
+
+1354979982 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\cursor.cpp
+	"cursor.h"
+
+1355425854 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\cursor.h
+	"ofMain.h"
+
+1355415681 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\customevent.cpp
+	"customevent.h"
+
+1354980875 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\main.cpp
+	"ofMain.h"
+	"testApp.h"
+	"ofAppGlutWindow.h"
+
+1355437596 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\testapp.h
+	"constants.h"
+	"ofMain.h"
+	"cursor.h"
+	"ofxOpenNI.h"
+	"viewmanager.h"
+
+1355527115 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewmanager.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+	"mainmenu.h"
+	"overview.h"
+	"singleview.h"
+	"view3d.h"
+
+1355437411 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\mainmenu.h
+	"ofMain.h"
+	"constants.h"
+	"viewchangebutton.h"
+	"button.h"
+	"singleview.h"
+	"customevent.h"
+
+1355424551 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\view.h
+	"viewmanager.h"
+	"cursor.h"
+
+1355437667 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\singleview.h
+	"constants.h"
+	"ofMain.h"
+	"basebutton.h"
+	"button.h"
+	"customevent.h"
+	"students.h"
+
+1355446114 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\students.h
+	"constants.h"
+	"ofMain.h"
+	"ofxSQLiteHeaders.h"
+
+1355445900 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\overview.h
+	"ofMain.h"
+	"customevent.h"
+	"basebutton.h"
+	"button.h"
+	"viewchangebutton.h"
+	"students.h"
+
+1355437075 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\mainmenu.cpp
+	"mainmenu.h"
+
+1355447386 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\overview.cpp
+	"overview.h"
+
+1355437667 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\singleview.cpp
+	"singleview.h"
+
+1355447173 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\students.cpp
+	"students.h"
+
+1355058505 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\view.cpp
+	"view.h"
+
+1355526834 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewmanager.cpp
+	"viewmanager.h"
+
+1355446856 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\testapp.cpp
+	"testApp.h"
+	"stdio.h"
+
+1355419638 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\basebutton.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355419638 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\basebutton.cpp
+	"basebutton.h"
+
+1355446954 source:c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewchangebutton.cpp
+	"viewchangebutton.h"
+
+1355526942 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\viewchangebutton.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355527201 c:\openframework\of_v0072\apps\myapps\hawk_app_lowmem\src\view3d.h
+	"ofMain.h"
+	"constants.h"
+	"viewchangebutton.h"
+	"button.h"
+	"singleview.h"
+	"customevent.h"
+
+1355527817 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\view3d.cpp
+	"view3d.h"
+
+1355527817 c:\openframework\of_v0072\apps\myapps\hawk_app\src\view3d.h
+	"ofMain.h"
+	"constants.h"
+	"viewchangebutton.h"
+	"customevent.h"
+
+1355531236 c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewchangebutton.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355419638 c:\openframework\of_v0072\apps\myapps\hawk_app\src\basebutton.h
+	"ofMain.h"
+	"constants.h"
+	"customevent.h"
+
+1355595070 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\viewchangebutton.cpp
+	"viewchangebutton.h"
+
+1355858627 c:\openframework\of_v0072\apps\myapps\hawk_app\src\worldview.h
+	"ofMain.h"
+	"constants.h"
+	"cursor.h"
+	"object3d.h"
+	"viewchangebutton.h"
+	"customevent.h"
+	"mycamera.h"
+
+1355860455 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\worldview.cpp
+	"worldview.h"
+
+1355588270 c:\openframework\of_v0072\apps\myapps\hawk_app\src\my3dnode.h
+	"ofMain.h"
+	"constants.h"
+
+1355599759 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\my3dnode.cpp
+	"my3dnode.h"
+
+1352652390 c:\openframework\of_v0072\addons\ofxfengine3dcore\src\ofxfengine3dcore.h
+	"ofxFEngineFreeCam.h"
+	"ofxFEngineEnvironment.h"
+
+1352652390 c:\openframework\of_v0072\addons\ofxfengine3dcore\src\ofxfenginefreecam.h
+	"ofMain.h"
+
+1352652390 c:\openframework\of_v0072\addons\ofxfengine3dcore\src\ofxfengineenvironment.h
+	"ofMain.h"
+
+1352652390 source:c:\openframework\of_v0072\addons\ofxfengine3dcore\src\ofxfengineenvironment.cpp
+	"ofxFEngineEnvironment.h"
+
+1352652390 source:c:\openframework\of_v0072\addons\ofxfengine3dcore\src\ofxfenginefreecam.cpp
+	"ofxFEngineFreeCam.h"
+
+1355598003 c:\openframework\of_v0072\apps\myapps\hawk_app\src\floor.h
+	"ofMain.h"
+	"constants.h"
+
+1355598209 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\floor.cpp
+	"floor.h"
+
+1355860213 c:\openframework\of_v0072\apps\myapps\hawk_app\src\object3d.h
+	"ofMain.h"
+	"constants.h"
+
+1355860071 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\object3d.cpp
+	"object3d.h"
+
+1355856211 c:\openframework\of_v0072\apps\myapps\hawk_app\src\mycamera.h
+	"ofMain.h"
+
+1355857606 source:c:\openframework\of_v0072\apps\myapps\hawk_app\src\mycamera.cpp
+	"mycamera.h"
 
