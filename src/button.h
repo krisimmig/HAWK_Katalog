@@ -3,27 +3,34 @@
 
 #include "ofMain.h"
 #include "constants.h"
+#include "customevent.h"
 
 class RoundButton
 {
 public:
-    RoundButton();
-    void setup(string _label);
 
+    RoundButton(std::string label, std::string dept, int x, int y);
+    virtual ~RoundButton();
+
+protected:
+private:
+    void addListeners();
     int xPos;
     int yPos;
     int radius;
     string label;
+    string dept;
 
-    int actionTimer;
-    int actionDelay;
+    int actionTeaTimer;
+    int actionTeaDelay;
 
-    void draw(int x, int y);
+    void draw(ofEventArgs &e);
+    void mouseReleased(ofMouseEventArgs &args);
+    void mouseMoved(ofMouseEventArgs &args);
+    void changeDept(std::string d);
+    void changeViewToOverview();
     bool hoverState(int x, int y);
-    bool mouseReleased(int x, int y, int button);
-
-protected:
-private:
+    bool hoovering;
 };
 
 #endif // BUTTON_H

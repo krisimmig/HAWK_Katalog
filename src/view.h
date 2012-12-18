@@ -7,13 +7,13 @@
 class View
 {
 public:
-    void setup(HandCursor &c, ViewManager &vs);
+    void setup();
     virtual void setupButtons();
     void update(bool t);
     bool trackingHand;
 
-    ViewManager* viewmanager;
-    HandCursor* cursor;
+//    ViewManager* viewmanager;
+//    HandCursor* cursor;
 
 protected:
     View();

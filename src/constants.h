@@ -4,7 +4,7 @@
 #define DB_NAME "sample.db"
 #define IMAGE_DIR "../images"
 
-enum enum_views { MAINMENU, OVERVIEW, SINGLE };
+enum enum_views { MAINMENU, OVERVIEW, WORLDVIEW };
 
 #endif // CONSTANTS_H_INCLUDED
 

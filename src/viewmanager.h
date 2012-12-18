@@ -3,17 +3,29 @@
 
 #include "ofMain.h"
 #include "constants.h"
+#include "customevent.h"
+#include "mainmenu.h"
+#include "overview.h"
+#include "worldview.h"
 
 class ViewManager
 {
 public:
     ViewManager();
-    void setView(enum_views v);
-    enum_views getCurrentView();
+    void setCursor(HandCursor &_cursor);
 
 protected:
 private:
+    void deptChanged(CustomEvent &e);
+    void viewChanged(CustomEvent &e);
+    void deleteOldView(enum_views oldView);
+
+    std::string currentDept;
+    MainMenu* m_view;
+    Overview* o_view;
+    WorldView* w_view;
     enum_views currentView;
+    HandCursor* cursor;
 };
 
 #endif // VIEWMANAGER_H

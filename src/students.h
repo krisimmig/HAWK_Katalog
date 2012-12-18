@@ -1,4 +1,5 @@
 #ifndef STUDENTS_H
+#define STUDENTS_H
 
 #include "constants.h"
 #include "ofMain.h"
@@ -8,6 +9,7 @@ class Students
 {
     public:
         Students();
+        Students(int id);
         virtual ~Students();
 
         // box position
@@ -27,6 +29,7 @@ class Students
 
         void setup(int _id);
         void drawInfo(int x, int y);
+        void drawShortInfo(int x, int y);
         string wrapString(string text, int width);
 
         // count records in db

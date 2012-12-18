@@ -8,17 +8,17 @@ class HandCursor
 public:
     HandCursor();
     void setup(int x, int y, int r);
-
-    int radius;
+    void update(int x, int y);
+    void draw();
     int xPos;
     int yPos;
 
-
-    void update(int x, int y);
-    void draw();
+    ofVec3f kinectMovement;
 
 protected:
 private:
+    int radius;
+
 };
 
 #endif // CURSOR_H

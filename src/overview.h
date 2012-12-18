@@ -2,25 +2,29 @@
 #define OVERVIEW_H
 
 #include "ofMain.h"
-#include "view.h"
 #include "customevent.h"
 #include "button.h"
+#include "viewchangebutton.h"
+#include "students.h"
 
-class Overview : public View
+class Overview
 {
 public:
-    Overview();
-    virtual void setupButtons();
-    void draw();
-    void deptChanged(CustomEvent &args);
-
-    std::string fachbereich;
-    RoundButton singleviewButton;
-    RoundButton mainmenuButton;
-    void myMouseReleased(ofMouseEventArgs &args);
+    Overview(std::string currentDept);
+    virtual ~Overview();
 
 protected:
 private:
+
+    void draw(ofEventArgs &e);
+    std::string fachbereich;
+
+    // student info
+    int* studentIDs;
+    int count;
+    ViewChangeButton* buttonToMainmenu;
+    ViewChangeButton* buttonToWorldview;
+    Students** allStudentsFromDept;
 };
 
 #endif // OVERVIEW_H

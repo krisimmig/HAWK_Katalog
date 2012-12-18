@@ -1,7 +1,6 @@
 #include "testApp.h"
 #include "stdio.h"
 
-
 testApp::testApp()
 {
 
@@ -9,11 +8,11 @@ testApp::testApp()
 
 void testApp::setup()
 {
-    ofBackground(255, 255, 255);
-    ofSetColor(50,20,230);
-
     ofEnableSmoothing();
     ofSetFrameRate(30);
+    float filterFactor = 0.1f;
+
+    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 25);
 
     // use app with or without kinect
     useKinect = true;
@@ -24,13 +23,9 @@ void testApp::setup()
         // ---------------------------------
         openNIDevice.setup();
         openNIDevice.addDepthGenerator();
-        openNIDevice.setRegister(true);
         openNIDevice.setMirror(true);
-        // setup the hand generator
-        openNIDevice.addHandsGenerator();
-        // add all focus gestures (ie., wave, click, raise arm)
-        openNIDevice.addAllHandFocusGestures();
-        openNIDevice.setMaxNumHands(4);
+        openNIDevice.addUserGenerator();
+        openNIDevice.setMaxNumUsers(1);
         openNIDevice.start();
     }
 
@@ -39,123 +34,74 @@ void testApp::setup()
     // ---------------------------------
     cursorXPos = -50;
     cursorYPos = -50;
-    cursorRadius = 30;
+    int cursorRadius = 30;
     cursor.setup(cursorXPos, cursorYPos, cursorRadius);
+//    w_view.setCursor(cursor);
+    viewmanager.setCursor(cursor);
 
-    // ---------------------------------
-    // views setup
-    // ---------------------------------
-    o_view.setup(cursor, viewmanager);
-    m_view.setup(cursor, viewmanager);
-    s_view.setup(cursor, viewmanager);
-    changeNotifications();
 }
 
-void testApp::changeNotifications()
-{
-    currentView = viewmanager.getCurrentView();
-    switch (currentView)
-    {
-    case MAINMENU :
-        m_view.update(trackingHand);
-        ofAddListener(ofEvents().mouseReleased, &m_view, &MainMenu::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &s_view, &Singleview::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &o_view, &Overview::myMouseReleased);
-        break;
-    case OVERVIEW :
-        o_view.update(trackingHand);
-        ofAddListener(ofEvents().mouseReleased, &o_view, &Overview::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &s_view, &Singleview::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &m_view, &MainMenu::myMouseReleased);
-        break;
-    case SINGLE :
-        s_view.update(trackingHand);
-        ofAddListener(ofEvents().mouseReleased, &s_view, &Singleview::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &m_view, &MainMenu::myMouseReleased);
-        ofRemoveListener(ofEvents().mouseReleased, &o_view, &Overview::myMouseReleased);
-        break;
-    }
-}
 void testApp::update()
 {
-    ofSetBackgroundColor(245, 255, 250);
-    ofSetColor(10,0,10);
-
     if(useKinect)
     {
         openNIDevice.update();
         // upadte cursor position
         cursor.update(cursorXPos, cursorYPos);
-    }
+        // get number of current hands
+        int numUsers = openNIDevice.getNumTrackedUsers();
 
-    // update active view
-    if(currentView != viewmanager.getCurrentView())
-    {
-        changeNotifications();
-    }
+        userInfo = ofToString(numUsers);
+        if(numUsers > 0)
+        {
+            for (int i = 0; i < numUsers; i++)
+            {
+                user = &openNIDevice.getTrackedUser(i);
+                userInfo += ", id: ";
+                userInfo += ofToString(user->getXnID());
 
-    switch (currentView)
-    {
-    case MAINMENU :
-        m_view.update(trackingHand);
-        break;
-    case OVERVIEW :
-        o_view.update(trackingHand);
-        break;
-    case SINGLE :
-        s_view.update(trackingHand);
-        break;
-    }
+                // rotation
+                float leftHandZ = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
+                float leftShoulderZ = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
+                if( (leftShoulderZ - leftHandZ) > 400 )
+                {
+                    // left - right
+                    float leftElbowX = user->getJoint(JOINT_LEFT_ELBOW).getWorldPosition().x;
+                    float leftHandX = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
+                    kinectMovementX = leftElbowX - leftHandX;
 
+                    // up - down
+                    float elbowY = user->getJoint(JOINT_LEFT_ELBOW).getWorldPosition().y;
+                    float handY = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
+                    kinectMovementY = elbowY - handY;
+                }
+                else
+                {
+                    kinectMovementX = 0;
+                    kinectMovementY = 0;
+                }
+
+                // speed
+                float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
+                float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
+                if( (rightShoulderZ - rightHandZ) > 200 || (rightShoulderZ - rightHandZ) < -200  )
+                {
+
+                    kinectMovementZ = rightShoulderZ - rightHandZ;
+                }
+                else
+                {
+                    kinectMovementZ = 0;
+                }
+            }
+        }
+        cursor.kinectMovement.set(kinectMovementX, kinectMovementY, kinectMovementZ);
+    }
 }
 
 void testApp::draw()
 {
-
-    // get number of current hands
-    if(useKinect)
-    {
-        int numHands = openNIDevice.getNumTrackedHands();
-
-        // when no hand is tracked, dissappear handCurosr
-        if(numHands == 0)
-        {
-            trackingHand = false;
-            cursorXPos = -50;
-        }
-        // iterate through users
-        for (int i = 0; i < numHands; i++)
-        {
-            // set tracking user to true
-            trackingHand = true;
-
-            // get a reference to this user
-            ofxOpenNIHand & hand = openNIDevice.getTrackedHand(i);
-            ofPoint & handPosition = hand.getPosition();
-
-            // set cursor Position & adjust to screensize
-            cursorXPos = ( handPosition.x / (600 / 100) ) * (ofGetWidth() / 100);
-            cursorYPos = ( handPosition.y / (440 / 100) ) * (ofGetHeight() / 100);
-        }
-    }
-
-    // ---
-    // view switcher
-    // ---
-    switch (currentView)
-    {
-    case MAINMENU :
-        m_view.draw();
-        break;
-    case OVERVIEW :
-        o_view.draw();
-        break;
-    case SINGLE :
-        s_view.draw();
-        break;
-    }
-    // draw cursor last / always ontop
-    cursor.draw();
+    garamondRegularH1.drawString("User: " + userInfo, 550, 45);
 }
 
 void testApp::exit()

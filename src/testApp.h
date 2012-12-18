@@ -9,9 +9,6 @@
 
 #include "ofxOpenNI.h"
 #include "viewmanager.h"
-#include "mainmenu.h"
-#include "overview.h"
-#include "singleview.h"
 
 class testApp : public ofBaseApp
 {
@@ -22,24 +19,25 @@ public:
     void draw();
     void exit();
 
-    void changeNotifications();
+    ofTrueTypeFont garamondRegularH1;
 
     // views
+//    WorldView w_view;
     ViewManager viewmanager;
-    MainMenu m_view;
-    Overview o_view;
-    Singleview s_view;
-    enum_views currentView;
 
     // cursor
     ofxOpenNI openNIDevice;
+    ofxOpenNIUser* user;
     bool useKinect;
     HandCursor cursor;
     int cursorXPos;
     int cursorYPos;
+    float kinectMovementX;
+    float kinectMovementY;
+    float kinectMovementZ;
+    float radius;
     bool trackingHand;
-    int actionDelay;
-    int cursorRadius;
+    std::string userInfo;
 
 };
 

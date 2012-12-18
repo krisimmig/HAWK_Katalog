@@ -3,8 +3,16 @@
 Students::Students()
 {
     //ctor
-    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
-    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
+//    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
+//    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
+}
+
+Students::Students(int id)
+{
+    //ctor
+//    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
+//    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
+    setup(id);
 }
 
 void Students::setup(int _id)
@@ -33,6 +41,8 @@ void Students::setup(int _id)
         cout << "error loading image: " << image_01 << endl;
     }
 
+    delete sqlite;
+
 }
 
 void Students::drawInfo(int _x, int _y)
@@ -50,8 +60,11 @@ void Students::drawInfo(int _x, int _y)
     garamondRegularH1.drawString( first_name + " " + last_name + " (" + fachbereich + ")", 50, 100 );
     garamondRegularH1.drawString( titel, 50, ofGetHeight() - 150 );
 
+    ofDrawBitmapString( first_name + " " + last_name + " (" + fachbereich + ")", 50, 100 );
+    ofDrawBitmapString( titel, 50, ofGetHeight() - 150 );
+
     string beschreibungWrapped = wrapString(beschreibung, 800);
-    garamondRegularP.drawString(beschreibungWrapped, 50, ofGetHeight() - 125 );
+    ofDrawBitmapString(beschreibungWrapped, 50, ofGetHeight() - 125 );
 
     ofSetLineWidth(2);
     ofLine(0, centerYWindow - rahmen/2 -1, ofGetWidth(), centerYWindow - rahmen/2 -1);
@@ -85,6 +98,12 @@ void Students::drawInfo(int _x, int _y)
     }
 }
 
+void Students::drawShortInfo(int x, int y)
+{
+    ofDrawBitmapString( first_name + " " + last_name + " (" + fachbereich + ")", x, y );
+    ofDrawBitmapString( titel, x, y + 25 );
+}
+
 // count number of records in DB
 int Students::countAll(std::string fb)
 {
@@ -94,6 +113,7 @@ int Students::countAll(std::string fb)
                                     .from("students")
                                     .where("fachbereich", fb)
                                     .execute().begin();
+    delete sqlite;
     return selectCount.getInt();
 }
 
@@ -112,6 +132,7 @@ int* Students::getStudentIds(std::string fb)
                           .order("id", " ASC ")
                           .execute().begin();
 
+    delete sqlite;
     // create new int studentIdArray
     int *studentIdArray = new int[count];
     int i = 0;
@@ -164,4 +185,5 @@ string Students::wrapString(string text, int width)
 Students::~Students()
 {
     //dtor
+    delete sqlite;
 }
