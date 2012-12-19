@@ -75,6 +75,7 @@ void testApp::update()
                 }
 
                 // speed
+                //
                 float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
                 float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
                 if( (rightShoulderZ - rightHandZ) > 200 || (rightShoulderZ - rightHandZ) < -200  )
