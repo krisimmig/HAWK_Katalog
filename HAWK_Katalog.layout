@@ -4,7 +4,7 @@
 	<File name="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngine3DCore.h" open="0" top="0" tabpos="10">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineEnvironment.cpp" open="0" top="0" tabpos="12">
+	<File name="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineEnvironment.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineEnvironment.h" open="0" top="0" tabpos="11">
@@ -76,10 +76,10 @@
 	<File name="src\my3dnode.h" open="0" top="0" tabpos="20">
 		<Cursor position="270" topLine="0" />
 	</File>
-	<File name="src\mycamera.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1145" topLine="21" />
+	<File name="src\mycamera.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="671" topLine="21" />
 	</File>
-	<File name="src\mycamera.h" open="1" top="0" tabpos="2">
+	<File name="src\mycamera.h" open="1" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="src\object3d.cpp" open="1" top="0" tabpos="7">
@@ -106,8 +106,8 @@
 	<File name="src\students.h" open="0" top="0" tabpos="10">
 		<Cursor position="575" topLine="0" />
 	</File>
-	<File name="src\testApp.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="4351" topLine="99" />
+	<File name="src\testApp.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="3108" topLine="64" />
 	</File>
 	<File name="src\testApp.h" open="1" top="0" tabpos="6">
 		<Cursor position="466" topLine="0" />
@@ -125,9 +125,9 @@
 		<Cursor position="311" topLine="0" />
 	</File>
 	<File name="src\worldview.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="1021" topLine="75" />
+		<Cursor position="964" topLine="0" />
 	</File>
 	<File name="src\worldview.h" open="1" top="0" tabpos="5">
-		<Cursor position="709" topLine="0" />
+		<Cursor position="529" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

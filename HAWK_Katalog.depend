@@ -3590,13 +3590,14 @@
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1355868625 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
+1355874277 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
 	"ofMain.h"
 	"constants.h"
 	"cursor.h"
 	"object3d.h"
 	"viewchangebutton.h"
 	"customevent.h"
+	"ofxassimpmodelloader.h"
 	"mycamera.h"
 
 1355860213 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
@@ -3632,7 +3633,7 @@
 1355447173 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
 	"students.h"
 
-1355869408 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
+1355879000 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
 	"testApp.h"
 	"stdio.h"
 
@@ -3642,9 +3643,142 @@
 1355858757 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1355870959 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1355881964 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
 
 1355869710 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp
 	"mycamera.h"
+
+1350754619 c:\openframework\of_v0072\addons\ofxassimpmodelloader\src\ofxassimpmodelloader.h
+	"ofMain.h"
+	"assimp.h"
+	"aiScene.h"
+	"ofxAssimpMeshHelper.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\assimp.h
+	"aiTypes.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aitypes.h
+	<sys/types.h>
+	<memory.h>
+	<math.h>
+	<stddef.h>
+	"aiDefines.h"
+	"aiVector3D.h"
+	"aiVector2D.h"
+	"aiColor4D.h"
+	"aiMatrix3x3.h"
+	"aiMatrix4x4.h"
+	"aiQuaternion.h"
+	<new>
+	<string>
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+	"aiVector3D.inl"
+	"aiColor4D.inl"
+	"aiMatrix3x3.inl"
+	"aiMatrix4x4.inl"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aidefines.h
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aivector3d.h
+	<math.h>
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aivector2d.h
+	<math.h>
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\compiler\pushpack1.h
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\compiler\poppack1.h
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aicolor4d.h
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimatrix3x3.h
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimatrix4x4.h
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aiquaternion.h
+	<math.h>
+	"aiTypes.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aivector3d.inl
+	"aiVector3D.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aicolor4d.inl
+	"aiColor4D.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimatrix3x3.inl
+	"aiMatrix3x3.h"
+	"aiMatrix4x4.h"
+	<algorithm>
+	<limits>
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimatrix4x4.inl
+	"aiMatrix4x4.h"
+	"aiMatrix3x3.h"
+	<algorithm>
+	<limits>
+	<math.h>
+	"aiAssert.h"
+	"aiQuaternion.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aiassert.h
+	<string>
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aiscene.h
+	"aiTypes.h"
+	"aiTexture.h"
+	"aiMesh.h"
+	"aiLight.h"
+	"aiCamera.h"
+	"aiMaterial.h"
+	"aiAnim.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aitexture.h
+	"aiTypes.h"
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimesh.h
+	"aiTypes.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\ailight.h
+	"aiTypes.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aicamera.h
+	"aiTypes.h"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimaterial.h
+	"aiTypes.h"
+	"./Compiler/pushpack1.h"
+	"./Compiler/poppack1.h"
+	"aiMaterial.inl"
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aimaterial.inl
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aianim.h
+	"aiTypes.h"
+	"aiQuaternion.h"
+
+1350754619 c:\openframework\of_v0072\addons\ofxassimpmodelloader\src\ofxassimpmeshhelper.h
+	"aiMesh.h"
+	"ofVbo.h"
+	"ofMaterial.h"
+
+1350754619 source:c:\openframework\of_v0072\addons\ofxassimpmodelloader\src\ofxassimpmodelloader.cpp
+	"ofxAssimpModelLoader.h"
+	"aiConfig.h"
+	"aiPostProcess.h"
+	<assert.h>
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aiconfig.h
+
+1350754615 c:\openframework\of_v0072\addons\ofxassimpmodelloader\libs\assimp\include\aipostprocess.h
+	"aiTypes.h"
 

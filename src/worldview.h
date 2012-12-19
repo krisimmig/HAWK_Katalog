@@ -7,7 +7,9 @@
 #include "object3d.h"
 #include "viewchangebutton.h"
 #include "customevent.h"
+#include "ofxassimpmodelloader.h"
 #include "mycamera.h"
+
 
 
 class WorldView
@@ -33,6 +35,7 @@ private:
     ofLight light;
     HandCursor* cursor;
     Object3D mySphere[50];
+    ofxAssimpModelLoader model;
 };
 
 #endif // WORLDVIEW_H

@@ -29,14 +29,6 @@ void testApp::setup()
         openNIDevice.start();
     }
 
-    // ---------------------------------
-    // cursor setup
-    // ---------------------------------
-    cursorXPos = -50;
-    cursorYPos = -50;
-    int cursorRadius = 30;
-    cursor.setup(cursorXPos, cursorYPos, cursorRadius);
-//    w_view.setCursor(cursor);
     viewmanager.setCursor(cursor);
 
 }
@@ -59,6 +51,7 @@ void testApp::update()
                 user = &openNIDevice.getTrackedUser(i);
                 userInfo += ", id: ";
                 userInfo += ofToString(user->getXnID());
+                user->drawSkeleton();
 
                 // rotation
                 float leftHandZ = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
@@ -96,42 +89,16 @@ void testApp::update()
             }
         }
         cursor.kinectMovement.set(kinectMovementX, kinectMovementY, kinectMovementZ);
-
-        // get number of current hands
-        int numHands = openNIDevice.getNumTrackedHands();
-        // when no hand is tracked, dissappear handCurosr
-        if(numHands == 0)
-        {
-            trackingHand = false;
-            cursorXPos = -50;
-        }
-        // iterate through users
-        for (int i = 0; i < numHands; i++)
-        {
-            // set tracking user to true
-            trackingHand = true;
-
-            // get a reference to this user
-            ofxOpenNIHand & hand = openNIDevice.getTrackedHand(i);
-            ofPoint & handPosition = hand.getPosition();
-
-            // set cursor Position & adjust to screensize
-            cursorXPos = ( handPosition.x / (600 / 100) ) * (ofGetWidth() / 100);
-            cursorYPos = ( handPosition.y / (440 / 100) ) * (ofGetHeight() / 100);
-        }
-        // upadte cursor position
-        cursor.update(cursorXPos, cursorYPos);
     }
 }
 
 void testApp::draw()
 {
+    ofFill();
+    ofSetColor(20,230,20);
+    ofRect(500, 15, 200, 50);
+    ofSetColor(255,255,255);
     garamondRegularH1.drawString("User: " + userInfo, 550, 45);
-    if(viewmanager.currentView != WORLDVIEW)
-    {
-        cursor.draw();
-    }
-
 }
 
 void testApp::exit()
@@ -141,4 +108,3 @@ void testApp::exit()
         openNIDevice.stop();
     }
 }
-
