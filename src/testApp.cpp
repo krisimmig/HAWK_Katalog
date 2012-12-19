@@ -96,8 +96,6 @@ void testApp::update()
 void testApp::draw()
 {
     ofFill();
-    ofSetColor(20,230,20);
-    ofRect(500, 15, 200, 50);
     ofSetColor(255,255,255);
     garamondRegularH1.drawString("User: " + userInfo, 550, 45);
 }
