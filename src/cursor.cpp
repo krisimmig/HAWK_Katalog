@@ -20,8 +20,9 @@ void HandCursor::update(int x, int y)
 
 void HandCursor::draw()
 {
-    ofEnableAlphaBlending();
-    ofSetColor(20,20,20, 127);
+//    ofEnableAlphaBlending();
+    ofSetColor(20,255,20);
     ofCircle(xPos, yPos, radius);
-    ofDisableAlphaBlending();
+//    ofDisableAlphaBlending();
+
 }

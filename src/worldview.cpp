@@ -12,15 +12,20 @@ WorldView::WorldView()
     // environment setup
     ofSetVerticalSync(true);
     ofDisableArbTex();
+    ofEnableAlphaBlending();
     glEnable(GL_DEPTH_TEST);
     light.setPointLight();
     light.setPosition(2000,2000,2000);
     light.enable();
+    ofFill();
     // camera
     camera.setSpeed(10);
     camera.setDecelerationMove(0.95);
     camera.setDecelerationRotate(0.9);
     camera.setKinect(true);
+
+    // fbo
+    fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 
     // model landscape
     model.loadModel("landscape.3ds");
@@ -52,7 +57,7 @@ void WorldView::update(ofEventArgs &e)
     int x = camera.getCamera().getGlobalPosition().x;
     int y = camera.getCamera().getGlobalPosition().y;
     int z = camera.getCamera().getGlobalPosition().z;
-    if (x > 4000 || y > 4000 || z > 800 || x < -4000 || y < -4000 || z < -2000)
+    if (x > 4000 || y > 4000 || z > 1200 || x < -5000 || y < -4000 || z < -2000)
     {
         cout << "reset position" << endl;
         camera.setPosition(0,0,0);
@@ -66,20 +71,9 @@ void WorldView::setCursor(HandCursor *c)
 
 void WorldView::draw(ofEventArgs &e)
 {
-    ofSetColor(0,0,0);
-    if(sphereInfo != "")
-    {
-        garamondRegularH1.drawString("Sphere ID: " + sphereInfo, 10, 80);
-    }
-
     int x = camera.getCamera().getGlobalPosition().x;
     int y = camera.getCamera().getGlobalPosition().y;
     int z = camera.getCamera().getGlobalPosition().z;
-    garamondRegularH1.drawString("X: " + ofToString(x) + " Y:" + ofToString(y) + " Z: " + ofToString(z), 10, ofGetHeight() - 20);
-    garamondRegularH1.drawString("Speed: " + ofToString(cursor->kinectMovement.z), 320, ofGetHeight() - 20);
-    garamondRegularH1.drawString("Rotation: " + ofToString(cursor->kinectMovement.x), 640, ofGetHeight() - 20);
-    ofSetColor(255, 255, 255);
-    ofRect(0, ofGetHeight() - 50, ofGetWidth(), 50);
 
     camera.begin();
     model.setPosition(0, 0, -2600);
@@ -102,6 +96,26 @@ void WorldView::draw(ofEventArgs &e)
         }
     }
     camera.end();
+
+    fbo.begin();
+
+    if(sphereInfo != "")
+    {
+        ofSetColor(0, 0, 0);
+        ofRect(0, 0, 220, 50);
+        ofSetColor(0, 0, 255);
+        garamondRegularH1.drawString("Sphere ID: " + sphereInfo, 5, 30);
+    }
+    ofSetColor(0, 0, 0);
+    ofRect(0, ofGetHeight() - 50, ofGetWidth(), 50);
+    ofSetColor(0, 0, 255);
+    garamondRegularH1.drawString("X: " + ofToString(x) + " Y:" + ofToString(y) + " Z: " + ofToString(z), 10, ofGetHeight() - 20);
+    garamondRegularH1.drawString("Speed: " + ofToString(cursor->kinectMovement.z), 420, ofGetHeight() - 20);
+    garamondRegularH1.drawString("Rotation: " + ofToString(cursor->kinectMovement.x), 700, ofGetHeight() - 20);
+
+    fbo.end();
+    fbo.draw(0,0);
+
 }
 
 void WorldView::keyPressed(ofKeyEventArgs &e)

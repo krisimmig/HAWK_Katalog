@@ -102,6 +102,35 @@ void Students::drawShortInfo(int x, int y)
 {
     ofDrawBitmapString( first_name + " " + last_name + " (" + fachbereich + ")", x, y );
     ofDrawBitmapString( titel, x, y + 25 );
+
+    double rahmen = 100;
+    //draw image01
+    // set color to white for tint-free images
+    ofSetColor(255,255,255);
+    double imageWidth = projectImage01.width;
+    double imageHeight = projectImage01.height;
+    int ratio = imageWidth / imageHeight;
+    int centerXWindow = ofGetWidth() / 2;
+    int centerYWindow = ofGetHeight() / 2;
+
+    if(ratio <= 1)
+    {
+        // hoeher als breit oder quadratisch
+        double conversion = rahmen / imageHeight;
+        int resizedImageWidth = imageWidth * conversion;
+        int resizedImageHeight = imageHeight * conversion;
+        // draw image in center if screen
+        projectImage01.draw(x - resizedImageWidth - 30, y - resizedImageHeight/2, resizedImageWidth , resizedImageHeight );
+    }
+    else
+    {
+        // breiter als hoch
+        double conversion = rahmen / imageWidth;
+        int resizedImageWidth = imageWidth * conversion;
+        int resizedImageHeight = imageHeight * conversion;
+        // draw image in center if screen
+        projectImage01.draw(x - resizedImageWidth - 30, y - resizedImageHeight/2, resizedImageWidth , resizedImageHeight );
+    }
 }
 
 // count number of records in DB
@@ -110,9 +139,9 @@ int Students::countAll(std::string fb)
     ofxSQLite* sqlite = new ofxSQLite(DB_NAME);
     // count entries
     ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
-                                    .from("students")
-                                    .where("fachbereich", fb)
-                                    .execute().begin();
+                                  .from("students")
+                                  .where("fachbereich", fb)
+                                  .execute().begin();
     delete sqlite;
     return selectCount.getInt();
 }

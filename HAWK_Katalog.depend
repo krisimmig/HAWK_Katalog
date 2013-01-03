@@ -3929,7 +3929,7 @@
 	"ofMain.h"
 	"constants.h"
 
-1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.cpp
+1355924663 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.cpp
 	"cursor.h"
 
 1355916035 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.h
@@ -3943,7 +3943,7 @@
 	"testApp.h"
 	"ofAppGlutWindow.h"
 
-1355916035 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.h
+1355923195 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.h
 	"constants.h"
 	"ofMain.h"
 	"cursor.h"
@@ -3982,7 +3982,7 @@
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1355916035 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
+1355927411 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
 	"ofMain.h"
 	"constants.h"
 	"cursor.h"
@@ -3999,7 +3999,7 @@
 1355916035 d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.h
 	"ofMain.h"
 
-1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mainmenu.cpp
+1355923992 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mainmenu.cpp
 	"mainmenu.h"
 
 1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\my3dnode.cpp
@@ -4015,7 +4015,7 @@
 1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
 	"object3d.h"
 
-1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
+1355925546 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
 	"overview.h"
 
 1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\singleview.cpp
@@ -4025,7 +4025,7 @@
 	"constants.h"
 	"ofMain.h"
 
-1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
+1355925488 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
 	"students.h"
 
 1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewchangebutton.cpp
@@ -4034,6 +4034,10 @@
 1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1355916035 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1355930181 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
+
+1355924695 source:d:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
+	"testApp.h"
+	"stdio.h"
 

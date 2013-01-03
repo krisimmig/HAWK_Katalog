@@ -36,6 +36,7 @@ private:
     HandCursor* cursor;
     Object3D mySphere[50];
     ofxAssimpModelLoader model;
+    ofFbo fbo;
 };
 
 #endif // WORLDVIEW_H

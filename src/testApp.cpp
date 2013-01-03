@@ -25,11 +25,15 @@ void testApp::setup()
         openNIDevice.addDepthGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
+        openNIDevice.addHandsGenerator();
+        openNIDevice.addAllHandFocusGestures();
         openNIDevice.setMaxNumUsers(3);
+        openNIDevice.setMaxNumHands(2);
         openNIDevice.start();
     }
 
     viewmanager.setCursor(cursor);
+    cursorRadius = 40;
 
 }
 
@@ -38,6 +42,33 @@ void testApp::update()
     if(useKinect)
     {
         openNIDevice.update();
+        int numHands = openNIDevice.getNumTrackedHands();
+
+        // when no hand is tracked, dissappear handCurosr
+        if(numHands == 0)
+        {
+            trackingHand = false;
+            ofShowCursor();
+            cursorXPos = -50;
+        }
+        // iterate through users
+        for (int i = 0; i < numHands; i++)
+        {
+            // set tracking user to true
+            trackingHand = true;
+
+            // get a reference to this user
+            ofxOpenNIHand & hand = openNIDevice.getTrackedHand(i);
+            ofPoint & handPosition = hand.getPosition();
+
+            // set cursor Position & adjust to screensize
+            cursorXPos = ( handPosition.x / (600 / 100) ) * (ofGetWidth() / 100);
+            cursorYPos = ( handPosition.y / (440 / 100) ) * (ofGetHeight() / 100);
+
+            // only PC, see http://forum.openframeworks.cc/index.php/topic,1438.0.html
+
+        }
+
         // upadte cursor position
         cursor.update(cursorXPos, cursorYPos);
         // get number of current hands
@@ -75,7 +106,7 @@ void testApp::update()
                 }
 
                 // speed
-                //
+
                 float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
                 float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
                 if( (rightShoulderZ - rightHandZ) > 200 || (rightShoulderZ - rightHandZ) < -200  )
@@ -95,9 +126,23 @@ void testApp::update()
 
 void testApp::draw()
 {
-    ofFill();
-    ofSetColor(255,255,255);
+//    ofFill();
+    ofSetColor(0,0,0);
     garamondRegularH1.drawString("User: " + userInfo, 550, 45);
+    if(trackingHand && viewmanager.currentView != WORLDVIEW)
+    {
+        SetCursorPos(cursorXPos + cursorRadius/2, cursorYPos + cursorRadius/2);
+//        ofHideCursor();
+//        cursor.draw();
+    }
+    else if (viewmanager.currentView == WORLDVIEW)
+    {
+        ofHideCursor();
+    }
+    else
+    {
+        ofShowCursor();
+    }
 }
 
 void testApp::exit()

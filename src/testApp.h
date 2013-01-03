@@ -32,6 +32,7 @@ public:
     HandCursor cursor;
     int cursorXPos;
     int cursorYPos;
+    int cursorRadius;
     float kinectMovementX;
     float kinectMovementY;
     float kinectMovementZ;

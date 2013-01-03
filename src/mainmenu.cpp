@@ -3,7 +3,7 @@
 MainMenu::MainMenu()
 {
     //ctor
-    ofBackground(133,133,133);
+    ofBackground(200,200,200);
     ofAddListener(ofEvents().draw, this, &MainMenu::draw);
     buttonGD = new RoundButton("GD", "GD",  250, 250);
     buttonDM = new RoundButton("DM", "DM", 350, 250);

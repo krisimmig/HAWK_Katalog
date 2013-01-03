@@ -35,8 +35,8 @@ void Overview::draw(ofEventArgs &e)
     ofDrawBitmapString("Fachbereich: " + fachbereich, 300, 75);
     ofDrawBitmapString("Anzahl: " + ofToString(count), 300, 100);
 
-    int abstand = 60;
-    int y = 350;
+    int abstand = 120;
+    int y = 150;
     for (int i = 0; i < count; i++)
     {
         allStudentsFromDept[i]->drawShortInfo(300, y);
