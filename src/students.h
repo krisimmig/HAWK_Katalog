@@ -30,12 +30,15 @@ class Students
         void setup(int _id);
         void drawInfo(int x, int y);
         void drawShortInfo(int x, int y);
+        void drawImage(int x, int y, int r);
         string wrapString(string text, int width);
 
         // count records in db
+        static int countAll();
         static int countAll(std::string fb);
 
         // get array of student IDs
+        static int* getStudentIds();
         static int* getStudentIds(std::string fb);
 
 

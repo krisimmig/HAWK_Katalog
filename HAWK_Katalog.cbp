@@ -353,6 +353,12 @@
 		<Unit filename="src\customevent.h">
 			<Option virtualFolder="src\controller\" />
 		</Unit>
+		<Unit filename="src\exitbutton.cpp">
+			<Option virtualFolder="src\views\" />
+		</Unit>
+		<Unit filename="src\exitbutton.h">
+			<Option virtualFolder="src\views\" />
+		</Unit>
 		<Unit filename="src\main.cpp">
 			<Option virtualFolder="src" />
 		</Unit>
@@ -360,12 +366,6 @@
 			<Option virtualFolder="src\views\" />
 		</Unit>
 		<Unit filename="src\mainmenu.h">
-			<Option virtualFolder="src\views\" />
-		</Unit>
-		<Unit filename="src\my3dnode.cpp">
-			<Option virtualFolder="src\views\" />
-		</Unit>
-		<Unit filename="src\my3dnode.h">
 			<Option virtualFolder="src\views\" />
 		</Unit>
 		<Unit filename="src\mycamera.cpp">

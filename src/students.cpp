@@ -103,15 +103,18 @@ void Students::drawShortInfo(int x, int y)
     ofDrawBitmapString( first_name + " " + last_name + " (" + fachbereich + ")", x, y );
     ofDrawBitmapString( titel, x, y + 25 );
 
-    double rahmen = 100;
+    drawImage(x - 200, y - 30, 100);
+}
+
+void Students::drawImage(int x, int y, int r)
+{
+    double rahmen = r;
     //draw image01
     // set color to white for tint-free images
     ofSetColor(255,255,255);
     double imageWidth = projectImage01.width;
     double imageHeight = projectImage01.height;
     int ratio = imageWidth / imageHeight;
-    int centerXWindow = ofGetWidth() / 2;
-    int centerYWindow = ofGetHeight() / 2;
 
     if(ratio <= 1)
     {
@@ -120,7 +123,7 @@ void Students::drawShortInfo(int x, int y)
         int resizedImageWidth = imageWidth * conversion;
         int resizedImageHeight = imageHeight * conversion;
         // draw image in center if screen
-        projectImage01.draw(x - resizedImageWidth - 30, y - resizedImageHeight/2, resizedImageWidth , resizedImageHeight );
+        projectImage01.draw(x, y, resizedImageWidth , resizedImageHeight );
     }
     else
     {
@@ -129,21 +132,45 @@ void Students::drawShortInfo(int x, int y)
         int resizedImageWidth = imageWidth * conversion;
         int resizedImageHeight = imageHeight * conversion;
         // draw image in center if screen
-        projectImage01.draw(x - resizedImageWidth - 30, y - resizedImageHeight/2, resizedImageWidth , resizedImageHeight );
+        projectImage01.draw(x, y, resizedImageWidth , resizedImageHeight );
     }
+}
+
+// count number of records in DB
+int Students::countAll()
+{
+    return countAll("");
 }
 
 // count number of records in DB
 int Students::countAll(std::string fb)
 {
     ofxSQLite* sqlite = new ofxSQLite(DB_NAME);
-    // count entries
-    ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
-                                  .from("students")
-                                  .where("fachbereich", fb)
-                                  .execute().begin();
-    delete sqlite;
-    return selectCount.getInt();
+
+    if(fb == "")
+    {
+        // count entries
+        ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
+                                      .from("students")
+                                      .execute().begin();
+        delete sqlite;
+        return selectCount.getInt();
+    }
+    else
+    {
+        // count entries
+        ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
+                                      .from("students")
+                                      .where("fachbereich", fb)
+                                      .execute().begin();
+        delete sqlite;
+        return selectCount.getInt();
+    }
+}
+
+int* Students::getStudentIds()
+{
+    return getStudentIds("");
 }
 
 // return array of student IDs
@@ -151,31 +178,60 @@ int* Students::getStudentIds(std::string fb)
 {
     ofxSQLite* sqlite = new ofxSQLite(DB_NAME);
     // count entries
+    int count;
 
-    int count = Students::countAll(fb);
-
-    // make query for all IDs
-    ofxSQLiteSelect sel = sqlite->select("id")
-                          .from("students")
-                          .where("fachbereich", fb)
-                          .order("id", " ASC ")
-                          .execute().begin();
-
-    delete sqlite;
-    // create new int studentIdArray
-    int *studentIdArray = new int[count];
-    int i = 0;
-    // put IDs from SQL query into array
-    while(sel.hasNext())
+    if(fb == "")
     {
-        int id = sel.getInt();
-        cout << "(getStudentIds) put IDs into array, id: " << id << endl;
-        studentIdArray[i] = id;
-        i++;
-        sel.next();
+        count = Students::countAll();
+        // make query for all IDs
+        ofxSQLiteSelect sel = sqlite->select("id")
+              .from("students")
+              .order("id", " ASC ")
+              .execute().begin();
+        delete sqlite;
+
+        // create new int studentIdArray
+        int *studentIdArray = new int[count];
+        int i = 0;
+        // put IDs from SQL query into array
+        while(sel.hasNext())
+        {
+            int id = sel.getInt();
+            cout << "(getStudentIds) put IDs into array, id: " << id << endl;
+            studentIdArray[i] = id;
+            i++;
+            sel.next();
+        }
+        // return int array with IDs
+        return studentIdArray;
     }
-    // return int array with IDs
-    return studentIdArray;
+    else
+    {
+        count = Students::countAll(fb);
+
+        // make query for all IDs
+        ofxSQLiteSelect sel = sqlite->select("id")
+              .from("students")
+              .where("fachbereich", fb)
+              .order("id", " ASC ")
+              .execute().begin();
+        delete sqlite;
+
+        // create new int studentIdArray
+        int *studentIdArray = new int[count];
+        int i = 0;
+        // put IDs from SQL query into array
+        while(sel.hasNext())
+        {
+            int id = sel.getInt();
+            cout << "(getStudentIds) put IDs into array, id: " << id << endl;
+            studentIdArray[i] = id;
+            i++;
+            sel.next();
+        }
+        // return int array with IDs
+        return studentIdArray;
+    }
 
 }
 

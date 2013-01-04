@@ -14,6 +14,7 @@ public:
     int yPos;
 
     ofVec3f kinectMovement;
+    bool visible;
 
 protected:
 private:

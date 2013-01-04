@@ -10,6 +10,7 @@ class CustomEvent : public ofEventArgs
 
         enum_views view;
         string dept;
+        int objectId;
 
         CustomEvent(){
 
@@ -17,6 +18,7 @@ class CustomEvent : public ofEventArgs
 
         static ofEvent <CustomEvent> deptChange;
         static ofEvent <CustomEvent> viewChange;
+        static ofEvent <CustomEvent> nearObject;
 };
 
 #endif // CUSTOMEVENT_H

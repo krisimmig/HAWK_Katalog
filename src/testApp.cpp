@@ -48,7 +48,6 @@ void testApp::update()
         if(numHands == 0)
         {
             trackingHand = false;
-            ofShowCursor();
             cursorXPos = -50;
         }
         // iterate through users
@@ -126,22 +125,21 @@ void testApp::update()
 
 void testApp::draw()
 {
-//    ofFill();
-    ofSetColor(0,0,0);
-    garamondRegularH1.drawString("User: " + userInfo, 550, 45);
-    if(trackingHand && viewmanager.currentView != WORLDVIEW)
+
+//    ofSetColor(0,0,0);
+//    garamondRegularH1.drawString("User: " + userInfo, 550, 45);
+
+    if(trackingHand)
     {
         SetCursorPos(cursorXPos + cursorRadius/2, cursorYPos + cursorRadius/2);
-//        ofHideCursor();
-//        cursor.draw();
     }
-    else if (viewmanager.currentView == WORLDVIEW)
+    if (cursor.visible)
     {
-        ofHideCursor();
+        ofShowCursor();
     }
     else
     {
-        ofShowCursor();
+        ofHideCursor();
     }
 }
 
