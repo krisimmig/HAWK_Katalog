@@ -7,7 +7,7 @@ WorldView::WorldView()
     ofAddListener(ofEvents().update, this, &WorldView::update);
     ofAddListener(ofEvents().keyPressed, this, &WorldView::keyPressed);
     ofAddListener(CustomEvent::nearObject, this, &WorldView::nearObjectListener);
-    ofBackground(240,240,240);
+    ofBackground(255,255,255);
     garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 22);
     garamondRegularS.loadFont("fonts/AGaramondPro-Regular.otf", 15);
     exitInfoScreenButton.setup("Exit", ofGetWidth() - 100, ofGetHeight() / 2);
@@ -16,27 +16,51 @@ WorldView::WorldView()
     // environment setup
     ofSetVerticalSync(true);
     ofDisableArbTex();
-    ofEnableAlphaBlending();
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FOG);
+    glPointSize(2);
+
     light.setPointLight();
-    light.setPosition(2000,2000,2000);
+    light.setPosition(0,0,400);
     light.enable();
-    ofFill();
+//    avatarLight.setSpotlight(10, 2);
+//    avatarLight.setDirectional();
+//    ofColor color = ofColor(255,255,255);
+//    avatarLight.setDiffuseColor(color);
+//    avatarLight.enable();
+    score = 0;
+
+    // fog
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glHint(GL_FOG_HINT, GL_DONT_CARE);
+    GLfloat fogColor[3] = {255,255,255};
+//    GLfloat fogColor[3] = {0,0,0};
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogf(GL_FOG_START, 800);
+    fogDistance = 3500;
+    glFogf(GL_FOG_END, fogDistance);
 
     // camera
-    camera.setSpeed(10);
-    camera.setDecelerationMove(0.95);
+    camera.setSpeed(5);
+    camera.setDecelerationMove(0.9);
     camera.setDecelerationRotate(0.9);
     camera.setKinect(true);
+    camera.setPosition(0,0,180);
+
 
     // model landscape
-    model.loadModel("landscape.3ds");
-    model.setPosition(ofGetWidth()*.5, ofGetHeight() * 0.75, 0);
+    landscape.loadModel("landscape.3ds");
+    human.loadModel("human.3ds");
 
     // student setup
     numberOfStudents = Students::countAll();
     studentIdArray = Students::getStudentIds();
     cout << "numberOfStudents: " << numberOfStudents << endl;
+    // load image
+    if(! infoBackground.loadImage("data/studentInfo.png"))
+    {
+        cout << "error loading image: data/studentInfo.png" << endl;
+    }
 
     mySphere = new Object3D*[numberOfStudents];
 
@@ -46,12 +70,13 @@ WorldView::WorldView()
     {
         int x = ofRandom(-4000, 4000);
         int y = ofRandom(-4000, 4000);
-        int z = ofRandom(-2000, 800);
+        int z = ofRandom(100, 150);
         mySphere[i] = new Object3D();
         mySphere[i]->setup(x,y,z, sphereSize, studentIdArray[i]);
     }
-    currentSphere = -1;
 
+    currentSphere = -1;
+    ofFill();
 }
 
 WorldView::~WorldView()
@@ -74,14 +99,22 @@ void WorldView::update(ofEventArgs &e)
         cursor->visible = false;
     }
 
-    int x = camera.getCamera().getGlobalPosition().x;
-    int y = camera.getCamera().getGlobalPosition().y;
-    int z = camera.getCamera().getGlobalPosition().z;
-    if (x > 4000 || y > 4000 || z > 1200 || x < -5000 || y < -4000 || z < -2000)
+    avatarXPos = camera.getCamera().getGlobalPosition().x;
+    avatarYPos = camera.getCamera().getGlobalPosition().y;
+    avatarZPos = camera.getCamera().getGlobalPosition().z;
+
+    avatarPos.x = avatarXPos;
+    avatarPos.y = avatarYPos;
+    avatarPos.z = avatarZPos;
+
+    avatarLight.setPosition(avatarPos);
+    cout << "light: " << avatarLight.getPosition().x << " "<< avatarLight.getPosition().y << " "<< avatarLight.getPosition().z << endl;
+    if (avatarXPos > 4000 || avatarYPos > 4000 || avatarZPos > 1200 || avatarXPos < -5000 || avatarYPos < -4000 || avatarZPos < -2000)
     {
         cout << "reset position" << endl;
-        camera.setPosition(0,-2000,0);
+        camera.setPosition(0,0,180);
     }
+
 }
 
 void WorldView::setCursor(HandCursor *c)
@@ -92,19 +125,27 @@ void WorldView::setCursor(HandCursor *c)
 
 void WorldView::draw(ofEventArgs &e)
 {
-
     camera.begin();
 
-    model.setPosition(0, 0, -2600);
-    model.setScale(30,30,15);
-    model.drawWireframe();
+    // draw environment
+    drawLandscape();
+    // fog
+    ofSetColor(255,255,255);
+    ofFill();
+    ofSphere(avatarXPos, avatarYPos, 0, fogDistance);
+
+    // draw human
+    ofVboMesh humamMesh = human.getMesh(0);
+    ofPushMatrix();
+    ofTranslate(0,200,0);
+    humamMesh.drawFaces();
+    ofSetColor(100,100,100);
+    humamMesh.drawWireframe();
+    ofPopMatrix();
+
+    // draw objects
     for(int i = 0; i < numberOfStudents; i++)
     {
-        ofVec3f avatarPos;
-        avatarPos.x = camera.getCamera().getGlobalPosition().x;
-        avatarPos.y = camera.getCamera().getGlobalPosition().y;
-        avatarPos.z = camera.getCamera().getGlobalPosition().z;
-
         ofVec3f spherePos = mySphere[i]->getPostion();
         float distance = avatarPos.distance(spherePos);
         if(distance < sphereSize * 2.2)
@@ -119,6 +160,10 @@ void WorldView::draw(ofEventArgs &e)
     }
     camera.end();
 
+    // scores
+    drawScore();
+
+    // if near object, draw info
     if(drawInfo)
     {
         drawSphereInfo();
@@ -130,10 +175,59 @@ void WorldView::nearObjectListener(CustomEvent &e)
     cursor->visible = true;
     exitInfoScreenButton.active = true;
     drawInfo = true;
+    score++;
+}
+
+void WorldView::drawLandscape()
+{
+    // sky
+    ofSetColor(240,240,240);
+    landscape.setPosition(0, 0, 750);
+    landscape.setScale(50,50,15);
+    landscape.drawWireframe();
+
+    // sky faces
+    ofSetColor(200,200,240);
+    landscape.setPosition(0, 0,751);
+    landscape.drawFaces();
+
+    // floor wire
+    ofSetColor(100,100,100);
+    landscape.setPosition(0, 0, -499);
+    landscape.setScale(10,10,6);
+    landscape.drawWireframe();
+
+    // floor faces
+    ofSetColor(200,200,240);
+    landscape.setPosition(0, 0, -500);
+    landscape.drawFaces();
+}
+
+void WorldView::drawScore()
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_FOG);
+
+    ofSetColor(10,10,10);
+    garamondRegularH1.drawString("Score: " + ofToString(score) + " / 1350", 50, 50);
+
+    glEnable(GL_FOG);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void WorldView::drawSphereInfo()
 {
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_FOG);
+
+    ofEnableAlphaBlending();
+    ofSetColor(255,255,255);
+
+    int infoXPos = 50;
+    int infoYPos = 200;
     // currentSphere is -1 at start of program
     if(currentSphere > -1)
     {
@@ -142,13 +236,23 @@ void WorldView::drawSphereInfo()
         {
             currentStudent.setup(mySphere[currentSphere]->id);
         }
-        currentStudent.drawImage(250, 250, 300);
-        ofSetColor(0, 255, 0);
-        garamondRegularH1.drawString(currentStudent.first_name, 5, 30);
-        garamondRegularH1.drawString(currentStudent.last_name, 5, 80);
-        garamondRegularH1.drawString(currentStudent.titel, 5, 120);
+        currentStudent.drawImage(infoXPos + 500, infoYPos, 300);
+        infoBackground.draw(infoXPos - 30, infoYPos - 30, -1);
+        ofSetColor(10, 255, 10);
+        garamondRegularH1.drawString(currentStudent.first_name, infoXPos, infoYPos);
+        garamondRegularH1.drawString(currentStudent.last_name, infoXPos, infoYPos + 25);
+        garamondRegularH1.drawString(currentStudent.titel, infoXPos, infoYPos + 50);
     }
+
+    ofDisableAlphaBlending();
+
+    glEnable(GL_FOG);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+
 }
+
+
 
 void WorldView::keyPressed(ofKeyEventArgs &e)
 {

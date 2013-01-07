@@ -276,28 +276,28 @@ void MyCamera::kinectRotations()
     // left - right
     if (kinectRotationX < -50)
     {
-        rotationRightSpeed = ofMap(kinectRotationX, -600, -1, 0.2, 0.001);
-        h -= rotationRightSpeed;
+        rotationRightSpeed = ofMap(kinectRotationX, -600, -1, 0.15, 0.001);
+
     }
 
     if (kinectRotationX > 50)
     {
-        rotationLeftSpeed = ofMap(kinectRotationX, 1, 600, 0.001, 0.2);
-        h += rotationLeftSpeed;
+        rotationLeftSpeed = ofMap(kinectRotationX, 1, 600, 0.001, 0.15);
+
     }
 
     // up - down
-    if (kinectRotationY < -50)
-    {
-        rotationUpSpeed = ofMap(kinectRotationY, -600, -1, 0.2, 0.001);
-        v -= rotationUpSpeed;
-    }
-
-    if (kinectRotationY > 50)
-    {
-        rotationDownSpeed = ofMap(kinectRotationY, 1, 600, 0.001, 0.2);
-        v += rotationDownSpeed;
-    }
+//    if (kinectRotationY < -50)
+//    {
+//        rotationUpSpeed = ofMap(kinectRotationY, -600, -1, 0.15, 0.001);
+//
+//    }
+//
+//    if (kinectRotationY > 50)
+//    {
+//        rotationDownSpeed = ofMap(kinectRotationY, 1, 600, 0.001, 0.15);
+//
+//    }
 
 
     // decelerate
@@ -337,13 +337,6 @@ void MyCamera::kinectRotations()
     {
         rotationUpSpeed = 0;
     }
-
-
-    h -= rotationRightSpeed;
-    h += rotationLeftSpeed;
-
-    v -= rotationDownSpeed;
-    v += rotationUpSpeed;
 
 }
 //------------------------------------------------------------------------------

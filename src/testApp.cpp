@@ -23,6 +23,7 @@ void testApp::setup()
         // ---------------------------------
         openNIDevice.setup();
         openNIDevice.addDepthGenerator();
+        openNIDevice.addImageGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
         openNIDevice.addHandsGenerator();
@@ -42,6 +43,7 @@ void testApp::update()
     if(useKinect)
     {
         openNIDevice.update();
+
         int numHands = openNIDevice.getNumTrackedHands();
 
         // when no hand is tracked, dissappear handCurosr
@@ -84,19 +86,19 @@ void testApp::update()
                 user->drawSkeleton();
 
                 // rotation
-                float leftHandZ = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
-                float leftShoulderZ = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
-                if( (leftShoulderZ - leftHandZ) > 400 )
+                float rotHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
+                float rotShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
+                if( (rotShoulderZ - rotHandZ) > 400 )
                 {
                     // left - right
-                    float leftElbowX = user->getJoint(JOINT_LEFT_ELBOW).getWorldPosition().x;
-                    float leftHandX = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
-                    kinectMovementX = leftElbowX - leftHandX;
+                    float rotVal1 = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().x;
+                    float rotVal2 = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().x;
+                    kinectMovementX = rotVal1 - rotVal2;
 
                     // up - down
-                    float elbowY = user->getJoint(JOINT_LEFT_ELBOW).getWorldPosition().y;
-                    float handY = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
-                    kinectMovementY = elbowY - handY;
+                    float rotVal3 = user->getJoint(JOINT_RIGHT_ELBOW).getWorldPosition().y;
+                    float rotVal4 = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().y;
+                    kinectMovementY = rotVal3 - rotVal4;
                 }
                 else
                 {
@@ -105,13 +107,11 @@ void testApp::update()
                 }
 
                 // speed
-
-                float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
-                float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
-                if( (rightShoulderZ - rightHandZ) > 200 || (rightShoulderZ - rightHandZ) < -200  )
+                float speedVal1 = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
+                float speedVal2 = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
+                if( (speedVal2 - speedVal1) > 200 || (speedVal2 - speedVal1) < -200  )
                 {
-
-                    kinectMovementZ = rightShoulderZ - rightHandZ;
+                    kinectMovementZ = speedVal2 - speedVal1;
                 }
                 else
                 {
@@ -125,10 +125,6 @@ void testApp::update()
 
 void testApp::draw()
 {
-
-//    ofSetColor(0,0,0);
-//    garamondRegularH1.drawString("User: " + userInfo, 550, 45);
-
     if(trackingHand)
     {
         SetCursorPos(cursorXPos + cursorRadius/2, cursorYPos + cursorRadius/2);
@@ -141,6 +137,19 @@ void testApp::draw()
     {
         ofHideCursor();
     }
+
+    ofPushMatrix();
+
+    ofTranslate(0,0,1);
+    ofSetColor(0,0,0);
+    garamondRegularH1.drawString("User: " + userInfo, 550, 45);
+
+    ofSetColor(255,255,255);
+    float factor = 0.5f;
+    openNIDevice.drawImage(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor);
+
+    ofPopMatrix();
+
 }
 
 void testApp::exit()

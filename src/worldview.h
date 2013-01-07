@@ -12,8 +12,6 @@
 #include "ofxassimpmodelloader.h"
 #include "mycamera.h"
 
-
-
 class WorldView
 {
 public:
@@ -21,7 +19,6 @@ public:
     virtual ~WorldView();
     void setCursor(HandCursor *cursor);
     void nearObjectListener(CustomEvent &e);
-
     bool drawInfo;
 
 protected:
@@ -29,22 +26,30 @@ private:
     void draw(ofEventArgs &e);
     void update(ofEventArgs &e);
     void drawSphereInfo();
+    void drawLandscape();
+    void drawScore();
     void keyPressed(ofKeyEventArgs &e);
     ExitButton exitInfoScreenButton;
 
     HandCursor* cursor;
 
     // environment + camera
-    ofxAssimpModelLoader model;
+    ofxAssimpModelLoader landscape;
     ofLight light;
+    ofLight avatarLight;
     MyCamera camera;
     float speed;
     float dollyAmount;
 
     // 3d objects
+    ofxAssimpModelLoader human;
     Object3D** mySphere;
     int currentSphere;
     int sphereSize;
+    int avatarXPos;
+    int avatarYPos;
+    int avatarZPos;
+    ofVec3f avatarPos;
 
     // student stuff
     Students currentStudent;
@@ -52,7 +57,11 @@ private:
     int* studentIdArray;
     ofTrueTypeFont garamondRegularH1;
     ofTrueTypeFont garamondRegularS;
-    ofImage projectImage01;
+    ofImage infoBackground;
+
+    // fog
+    float fogDistance;
+    int score;
 
 };
 

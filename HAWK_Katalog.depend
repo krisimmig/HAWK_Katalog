@@ -3523,7 +3523,7 @@
 1355857606 source:c:\openframework\of_v0072\apps\myapps\HAWK_Katalog\src\mycamera.cpp
 	"mycamera.h"
 
-1355535071 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\button.cpp
+1357501493 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\button.cpp
 	"button.h"
 
 1355531236 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\button.h
@@ -3590,7 +3590,7 @@
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1357256608 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
+1357532272 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
 	"ofMain.h"
 	"constants.h"
 	"cursor.h"
@@ -3602,10 +3602,11 @@
 	"ofxassimpmodelloader.h"
 	"mycamera.h"
 
-1357248938 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
+1357515912 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
 	"ofMain.h"
 	"constants.h"
 	"customevent.h"
+	"ofxassimpmodelloader.h"
 
 1355856211 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.h
 	"ofMain.h"
@@ -3620,7 +3621,7 @@
 	"ofMain.h"
 	"constants.h"
 
-1357257214 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
+1357532721 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
 	"object3d.h"
 
 1357230185 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
@@ -3636,7 +3637,7 @@
 1357245723 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
 	"students.h"
 
-1357247837 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
+1357588217 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
 	"testApp.h"
 	"stdio.h"
 
@@ -3646,10 +3647,10 @@
 1357246502 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1357254811 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1357533983 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
 
-1355869710 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp
+1357385960 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp
 	"mycamera.h"
 
 1350754619 c:\openframework\of_v0072\addons\ofxassimpmodelloader\src\ofxassimpmodelloader.h
@@ -4049,6 +4050,6 @@
 	"constants.h"
 	"customevent.h"
 
-1357256104 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\exitbutton.cpp
+1357501493 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\exitbutton.cpp
 	"exitbutton.h"
 

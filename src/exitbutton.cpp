@@ -40,6 +40,8 @@ void ExitButton::addListeners()
 
 void ExitButton::draw(ofEventArgs &e)
 {
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
     if(active)
     {
         ofNoFill();
@@ -57,6 +59,8 @@ void ExitButton::draw(ofEventArgs &e)
             timerShape.draw();
         }
     }
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
 }
 
 void ExitButton::mouseMoved(ofMouseEventArgs &args)

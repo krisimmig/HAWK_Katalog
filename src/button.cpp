@@ -33,6 +33,7 @@ void RoundButton::addListeners()
 
 void RoundButton::draw(ofEventArgs &e)
 {
+
     ofNoFill();
     ofSetColor(0, 0, 0);
     ofCircle(xPos, yPos, radius);
