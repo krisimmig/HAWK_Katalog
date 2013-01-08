@@ -14,6 +14,7 @@ ViewChangeButton::ViewChangeButton(std::string l, enum_views t, int x, int y)
     actionTimer = 0;
     hoovering = false;
     addListeners();
+    active = true;
 }
 
 ViewChangeButton::~ViewChangeButton()
@@ -34,17 +35,22 @@ void ViewChangeButton::addListeners()
 
 void ViewChangeButton::draw(ofEventArgs &e)
 {
-    if(hoovering)
+    if(active)
     {
-        ofFill();
-        ofSetColor(255,0,0);
-        ofRect(xPos, yPos, width/actionDelay * actionTimer, height);
-    }
 
-    ofNoFill();
-    ofSetColor(0, 0, 0);
-    ofRect(xPos, yPos, width, height);
-    ofDrawBitmapString(label, xPos + 15, yPos + 15);
+        if(hoovering)
+        {
+            ofFill();
+            ofSetColor(255,0,0);
+            ofRect(xPos, yPos, width/actionDelay * actionTimer, height);
+        }
+
+        ofNoFill();
+        ofSetColor(0, 0, 0);
+        ofRect(xPos, yPos, width, height);
+        ofDrawBitmapString(label, xPos + 15, yPos + 15);
+
+    }
 }
 
 void ViewChangeButton::mouseReleased(ofMouseEventArgs &args)

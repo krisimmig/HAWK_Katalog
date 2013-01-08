@@ -30,6 +30,8 @@ private:
     void mouseReleased(ofMouseEventArgs &args);
     void mouseMoved(ofMouseEventArgs &args);
 
+    bool active;
+
 };
 
 #endif // VIEWCHANGEBUTTON_H

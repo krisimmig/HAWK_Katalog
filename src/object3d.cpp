@@ -57,18 +57,20 @@ void Object3D::drawNear()
 
 void Object3D::drawObject()
 {
+    ofPushMatrix();
+
     // set color
     if(nearBool)
     {
-        ofSetColor(255, 0, 0);
+        ofSetColor(0, 255, 0);
+        ofTranslate(x,y,100);
     }
     else
     {
-        ofSetColor(200, sphereColor_2, sphereColor_1);
+        ofSetColor(10, 200, 50);
     }
 
     // draw subject form
-    ofPushMatrix();
     int height;
     if(rotateDegree < 360.0)
     {
@@ -81,25 +83,16 @@ void Object3D::drawObject()
         height = 60 * sin(rotateDegree * 0.05);
     }
 
-    ofTranslate(x,y,100 + height);
+    if(!nearBool) {ofTranslate(x,y,100 + height);}
+
     ofRotate(rotateDegree);
     subjectMesh.drawFaces();
-//    ring.drawFaces();
     glPointSize(3);
     subjectMesh.drawVertices();
     ofSetColor(100,100,100);
     subjectMesh.drawWireframe();
     ofPopMatrix();
 
-    // draw ring
-//    ofPushMatrix();
-//    ofEnableAlphaBlending();
-////    ofSetColor(125, sphereColor_2, sphereColor_1, 50);
-//    ofTranslate(x,y,100);
-//    ring.drawFaces();
-//    ring.drawVertices();
-//    ofPopMatrix();
-//    ofDisableAlphaBlending();
 }
 
 ofVec3f Object3D::getPostion()

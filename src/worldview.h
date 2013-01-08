@@ -34,15 +34,16 @@ private:
     HandCursor* cursor;
 
     // environment + camera
+    GLfloat environmentColor[3];
     ofxAssimpModelLoader landscape;
     ofLight light;
-    ofLight avatarLight;
     MyCamera camera;
     float speed;
     float dollyAmount;
 
     // 3d objects
     ofxAssimpModelLoader human;
+    float rotateDegree;
     Object3D** mySphere;
     int currentSphere;
     int sphereSize;
@@ -55,8 +56,8 @@ private:
     Students currentStudent;
     int numberOfStudents;
     int* studentIdArray;
-    ofTrueTypeFont garamondRegularH1;
-    ofTrueTypeFont garamondRegularS;
+    ofTrueTypeFont Helvetica22;
+    ofTrueTypeFont Helvetica15;
     ofImage infoBackground;
 
     // fog

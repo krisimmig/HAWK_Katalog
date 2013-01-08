@@ -22,7 +22,6 @@ public:
     ofTrueTypeFont garamondRegularH1;
 
     // views
-//    WorldView w_view;
     ViewManager viewmanager;
 
     // cursor
@@ -39,6 +38,8 @@ public:
     float radius;
     bool trackingHand;
     std::string userInfo;
+
+    int userId;
 
 };
 
