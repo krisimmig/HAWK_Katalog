@@ -12,7 +12,7 @@ void testApp::setup()
     ofSetFrameRate(30);
     float filterFactor = 0.1f;
 
-    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 25);
+    garamondRegularH1.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 25);
 
     // use app with or without kinect
     useKinect = true;
@@ -89,7 +89,7 @@ void testApp::update()
                 // rotation
                 float rotHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
                 float rotShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
-                if( (rotShoulderZ - rotHandZ) > 400 )
+                if( (rotShoulderZ - rotHandZ) > 250 )
                 {
                     // left - right
                     float rotVal1 = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().x;
@@ -108,8 +108,8 @@ void testApp::update()
                 }
 
                 // speed
-                float speedVal1 = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
-                float speedVal2 = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
+                float speedVal1 = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
+                float speedVal2 = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
                 if( (speedVal2 - speedVal1) > 200 || (speedVal2 - speedVal1) < -200  )
                 {
                     kinectMovementZ = speedVal2 - speedVal1;
@@ -149,11 +149,11 @@ void testApp::draw()
 
     ofSetColor(255,255,255);
     float factor = 0.5f;
-    openNIDevice.drawImage(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor);
-    if(userId < 0)
-    {
-       openNIDevice.drawSkeleton(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor, userId);
-    }
+//    openNIDevice.drawImage(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor);
+//    if(userId < 0)
+//    {
+//       openNIDevice.drawSkeleton(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor, userId);
+//    }
 
 
     ofPopMatrix();
@@ -162,6 +162,8 @@ void testApp::draw()
     {
         glEnable(GL_LIGHTING);
     }
+    ofSetColor(10,10,255);
+    garamondRegularH1.drawString(userInfo, 550, 50);
 
 }
 

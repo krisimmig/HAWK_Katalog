@@ -9,7 +9,7 @@ WorldView::WorldView()
     ofAddListener(CustomEvent::nearObject, this, &WorldView::nearObjectListener);
     ofBackground(255,255,255);
 
-    Helvetica22.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 22);
+    Helvetica22.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
     Helvetica15.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
 
     exitInfoScreenButton.setup("Exit", ofGetWidth() - 100, ofGetHeight() / 2);
@@ -243,7 +243,10 @@ void WorldView::drawSphereInfo()
     glDisable(GL_FOG);
 
     ofEnableAlphaBlending();
+    ofSetColor(255,255,255,125);
+    ofRect(0,0, ofGetWidth(), ofGetHeight());
     ofSetColor(255,255,255);
+
 
     int infoXPos = 50;
     int infoYPos = 200;
@@ -256,12 +259,13 @@ void WorldView::drawSphereInfo()
             currentStudent.setup(mySphere[currentSphere]->id);
         }
         currentStudent.drawImage(infoXPos + 500, infoYPos, 300);
-        infoBackground.draw(infoXPos - 30, infoYPos - 30, -1);
-        ofSetColor(10, 10, 10);
+//        infoBackground.draw(infoXPos - 30, infoYPos - 30, -1);
+        ofSetColor(10,240,50);
         infoYPos += 50;
-        Helvetica22.drawString(currentStudent.first_name, infoXPos, infoYPos);
-        Helvetica22.drawString(currentStudent.last_name, infoXPos, infoYPos + 25);
-        Helvetica22.drawString(currentStudent.titel, infoXPos, infoYPos + 50);
+
+        Helvetica22.drawString(currentStudent.first_name + " " + currentStudent.last_name , infoXPos, infoYPos);
+//        Helvetica22.drawString(currentStudent.last_name, infoXPos, infoYPos + 25);
+        Helvetica15.drawString(currentStudent.titel, infoXPos, infoYPos + 50);
     }
 
     ofDisableAlphaBlending();
