@@ -20,7 +20,7 @@ WorldView::WorldView()
     zoomLevel = 3;
 
     // student setup
-    numberOfStudents = 90;
+    numberOfStudents = 92;
 
     mySphere = new Object3D*[numberOfStudents];
 
@@ -31,6 +31,7 @@ WorldView::WorldView()
     for(int i = 0; i < numberOfStudents; i++)
     {
         for(int j = 0; j < sqrt(numberOfStudents); j++)
+//        for(int j = 0; j < 17; j++)
         {
             if(counter < numberOfStudents)
             {
@@ -103,6 +104,51 @@ void WorldView::draw(ofEventArgs &e)
         }
     }
     camera.end();
+
+    if(zoomLevel == 3)
+    {
+        ofVec3f middleWordlXYZ = mySphere[numberOfStudents/2]->getPostion();
+        ofVec3f middleScreenXYZ = camera.worldToScreen(middleWordlXYZ, ofGetCurrentViewport() );
+
+        std::string fachbereich = "GRAFIKDESIGN";
+        ofSetColor(10,10,10);
+        ofRectangle fachbereichRect = Helvetica22.getStringBoundingBox(fachbereich, 0,0);
+        int x = middleScreenXYZ.x - fachbereichRect.width / 2;
+        int y = middleScreenXYZ.y + fachbereichRect.height / 2;
+        ofPushMatrix();
+        ofTranslate(0,0,50);
+        ofRect(x - 5, y - fachbereichRect.height - 5, fachbereichRect.width + 10, fachbereichRect.height +10);
+        ofSetColor(255,255,255);
+
+        Helvetica22.drawString(fachbereich, x, y);
+        ofPopMatrix();
+    }
+
+    if(zoomLevel == 2)
+    {
+        for(int i = 0; i < numberOfStudents; i++)
+        {
+            int thisId = mySphere[i]->id;
+            if(thisId % 5 == 0)
+            {
+                ofVec3f sphereWordlXYZ = mySphere[i]->getPostion();
+                ofVec3f sphereScreenXYZ = camera.worldToScreen(sphereWordlXYZ, ofGetCurrentViewport() );
+
+                int sphereId = mySphere[i]->id;
+                ofSetColor(10,10,10);
+                ofRectangle sphereIdRect = Helvetica15.getStringBoundingBox(ofToString(sphereId), 0,0);
+                int x = sphereScreenXYZ.x - sphereIdRect.width / 2;
+                int y = sphereScreenXYZ.y + sphereIdRect.height / 2;
+
+                ofPushMatrix();
+                ofTranslate(30,0,0);
+                ofRect(x - 5, y - sphereIdRect.height - 5, sphereIdRect.width + 10, sphereIdRect.height +10);
+                ofSetColor(255,255,255);
+                Helvetica15.drawString(ofToString(sphereId), x, y);
+                ofPopMatrix();
+            }
+        }
+    }
 
     for(int i = 0; i < numberOfStudents; i++)
     {
