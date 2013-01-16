@@ -11,6 +11,7 @@ class CustomEvent : public ofEventArgs
         enum_views view;
         string dept;
         int objectId;
+        int zoomLevel;
 
         CustomEvent(){
 
@@ -19,6 +20,7 @@ class CustomEvent : public ofEventArgs
         static ofEvent <CustomEvent> deptChange;
         static ofEvent <CustomEvent> viewChange;
         static ofEvent <CustomEvent> nearObject;
+        static ofEvent <CustomEvent> zoomChange;
 };
 
 #endif // CUSTOMEVENT_H

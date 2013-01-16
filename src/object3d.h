@@ -4,7 +4,6 @@
 #include "ofMain.h"
 #include "constants.h"
 #include "customevent.h"
-#include "ofxassimpmodelloader.h"
 
 class Object3D
 {
@@ -13,33 +12,32 @@ public:
     virtual ~Object3D();
     void setup(int x, int y, int z, int size, int id);
     void draw();
-    void drawNear();
+    void setZoomLevel(int zoomLevel);
+    void setClosestToCamera(bool closest);
+    bool getClosestToCamera();
+    std::string getFullName();
 
     ofVec3f getPostion();
     int id;
-    bool nearBool;
+
+
+private:
+
+    int x;
+    int y;
+    int z;
+
     std::string first_name;
     std::string last_name;
     std::string image_01;
 
-private:
-
-    void drawObject();
-    int x;
-    int y;
-    int z;
     int size;
+    int zoomLevel;
     float sphereColor_1;
     float sphereColor_2;
 
-    float rotateDegree;
-    ofVboMesh subjectMesh;
-    ofVboMesh ringMesh;
+    bool closestToCamera;
 
-    ofxAssimpModelLoader subject;
-    ofxAssimpModelLoader ring;
-
-    ofLight objectLight;
 };
 
 #endif // OBJECT3D_H

@@ -5,81 +5,44 @@ WorldView::WorldView()
     //ctor
     ofAddListener(ofEvents().draw, this, &WorldView::draw);
     ofAddListener(ofEvents().update, this, &WorldView::update);
+    ofAddListener(ofEvents().keyReleased, this, &WorldView::keyReleased);
     ofAddListener(ofEvents().keyPressed, this, &WorldView::keyPressed);
-    ofAddListener(CustomEvent::nearObject, this, &WorldView::nearObjectListener);
-    ofBackground(255,255,255);
+    ofAddListener(ofEvents().mouseDragged, this, &WorldView::mouseDragged);
+    ofAddListener(CustomEvent().zoomChange, this, &WorldView::zoomChangeListener);
 
     Helvetica22.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
     Helvetica15.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
-
-    exitInfoScreenButton.setup("Exit", ofGetWidth() - 100, ofGetHeight() / 2);
-    drawInfo = false;
-
-    // environment setup
-    ofSetVerticalSync(true);
-    ofDisableArbTex();
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_FOG);
-    glPointSize(2);
-    rotateDegree = 0.0f;
-    environmentColor[0] = 20;
-    environmentColor[1] = 100;
-    environmentColor[2] = 255;
-
-    // light setup
-    light.setPointLight();
-    light.setPosition(0,0,400);
-    light.setAmbientColor( ofColor(environmentColor[0],environmentColor[1],environmentColor[2] ) );
-    light.setDiffuseColor( ofColor(255,255,255) );
-    light.enable();
-
-    score = 0;
-
-    // fog
-    glFogi(GL_FOG_MODE, GL_LINEAR);
-    glHint(GL_FOG_HINT, GL_DONT_CARE);
-
-    glFogfv(GL_FOG_COLOR, environmentColor);
-    glFogf(GL_FOG_START, 800);
-    fogDistance = 3500;
-    glFogf(GL_FOG_END, fogDistance);
+    ofEnableSmoothing();
 
     // camera
-    camera.setSpeed(5);
-    camera.setDecelerationMove(0.9);
-    camera.setDecelerationRotate(0.9);
-    camera.setKinect(true);
-    camera.setPosition(0,0,180);
-
-
-    // model landscape
-    landscape.loadModel("landscape.3ds");
-    human.loadModel("human.3ds");
+    cameraHeight = 2000;
+    camera.setPosition(0,0,cameraHeight);
+    zoomLevel = 3;
 
     // student setup
-    numberOfStudents = Students::countAll();
-    studentIdArray = Students::getStudentIds();
-    cout << "numberOfStudents: " << numberOfStudents << endl;
-    // load image
-    if(! infoBackground.loadImage("data/studentInfo.png"))
-    {
-        cout << "error loading image: data/studentInfo.png" << endl;
-    }
+    numberOfStudents = 90;
 
     mySphere = new Object3D*[numberOfStudents];
 
     // spheres
-    sphereSize = 100;
+    sphereSize = 150;
+    int abstand = 250;
+    int counter = 0;
     for(int i = 0; i < numberOfStudents; i++)
     {
-        int x = ofRandom(-4000, 4000);
-        int y = ofRandom(-4000, 4000);
-        int z = ofRandom(100, 150);
-        mySphere[i] = new Object3D();
-        mySphere[i]->setup(x,y,z, sphereSize, studentIdArray[i]);
+        for(int j = 0; j < sqrt(numberOfStudents); j++)
+        {
+            if(counter < numberOfStudents)
+            {
+                int x = abstand * i;
+                int y = abstand * j;
+                int z = -800;
+                mySphere[counter] = new Object3D();
+                mySphere[counter]->setup(x,y,z, sphereSize, counter);
+                counter++;
+            }
+        }
     }
-
-    currentSphere = -1;
     ofFill();
 }
 
@@ -88,35 +51,26 @@ WorldView::~WorldView()
     //dtor
     ofRemoveListener(ofEvents().draw, this, &WorldView::draw);
     ofRemoveListener(ofEvents().update, this, &WorldView::update);
-    ofRemoveListener(ofEvents().keyPressed, this, &WorldView::keyPressed);
-    ofRemoveListener(CustomEvent().nearObject, this, &WorldView::nearObjectListener);
+    ofRemoveListener(ofEvents().keyReleased, this, &WorldView::keyReleased);
     delete mySphere;
 }
 
 void WorldView::update(ofEventArgs &e)
 {
-    camera.setKinectMovement(cursor->kinectMovement);
-    if(!exitInfoScreenButton.active)
+    if(camera.getPosition().z < cameraHeight)
     {
-        camera.update();
-        drawInfo = false;
-        cursor->visible = false;
+        camera.dolly(40);
     }
 
-    avatarXPos = camera.getCamera().getGlobalPosition().x;
-    avatarYPos = camera.getCamera().getGlobalPosition().y;
-    avatarZPos = camera.getCamera().getGlobalPosition().z;
+    if(camera.getPosition().z > cameraHeight)
+    {
+        camera.dolly(-40);
+    }
 
-    avatarPos.x = avatarXPos;
-    avatarPos.y = avatarYPos;
-    avatarPos.z = avatarZPos;
-//
-//    if (avatarXPos > 4000 || avatarYPos > 4000 || avatarZPos > 1200 || avatarXPos < -5000 || avatarYPos < -4000 || avatarZPos < -2000)
-//    {
-//        cout << "reset position" << endl;
-//        camera.setPosition(0,0,180);
-//    }
-
+    for(int i = 0; i < numberOfStudents; i++)
+    {
+        mySphere[i]->setZoomLevel(zoomLevel);
+    }
 }
 
 void WorldView::setCursor(HandCursor *c)
@@ -127,158 +81,164 @@ void WorldView::setCursor(HandCursor *c)
 
 void WorldView::draw(ofEventArgs &e)
 {
+    ofBackgroundGradient(ofColor(255), ofColor(175));
     camera.begin();
-
-    // draw environment
-    drawLandscape();
-    // fog
-//    ofSetColor(environmentColor[0],environmentColor[1],environmentColor[2]);
-    ofSetColor(255,255,255);
-    ofFill();
-    ofSphere(avatarXPos, avatarYPos, 0, fogDistance);
-
-    // draw human
-    ofVboMesh humamMesh = human.getMesh(0);
-    ofPushMatrix();
-
-    int height;
-
-    if(rotateDegree < 360.0)
-    {
-        rotateDegree++;
-        height = 30 * sin(rotateDegree * 0.01);
-    }
-    else
-    {
-        rotateDegree = 0.0;
-        height = 30 * sin(rotateDegree * 0.01);
-    }
-
-    ofTranslate(0,200,150 + height);
-    humamMesh.drawFaces();
-    ofSetColor(100,100,100);
-    humamMesh.drawWireframe();
-    ofPopMatrix();
 
     // draw objects
     for(int i = 0; i < numberOfStudents; i++)
     {
         ofVec3f spherePos = mySphere[i]->getPostion();
-        float distance = avatarPos.distance(spherePos);
-        if(distance < sphereSize * 2.2)
+        ofVec3f cameraPos = camera.getPosition();
+        float distance = cameraPos.distance(spherePos);
+        if(distance < 809)
         {
-            mySphere[i]->drawNear();
-            currentSphere = i;
+            mySphere[i]->setClosestToCamera(true);
+            mySphere[i]->draw();
+            std::string fullName = mySphere[i]->getFullName();
         }
         else
         {
+            mySphere[i]->setClosestToCamera(false);
             mySphere[i]->draw();
         }
     }
     camera.end();
 
-    // scores
-    drawScore();
-
-    // if near object, draw info
-    if(drawInfo)
+    for(int i = 0; i < numberOfStudents; i++)
     {
-        drawSphereInfo();
-    }
-}
-
-void WorldView::nearObjectListener(CustomEvent &e)
-{
-    cursor->visible = true;
-    exitInfoScreenButton.active = true;
-    drawInfo = true;
-    score++;
-}
-
-void WorldView::drawLandscape()
-{
-    // sky wires
-    ofSetColor(240,240,240);
-    landscape.setPosition(0, 0, 750);
-    landscape.setScale(50,50,15);
-//    landscape.drawWireframe();
-    glPointSize(2);
-    landscape.drawVertices();
-
-    // sky faces
-//    ofSetColor(200,200,240);
-//    landscape.setPosition(0, 0,751);
-//    landscape.drawFaces();
-
-    // floor wire
-    ofSetColor(100,100,100);
-    landscape.setPosition(0, 0, -499);
-    landscape.setScale(50,50,10);
-    landscape.drawWireframe();
-
-    // floor faces
-    ofSetColor(0,0,50);
-    landscape.setPosition(0, 0, -500);
-    landscape.drawFaces();
-}
-
-void WorldView::drawScore()
-{
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_FOG);
-
-    ofSetColor(10,10,240);
-    Helvetica22.drawString("Score: " + ofToString(score) + " / " + ofToString(numberOfStudents), 50, 50);
-
-    glEnable(GL_FOG);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-}
-
-void WorldView::drawSphereInfo()
-{
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_FOG);
-
-    ofEnableAlphaBlending();
-    ofSetColor(255,255,255,125);
-    ofRect(0,0, ofGetWidth(), ofGetHeight());
-    ofSetColor(255,255,255);
-
-
-    int infoXPos = 50;
-    int infoYPos = 200;
-    // currentSphere is -1 at start of program
-    if(currentSphere > -1)
-    {
-        // sphere id changed? update student if so
-        if( currentStudent.id != mySphere[currentSphere]->id)
+        if(mySphere[i]->getClosestToCamera())
         {
-            currentStudent.setup(mySphere[currentSphere]->id);
+            std::string fullName = mySphere[i]->getFullName();
+            int id = mySphere[i]->id;
+            std::string info = fullName + " / " + ofToString(id);
+            ofSetColor(10,10,10);
+            ofRectangle nameRect = Helvetica22.getStringBoundingBox(info, 45,45);
+            ofRect(nameRect.x, nameRect.y, nameRect.width +10, nameRect.height +10);
+            ofSetColor(255,255,255);
+            Helvetica22.drawString(info, 50,50);
+
+            ofVec3f worldXYZ = mySphere[i]->getPostion();
+            ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
+
+            ofSetColor(10,10,10);
+            ofRectangle idRect = Helvetica15.getStringBoundingBox(ofToString(id), 0,0);
+            int x = screenXYZ.x + 47;
+            int y = screenXYZ.y + 10;
+            ofRect(x - 5, y - idRect.height - 5, idRect.width + 10, idRect.height +10);
+            ofSetColor(255,255,255);
+            Helvetica15.drawString(ofToString(id), x, y);
         }
-        currentStudent.drawImage(infoXPos + 500, infoYPos, 300);
-//        infoBackground.draw(infoXPos - 30, infoYPos - 30, -1);
-        ofSetColor(10,240,50);
-        infoYPos += 50;
-
-        Helvetica22.drawString(currentStudent.first_name + " " + currentStudent.last_name , infoXPos, infoYPos);
-//        Helvetica22.drawString(currentStudent.last_name, infoXPos, infoYPos + 25);
-        Helvetica15.drawString(currentStudent.titel, infoXPos, infoYPos + 50);
     }
-
-    ofDisableAlphaBlending();
-
-    glEnable(GL_FOG);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-
 }
 
+void WorldView::keyReleased(ofKeyEventArgs &e)
+{
+    switch(e.key)
+    {
+    case 'e':
+        changeZoomLevel(1);
+        break;
+    case 'q':
+        changeZoomLevel(0);
+        break;
+    }
+}
 
 
 void WorldView::keyPressed(ofKeyEventArgs &e)
 {
-
+    switch(e.key)
+    {
+    case 'w':
+        camera.boom(1.0f);
+        break;
+    case 's':
+        camera.boom(-1.0f);
+        break;
+    case 'a':
+        camera.truck(-1.0f);
+        break;
+    case 'd':
+        camera.truck(1.0f);
+        break;
+    }
 }
+
+
+void WorldView::changeZoomLevel(int _zoomLevel)
+{
+    static CustomEvent changeZoomLevel;
+    changeZoomLevel.zoomLevel = _zoomLevel;
+    ofNotifyEvent(CustomEvent::zoomChange, changeZoomLevel);
+}
+
+void WorldView::zoomChangeListener(CustomEvent &e)
+{
+    if(e.zoomLevel == 0)
+    {
+        if(zoomLevel < 3)
+        {
+            zoomLevel++;
+            cameraHeight += 1000;
+        }
+        else
+        {
+            cout << "Max Zoomout." << endl;
+        }
+    }
+    else if (e.zoomLevel == 1)
+    {
+        if(zoomLevel > 1)
+        {
+            zoomLevel--;
+            cameraHeight -= 1000;
+        }
+        else
+        {
+            cout << "Max Zoomin." << endl;
+        }
+
+    }
+    cout << "cameraHeight: " << cameraHeight << endl;
+    cout << "zoomLevel: " << zoomLevel << endl;
+}
+
+void WorldView::mouseDragged(ofMouseEventArgs &e)
+{
+    float dragSpeed;
+    switch(zoomLevel)
+    {
+    case 1:
+        dragSpeed = 10.0f;
+        break;
+    case 2:
+        dragSpeed = 20.0f;
+        break;
+    case 3:
+        dragSpeed = 30.0f;
+        break;
+    }
+
+    if(e.x > pmouseX)
+    {
+        camera.truck(-dragSpeed);
+    }
+    if(e.x < pmouseX)
+    {
+        camera.truck(dragSpeed);
+    }
+    if(e.y > pmouseY)
+    {
+        camera.boom(dragSpeed);
+    }
+    if(e.y < pmouseY)
+    {
+        camera.boom(-dragSpeed);
+    }
+
+    pmouseX = e.x;
+    pmouseY = e.y;
+}
+
+
+

@@ -12,87 +12,72 @@ Object3D::~Object3D()
 void Object3D::setup(int _x, int _y, int _z, int _size, int _id)
 {
     // general
+    closestToCamera = false;
     id = _id;
     x = _x;
     y = _y;
     z = _z;
     size = _size;
+    zoomLevel = 3;
     sphereColor_1 = ofRandom(180, 255);
     sphereColor_2 = ofRandom(180, 255);
-    nearBool = false;
 
-    // 3d model
-    subject.loadModel("platonic.3ds");
-    ring.loadModel("ring.3ds");
-    subjectMesh = subject.getMesh(0);
-    ringMesh = ring.getMesh(0);
-    rotateDegree = 0;
-
-    // light
-    objectLight.setPosition(x,y,z);
-    objectLight.setSpotlight(50, 3);
-//    objectLight.enable();
+    first_name = "Max";
+    last_name = "Mustermann";
 }
 
 void Object3D::draw()
 {
-    // draw subject form
-    drawObject();
-    nearBool = false;
+    int adjustedSize;
+    switch(zoomLevel)
+    {
+    case 1:
+        adjustedSize = size * 0.3;
+        break;
+    case 2:
+        adjustedSize = size * 0.6;
+        break;
+    case 3:
+        adjustedSize = size;
+        break;
+    }
+
+    ofSetColor(50,50,50);
+    ofNoFill();
+    ofEllipse(x,y,z,adjustedSize,adjustedSize);
+    ofFill();
+    ofEllipse(x,y,z,adjustedSize - adjustedSize * 0.3,adjustedSize - adjustedSize * 0.3);
+
+    if(closestToCamera)
+    {
+        ofNoFill();
+        ofSetColor(50,0,100);
+        ofEllipse(x,y,z,adjustedSize*1.3,adjustedSize*1.3);
+        ofFill();
+        ofSetColor(200,50,50);
+        ofEllipse(x,y,z,adjustedSize - adjustedSize * 0.3,adjustedSize - adjustedSize * 0.3);
+    }
 }
 
-void Object3D::drawNear()
+std::string Object3D::getFullName()
 {
-    // notify listeners
-
-    if(!nearBool)
-    {
-        static CustomEvent nearObjectEvent;
-        nearObjectEvent.objectId = id;
-        ofNotifyEvent(CustomEvent::nearObject, nearObjectEvent);
-    }
-    nearBool = true;
-    drawObject();
+    std::string fullName = first_name + " " + last_name;
+    return fullName;
 }
 
-void Object3D::drawObject()
+void Object3D::setZoomLevel(int _zoomLevel)
 {
-    ofPushMatrix();
+    zoomLevel = _zoomLevel;
+}
 
-    // set color
-    if(nearBool)
-    {
-        ofSetColor(0, 255, 0);
-        ofTranslate(x,y,100);
-    }
-    else
-    {
-        ofSetColor(10, 200, 50);
-    }
+void Object3D::setClosestToCamera(bool _closest)
+{
+    closestToCamera = _closest;
+}
 
-    // draw subject form
-    int height;
-    if(rotateDegree < 360.0)
-    {
-        rotateDegree++;
-        height = 60 * sin(rotateDegree * 0.05);
-    }
-    else
-    {
-        rotateDegree = 0.0;
-        height = 60 * sin(rotateDegree * 0.05);
-    }
-
-    if(!nearBool) {ofTranslate(x,y,100 + height);}
-
-    ofRotate(rotateDegree);
-    subjectMesh.drawFaces();
-    glPointSize(3);
-    subjectMesh.drawVertices();
-    ofSetColor(100,100,100);
-    subjectMesh.drawWireframe();
-    ofPopMatrix();
-
+bool Object3D::getClosestToCamera()
+{
+    return closestToCamera;
 }
 
 ofVec3f Object3D::getPostion()

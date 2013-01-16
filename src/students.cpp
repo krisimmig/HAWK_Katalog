@@ -3,6 +3,7 @@
 Students::Students()
 {
     //ctor
+    cout << "Students ctor" << endl;
 //    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
 //    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
 }
@@ -40,7 +41,7 @@ void Students::setup(int _id)
     {
         cout << "error loading image: " << image_01 << endl;
     }
-
+    cout << "Students::setup(int _id)" << endl;
     delete sqlite;
 
 }

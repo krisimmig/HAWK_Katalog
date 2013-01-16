@@ -3,7 +3,7 @@
 
 testApp::testApp()
 {
-
+    viewmanager.setCursor(cursor);
 }
 
 void testApp::setup()
@@ -15,7 +15,7 @@ void testApp::setup()
     garamondRegularH1.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 25);
 
     // use app with or without kinect
-    useKinect = true;
+    useKinect = false;
     if(useKinect)
     {
         // ---------------------------------
@@ -33,7 +33,7 @@ void testApp::setup()
         openNIDevice.start();
     }
 
-    viewmanager.setCursor(cursor);
+
     cursorRadius = 40;
 
 }
@@ -138,33 +138,6 @@ void testApp::draw()
     {
         ofHideCursor();
     }
-
-    if(viewmanager.currentView == WORLDVIEW)
-    {
-        glDisable(GL_LIGHTING);
-    }
-
-    ofPopMatrix();
-    ofTranslate(0,0,1);
-
-    ofSetColor(255,255,255);
-    float factor = 0.5f;
-//    openNIDevice.drawImage(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor);
-//    if(userId < 0)
-//    {
-//       openNIDevice.drawSkeleton(ofGetWidth() - 640 * factor, ofGetHeight() - 480 * factor,640 * factor,480 * factor, userId);
-//    }
-
-
-    ofPopMatrix();
-
-    if(viewmanager.currentView == WORLDVIEW)
-    {
-        glEnable(GL_LIGHTING);
-    }
-    ofSetColor(10,10,255);
-    garamondRegularH1.drawString(userInfo, 550, 50);
-
 }
 
 void testApp::exit()
