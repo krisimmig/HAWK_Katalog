@@ -26,23 +26,28 @@ private:
     void mouseDragged(ofMouseEventArgs &e);
     void changeZoomLevel(int zoomLevel);
     void zoomChangeListener(CustomEvent &e);
+    void moveScreen(ofVec2f moveVector);
+    void kinectMove();
     HandCursor* cursor;
 
     // environment + camera
     ofCamera camera;
     ofLight light;
+    float cameraHeight;
+    float dragSpeed;
+    float currentDragSpeed;
+    int zoomLevel;
+
+    float pmouseX;
+    float pmouseY;
 
     // 3d objects
     Object3D** mySphere;
     int currentSphere;
     int sphereSize;
-    int zoomLevel;
-    int pmouseX;
-    int pmouseY;
-    float cameraHeight;
+    int gestureTimer;
 
     // student stuff
-
     int numberOfStudents;
 //    int* studentIdArray;
     ofTrueTypeFont Helvetica22;

@@ -3,7 +3,7 @@
 ViewManager::ViewManager()
 {
     //ctor
-    currentView = WORLDVIEW;
+    currentView = MAINMENU;
     currentDept = "GD";
 
     // create first view with event
@@ -35,7 +35,9 @@ void ViewManager::viewChanged(CustomEvent &e)
         break;
     case WORLDVIEW :
         w_view = new WorldView();
-//        w_view->setCursor(cursor);
+        cout << "set cursor" << endl;
+        w_view->setCursor(cursor);
+        cout << "set cursor end" << endl;
         break;
     }
 }

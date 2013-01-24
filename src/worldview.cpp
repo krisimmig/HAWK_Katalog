@@ -13,11 +13,14 @@ WorldView::WorldView()
     Helvetica22.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
     Helvetica15.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
     ofEnableSmoothing();
+    gestureTimer = 0;
 
     // camera
-    cameraHeight = 2000;
+    cameraHeight = 5000;
     camera.setPosition(0,0,cameraHeight);
     zoomLevel = 3;
+    dragSpeed = 40.0f;
+    currentDragSpeed = dragSpeed;
 
     // student setup
     numberOfStudents = 92;
@@ -25,8 +28,8 @@ WorldView::WorldView()
     mySphere = new Object3D*[numberOfStudents];
 
     // spheres
-    sphereSize = 150;
-    int abstand = 250;
+    sphereSize = 550;
+    int abstand = 750;
     int counter = 0;
     for(int i = 0; i < numberOfStudents; i++)
     {
@@ -58,6 +61,7 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
+
     if(camera.getPosition().z < cameraHeight)
     {
         camera.dolly(40);
@@ -72,12 +76,16 @@ void WorldView::update(ofEventArgs &e)
     {
         mySphere[i]->setZoomLevel(zoomLevel);
     }
+
+    if(gestureTimer > 0)
+    {
+        gestureTimer--;
+    }
 }
 
 void WorldView::setCursor(HandCursor *c)
 {
     cursor = c;
-    cursor->visible = false;
 }
 
 void WorldView::draw(ofEventArgs &e)
@@ -103,6 +111,8 @@ void WorldView::draw(ofEventArgs &e)
             mySphere[i]->draw();
         }
     }
+    kinectMove();
+
     camera.end();
 
     if(zoomLevel == 3)
@@ -175,6 +185,16 @@ void WorldView::draw(ofEventArgs &e)
             Helvetica15.drawString(ofToString(id), x, y);
         }
     }
+
+    // draw sucher
+    ofNoFill();
+    ofEnableAlphaBlending();
+    ofSetColor(10,10,10,130);
+    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
+    ofSetColor(10,10,10,100);
+    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
+    ofDisableAlphaBlending();
+
 }
 
 void WorldView::keyReleased(ofKeyEventArgs &e)
@@ -189,7 +209,6 @@ void WorldView::keyReleased(ofKeyEventArgs &e)
         break;
     }
 }
-
 
 void WorldView::keyPressed(ofKeyEventArgs &e)
 {
@@ -210,7 +229,6 @@ void WorldView::keyPressed(ofKeyEventArgs &e)
     }
 }
 
-
 void WorldView::changeZoomLevel(int _zoomLevel)
 {
     static CustomEvent changeZoomLevel;
@@ -220,70 +238,93 @@ void WorldView::changeZoomLevel(int _zoomLevel)
 
 void WorldView::zoomChangeListener(CustomEvent &e)
 {
-    if(e.zoomLevel == 0)
+    if(gestureTimer == 0)
     {
-        if(zoomLevel < 3)
+        // 0 = zoomout
+        if(e.zoomLevel == 0)
         {
-            zoomLevel++;
-            cameraHeight += 1000;
-        }
-        else
-        {
-            cout << "Max Zoomout." << endl;
-        }
-    }
-    else if (e.zoomLevel == 1)
-    {
-        if(zoomLevel > 1)
-        {
-            zoomLevel--;
-            cameraHeight -= 1000;
-        }
-        else
-        {
-            cout << "Max Zoomin." << endl;
+            if(zoomLevel < 3)
+            {
+                zoomLevel++;
+                cameraHeight += 1000;
+            }
+            else
+            {
+                cout << "Max Zoomout." << endl;
+            }
         }
 
+        // 1 = zoomin
+        else if (e.zoomLevel == 1)
+        {
+            if(zoomLevel > 1)
+            {
+                zoomLevel--;
+                cameraHeight -= 1000;
+            }
+            else
+            {
+                cout << "Max Zoomin." << endl;
+            }
+
+        }
+
+        // change camera move speed
+        switch(zoomLevel)
+        {
+        case 1:
+            currentDragSpeed = dragSpeed * 0.5f;
+            break;
+        case 2:
+            currentDragSpeed = dragSpeed * 0.7f;
+            break;
+        case 3:
+            currentDragSpeed = dragSpeed;
+            break;
+        }
+        gestureTimer = 15;
     }
-    cout << "cameraHeight: " << cameraHeight << endl;
-    cout << "zoomLevel: " << zoomLevel << endl;
 }
 
 void WorldView::mouseDragged(ofMouseEventArgs &e)
 {
-    float dragSpeed;
-    switch(zoomLevel)
+    ofVec2f mouseCoords;
+    mouseCoords.set(e.x, e.y);
+    moveScreen(mouseCoords);
+}
+//
+void WorldView::kinectMove()
+{
+    if(cursor->cursorDrag)
     {
-    case 1:
-        dragSpeed = 10.0f;
-        break;
-    case 2:
-        dragSpeed = 20.0f;
-        break;
-    case 3:
-        dragSpeed = 30.0f;
-        break;
+        moveScreen(cursor->moveVector);
+    }
+}
+
+void WorldView::moveScreen(ofVec2f moveVector)
+{
+    // left - right
+    if(moveVector.x > pmouseX)
+    {
+        camera.truck(-currentDragSpeed);
+    }
+    if(moveVector.x < pmouseX)
+    {
+        camera.truck(currentDragSpeed);
     }
 
-    if(e.x > pmouseX)
+    // up - down
+    if(moveVector.y > pmouseY)
     {
-        camera.truck(-dragSpeed);
+        camera.boom(currentDragSpeed);
     }
-    if(e.x < pmouseX)
+    if(moveVector.y < pmouseY)
     {
-        camera.truck(dragSpeed);
-    }
-    if(e.y > pmouseY)
-    {
-        camera.boom(dragSpeed);
-    }
-    if(e.y < pmouseY)
-    {
-        camera.boom(-dragSpeed);
+        camera.boom(-currentDragSpeed);
     }
 
-    pmouseX = e.x;
-    pmouseY = e.y;
+    pmouseX = moveVector.x;
+    pmouseY = moveVector.y;
 }
 
 

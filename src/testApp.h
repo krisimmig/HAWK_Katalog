@@ -18,6 +18,7 @@ public:
     void update();
     void draw();
     void exit();
+    void changeZoomLevel(int _zoomLevel);
 
     ofTrueTypeFont garamondRegularH1;
 
@@ -31,12 +32,14 @@ public:
     HandCursor cursor;
     int cursorXPos;
     int cursorYPos;
-    int cursorRadius;
+
     float kinectMovementX;
     float kinectMovementY;
     float kinectMovementZ;
-    float radius;
-    bool trackingHand;
+    float handsDistance;
+    float previousHandsDistance;
+
+    bool twoHands;
     std::string userInfo;
 
     int userId;

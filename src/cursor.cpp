@@ -2,21 +2,22 @@
 
 HandCursor::HandCursor()
 {
-    visible = true;
+
 }
 
-void HandCursor::setup(int x, int y, int r)
+void HandCursor::setup(int x, int y)
 {
     xPos = x;
     yPos = y;
-    radius = r;
-
+    cursorDrag = false;
+    moveVector.set(x,y);
 }
 
 void HandCursor::update(int x, int y)
 {
     xPos = x;
     yPos = y;
+    moveVector.set(x,y);
 }
 
 void HandCursor::draw()

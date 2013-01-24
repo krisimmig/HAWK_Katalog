@@ -52,11 +52,11 @@
 	<File name="src\constants.h" open="0" top="0" tabpos="9">
 		<Cursor position="214" topLine="0" />
 	</File>
-	<File name="src\cursor.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="288" topLine="0" />
+	<File name="src\cursor.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="179" topLine="0" />
 	</File>
-	<File name="src\cursor.h" open="0" top="0" tabpos="12">
-		<Cursor position="257" topLine="0" />
+	<File name="src\cursor.h" open="1" top="0" tabpos="8">
+		<Cursor position="266" topLine="0" />
 	</File>
 	<File name="src\customevent.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="217" topLine="0" />
@@ -79,16 +79,16 @@
 	<File name="src\mainmenu.h" open="0" top="0" tabpos="2">
 		<Cursor position="42" topLine="0" />
 	</File>
-	<File name="src\mycamera.cpp" open="1" top="0" tabpos="5">
+	<File name="src\mycamera.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="8676" topLine="392" />
 	</File>
 	<File name="src\mycamera.h" open="0" top="0" tabpos="3">
 		<Cursor position="991" topLine="30" />
 	</File>
-	<File name="src\object3d.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="661" topLine="25" />
+	<File name="src\object3d.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1103" topLine="25" />
 	</File>
-	<File name="src\object3d.h" open="1" top="0" tabpos="4">
+	<File name="src\object3d.h" open="0" top="0" tabpos="4">
 		<Cursor position="407" topLine="0" />
 	</File>
 	<File name="src\overview.cpp" open="0" top="0" tabpos="7">
@@ -109,11 +109,11 @@
 	<File name="src\students.h" open="0" top="0" tabpos="10">
 		<Cursor position="87" topLine="0" />
 	</File>
-	<File name="src\testApp.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="71" topLine="0" />
+	<File name="src\testApp.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="1709" topLine="42" />
 	</File>
-	<File name="src\testApp.h" open="0" top="0" tabpos="8">
-		<Cursor position="762" topLine="0" />
+	<File name="src\testApp.h" open="1" top="0" tabpos="4">
+		<Cursor position="363" topLine="0" />
 	</File>
 	<File name="src\viewchangebutton.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="342" topLine="0" />
@@ -121,16 +121,16 @@
 	<File name="src\viewchangebutton.h" open="0" top="0" tabpos="11">
 		<Cursor position="413" topLine="0" />
 	</File>
-	<File name="src\viewmanager.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="443" topLine="3" />
+	<File name="src\viewmanager.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="97" topLine="18" />
 	</File>
-	<File name="src\viewmanager.h" open="0" top="0" tabpos="9">
-		<Cursor position="93" topLine="0" />
+	<File name="src\viewmanager.h" open="1" top="0" tabpos="6">
+		<Cursor position="311" topLine="0" />
 	</File>
 	<File name="src\worldview.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="3868" topLine="118" />
+		<Cursor position="8145" topLine="259" />
 	</File>
 	<File name="src\worldview.h" open="1" top="0" tabpos="2">
-		<Cursor position="540" topLine="10" />
+		<Cursor position="1002" topLine="10" />
 	</File>
 </CodeBlocks_layout_file>
