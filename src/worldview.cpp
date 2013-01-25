@@ -10,16 +10,25 @@ WorldView::WorldView()
     ofAddListener(ofEvents().mouseDragged, this, &WorldView::mouseDragged);
     ofAddListener(CustomEvent().zoomChange, this, &WorldView::zoomChangeListener);
 
-    Helvetica22.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
-    Helvetica15.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
+    HelveticaXL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 50);
+    HelveticaL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
+    HelveticaS.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
     ofEnableSmoothing();
     gestureTimer = 0;
+    random10 = ofRandom(10);
 
     // camera
-    cameraHeight = 5000;
-    camera.setPosition(0,0,cameraHeight);
+    cameraHeight = -2500;
+    ofVec3f v1;
+    ofVec3f v2;
+    v1.set(0,1,0);
+    v2.set(0,0,1);
+    camera.rotate(180, v1);
+    camera.rotate(180, v2);
+    currentCameraHeight = cameraHeight;
+    camera.setPosition(1000,1000,currentCameraHeight);
     zoomLevel = 3;
-    dragSpeed = 40.0f;
+    dragSpeed = 30.0f;
     currentDragSpeed = dragSpeed;
 
     // student setup
@@ -28,8 +37,9 @@ WorldView::WorldView()
     mySphere = new Object3D*[numberOfStudents];
 
     // spheres
-    sphereSize = 550;
-    int abstand = 750;
+    sphereSize = 350;
+    int abstandX = 156;
+    int abstandY = 184;
     int counter = 0;
     for(int i = 0; i < numberOfStudents; i++)
     {
@@ -38,11 +48,12 @@ WorldView::WorldView()
         {
             if(counter < numberOfStudents)
             {
-                int x = abstand * i;
-                int y = abstand * j;
-                int z = -800;
+                int x = abstandX * i;
+                int y = abstandY * j;
+                int z = 0;
                 mySphere[counter] = new Object3D();
                 mySphere[counter]->setup(x,y,z, sphereSize, counter);
+                mySphere[counter]->setFont(HelveticaXL);
                 counter++;
             }
         }
@@ -61,13 +72,13 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
-
-    if(camera.getPosition().z < cameraHeight)
+    // zoomout
+    if(camera.getPosition().z > currentCameraHeight)
     {
         camera.dolly(40);
     }
-
-    if(camera.getPosition().z > cameraHeight)
+    // zoomin
+    if(camera.getPosition().z < currentCameraHeight)
     {
         camera.dolly(-40);
     }
@@ -93,28 +104,18 @@ void WorldView::draw(ofEventArgs &e)
     ofBackgroundGradient(ofColor(255), ofColor(175));
     camera.begin();
 
-    // draw objects
+
+
+    // draw all objects
     for(int i = 0; i < numberOfStudents; i++)
     {
-        ofVec3f spherePos = mySphere[i]->getPostion();
-        ofVec3f cameraPos = camera.getPosition();
-        float distance = cameraPos.distance(spherePos);
-        if(distance < 809)
-        {
-            mySphere[i]->setClosestToCamera(true);
-            mySphere[i]->draw();
-            std::string fullName = mySphere[i]->getFullName();
-        }
-        else
-        {
-            mySphere[i]->setClosestToCamera(false);
-            mySphere[i]->draw();
-        }
+        mySphere[i]->draw();
     }
+
     kinectMove();
 
     camera.end();
-
+    // overview
     if(zoomLevel == 3)
     {
         ofVec3f middleWordlXYZ = mySphere[numberOfStudents/2]->getPostion();
@@ -122,7 +123,7 @@ void WorldView::draw(ofEventArgs &e)
 
         std::string fachbereich = "GRAFIKDESIGN";
         ofSetColor(10,10,10);
-        ofRectangle fachbereichRect = Helvetica22.getStringBoundingBox(fachbereich, 0,0);
+        ofRectangle fachbereichRect = HelveticaL.getStringBoundingBox(fachbereich, 0,0);
         int x = middleScreenXYZ.x - fachbereichRect.width / 2;
         int y = middleScreenXYZ.y + fachbereichRect.height / 2;
         ofPushMatrix();
@@ -130,33 +131,25 @@ void WorldView::draw(ofEventArgs &e)
         ofRect(x - 5, y - fachbereichRect.height - 5, fachbereichRect.width + 10, fachbereichRect.height +10);
         ofSetColor(255,255,255);
 
-        Helvetica22.drawString(fachbereich, x, y);
+        HelveticaL.drawString(fachbereich, x, y);
         ofPopMatrix();
     }
 
-    if(zoomLevel == 2)
+    // toggle center object highlight
+    if(zoomLevel == 1)
     {
         for(int i = 0; i < numberOfStudents; i++)
         {
-            int thisId = mySphere[i]->id;
-            if(thisId % 5 == 0)
-            {
-                ofVec3f sphereWordlXYZ = mySphere[i]->getPostion();
-                ofVec3f sphereScreenXYZ = camera.worldToScreen(sphereWordlXYZ, ofGetCurrentViewport() );
+            ofVec3f wordlXYZ = mySphere[i]->getPostion();
+            ofVec3f screenXYZ = camera.worldToScreen(wordlXYZ, ofGetCurrentViewport() );
 
-                int sphereId = mySphere[i]->id;
-                ofSetColor(10,10,10);
-                ofRectangle sphereIdRect = Helvetica15.getStringBoundingBox(ofToString(sphereId), 0,0);
-                int x = sphereScreenXYZ.x - sphereIdRect.width / 2;
-                int y = sphereScreenXYZ.y + sphereIdRect.height / 2;
+            ofVec2f screenMid;
+            ofVec2f objectPos;
 
-                ofPushMatrix();
-                ofTranslate(30,0,0);
-                ofRect(x - 5, y - sphereIdRect.height - 5, sphereIdRect.width + 10, sphereIdRect.height +10);
-                ofSetColor(255,255,255);
-                Helvetica15.drawString(ofToString(sphereId), x, y);
-                ofPopMatrix();
-            }
+            screenMid.set(ofGetWidth()/2,ofGetHeight()/2);
+            objectPos.set(screenXYZ.x, screenXYZ.y);
+
+            (screenMid.distance(objectPos) < 100) ? mySphere[i]->setClosestToCamera(true) : mySphere[i]->setClosestToCamera(false);
         }
     }
 
@@ -165,34 +158,57 @@ void WorldView::draw(ofEventArgs &e)
         if(mySphere[i]->getClosestToCamera())
         {
             std::string fullName = mySphere[i]->getFullName();
-            int id = mySphere[i]->id;
-            std::string info = fullName + " / " + ofToString(id);
-            ofSetColor(10,10,10);
-            ofRectangle nameRect = Helvetica22.getStringBoundingBox(info, 45,45);
-            ofRect(nameRect.x, nameRect.y, nameRect.width +10, nameRect.height +10);
-            ofSetColor(255,255,255);
-            Helvetica22.drawString(info, 50,50);
 
             ofVec3f worldXYZ = mySphere[i]->getPostion();
             ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
 
-            ofSetColor(10,10,10);
-            ofRectangle idRect = Helvetica15.getStringBoundingBox(ofToString(id), 0,0);
             int x = screenXYZ.x + 47;
             int y = screenXYZ.y + 10;
-            ofRect(x - 5, y - idRect.height - 5, idRect.width + 10, idRect.height +10);
+
+            ofSetColor(10,10,10);
+            ofRectangle infoRect = HelveticaL.getStringBoundingBox(fullName, 0,0);
+            ofRect(x - 5, y - infoRect.height - 5, infoRect.width + 10, infoRect.height +10);
             ofSetColor(255,255,255);
-            Helvetica15.drawString(ofToString(id), x, y);
+            HelveticaL.drawString(fullName, x, y);
         }
     }
 
     // draw sucher
-    ofNoFill();
-    ofEnableAlphaBlending();
-    ofSetColor(10,10,10,130);
-    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
-    ofSetColor(10,10,10,100);
-    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
+    if(zoomLevel < 3)
+    {
+        ofNoFill();
+        ofEnableAlphaBlending();
+        ofSetColor(10,10,10,130);
+        ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
+        ofSetColor(10,10,10,100);
+        ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
+    }
+
+    // draw hand user tracking indicators
+    // hand
+    ofFill();
+    (cursor->trackingHand) ? ofSetColor(10,255,10,255) : ofSetColor(10,255,10,100);
+    ofEllipse(ofGetWidth() - 50, ofGetHeight() - 50, 40, 40);
+
+    // user
+    (cursor->trackingUser) ? ofSetColor(10,255,10,255) : ofSetColor(10,255,10,100);
+    ofEllipse(ofGetWidth() - 100, ofGetHeight() - 50, 40, 40);
+    ofDisableAlphaBlending();
+
+    // calibrating user
+    if(cursor->calibratingUser)
+    {
+        ofSetColor(200,10,10,255);
+        ofEllipse(ofGetWidth() - 100, ofGetHeight() - 50, 40, 40);
+    }
+
+    // calibrating user
+    if(gestureTimer != 0)
+    {
+        ofSetColor(200,10,10,255);
+        ofEllipse(100, ofGetHeight() - 50, 40, 40);
+    }
+
     ofDisableAlphaBlending();
 
 }
@@ -238,6 +254,8 @@ void WorldView::changeZoomLevel(int _zoomLevel)
 
 void WorldView::zoomChangeListener(CustomEvent &e)
 {
+    float zoomAmount = (cameraHeight+500)/2;
+
     if(gestureTimer == 0)
     {
         // 0 = zoomout
@@ -246,7 +264,7 @@ void WorldView::zoomChangeListener(CustomEvent &e)
             if(zoomLevel < 3)
             {
                 zoomLevel++;
-                cameraHeight += 1000;
+                currentCameraHeight +=  zoomAmount;
             }
             else
             {
@@ -260,7 +278,7 @@ void WorldView::zoomChangeListener(CustomEvent &e)
             if(zoomLevel > 1)
             {
                 zoomLevel--;
-                cameraHeight -= 1000;
+                currentCameraHeight -= zoomAmount;
             }
             else
             {
@@ -273,17 +291,18 @@ void WorldView::zoomChangeListener(CustomEvent &e)
         switch(zoomLevel)
         {
         case 1:
-            currentDragSpeed = dragSpeed * 0.5f;
+            currentDragSpeed = dragSpeed * 0.17f;
             break;
         case 2:
-            currentDragSpeed = dragSpeed * 0.7f;
+            currentDragSpeed = dragSpeed * 0.45f;
             break;
         case 3:
             currentDragSpeed = dragSpeed;
             break;
         }
-        gestureTimer = 15;
+        gestureTimer = 30;
     }
+
 }
 
 void WorldView::mouseDragged(ofMouseEventArgs &e)
@@ -313,15 +332,19 @@ void WorldView::moveScreen(ofVec2f moveVector)
         camera.truck(currentDragSpeed);
     }
 
-    // up - down
-    if(moveVector.y > pmouseY)
+    // up - down / not in zoomout max
+    if(zoomLevel < 3)
     {
-        camera.boom(currentDragSpeed);
+        if(moveVector.y > pmouseY)
+        {
+            camera.boom(currentDragSpeed);
+        }
+        if(moveVector.y < pmouseY)
+        {
+            camera.boom(-currentDragSpeed);
+        }
     }
-    if(moveVector.y < pmouseY)
-    {
-        camera.boom(-currentDragSpeed);
-    }
+
 
     pmouseX = moveVector.x;
     pmouseY = moveVector.y;

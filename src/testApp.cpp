@@ -45,6 +45,10 @@ void testApp::update()
         int numUsers = openNIDevice.getNumTrackedUsers();
         int numHands = openNIDevice.getNumTrackedHands();
 
+        (numHands > 0) ? cursor.trackingHand = true : cursor.trackingHand = false;
+        (numUsers > 0) ? cursor.trackingUser = true : cursor.trackingUser = false;
+        if(numUsers == 0) cursor.calibratingUser = false;
+
         // iterate through users
         for (int i = 0; i < numHands; i++)
         {
@@ -62,6 +66,8 @@ void testApp::update()
         for (int i = 0; i < numUsers; i++)
         {
             user = &openNIDevice.getTrackedUser(i);
+            (user->isCalibrating()) ?  cursor.calibratingUser = true : cursor.calibratingUser = false;
+
             float rightHandX = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().x;
             float rightHandY = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().y;
             float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
@@ -100,12 +106,10 @@ void testApp::update()
                 if(handsDistance > previousHandsDistance && distanceDifference > 100)
                 {
                     changeZoomLevel(1);
-                    cout << "zoom in from testApp ******** " << endl;
                 }
                 else if(handsDistance < previousHandsDistance && distanceDifference < -100)
                 {
                     changeZoomLevel(0);
-                    cout << "******** zoom out from testApp" << endl;
                 }
             }
 

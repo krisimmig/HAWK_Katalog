@@ -34,9 +34,11 @@ private:
     ofCamera camera;
     ofLight light;
     float cameraHeight;
+    float currentCameraHeight;
     float dragSpeed;
     float currentDragSpeed;
     int zoomLevel;
+    int random10;
 
     float pmouseX;
     float pmouseY;
@@ -50,12 +52,10 @@ private:
     // student stuff
     int numberOfStudents;
 //    int* studentIdArray;
-    ofTrueTypeFont Helvetica22;
-    ofTrueTypeFont Helvetica15;
+    ofTrueTypeFont HelveticaXL;
+    ofTrueTypeFont HelveticaL;
+    ofTrueTypeFont HelveticaS;
 
-
-    // fog
-    float fogDistance;
 };
 
 #endif // WORLDVIEW_H
