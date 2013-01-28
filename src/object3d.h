@@ -18,12 +18,13 @@ public:
     bool getClosestToCamera();
     std::string getFullName();
 
-    ofVec3f getPostion();
+    ofVec3f getPosition();
     int id;
     std::string letter;
     vector<string> letters;
 
     ofImage image_portrait;
+    ofImage image_project_01;
     bool isMaster;
     bool isABC;
 
@@ -38,7 +39,7 @@ private:
     std::string first_name;
     std::string last_name;
     std::string fullName;
-    std::string image_01;
+    std::string file_project_01;
     std::string file_portrait;
 
     int size;

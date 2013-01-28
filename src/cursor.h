@@ -11,14 +11,15 @@ public:
     void update(int x, int y);
     void calculatePos();
     void draw();
+    bool coordsReady();
     int xPos;
     int yPos;
-    int smoothXPos;
-    int smoothYPos;
+    float smoothXPos;
+    float smoothYPos;
     bool cursorDrag;
     ofVec2f moveVector;
-    std::list<int> listOfXPositions;
-    std::list<int> listOfYPositions;
+    std::list<float> listOfXPositions;
+    std::list<float> listOfYPositions;
 
     bool calibratingUser;
     bool trackingUser;

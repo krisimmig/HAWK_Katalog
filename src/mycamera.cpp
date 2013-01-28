@@ -430,8 +430,6 @@ void MyCamera::makerotations()
 //--------------------------------------------------------------
 void MyCamera::myMyCameraMouseDragged(ofMouseEventArgs& args)
 {
-
     mousedragged = true;
-
 }
 

@@ -27,11 +27,7 @@ void testApp::setup()
         openNIDevice.addImageGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
-        openNIDevice.addHandsGenerator();
-        openNIDevice.addAllHandFocusGestures();
-        openNIDevice.setMaxNumUsers(3);
-        openNIDevice.setUserSmoothing(6);
-        openNIDevice.setMaxNumHands(2);
+        openNIDevice.setMaxNumUsers(1);
         openNIDevice.start();
     }
 
@@ -45,23 +41,8 @@ void testApp::update()
         int numUsers = openNIDevice.getNumTrackedUsers();
         int numHands = openNIDevice.getNumTrackedHands();
 
-        (numHands > 0) ? cursor.trackingHand = true : cursor.trackingHand = false;
         (numUsers > 0) ? cursor.trackingUser = true : cursor.trackingUser = false;
         if(numUsers == 0) cursor.calibratingUser = false;
-
-        // iterate through users
-        for (int i = 0; i < numHands; i++)
-        {
-
-            // get a reference to this user
-            ofxOpenNIHand & hand = openNIDevice.getTrackedHand(i);
-
-            // get hand position
-            ofPoint & handPosition = hand.getPosition();
-            // set cursor Position & adjust to screensize
-            cursorXPos = ( handPosition.x / (600 / 100) ) * (ofGetWidth() / 100);
-            cursorYPos = ( handPosition.y / (440 / 100) ) * (ofGetHeight() / 100);
-        }
 
         for (int i = 0; i < numUsers; i++)
         {
@@ -71,6 +52,9 @@ void testApp::update()
             float rightHandX = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().x;
             float rightHandY = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().y;
             float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
+
+            cursorXPos = rightHandX;
+            cursorYPos = rightHandY;
 
             // depth check right
             float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
@@ -90,7 +74,7 @@ void testApp::update()
 
             float leftShoulderZ = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
             float leftDistance = leftShoulderZ - leftHandZ;
-            if( leftDistance > 380 )
+            if( leftDistance > 450 )
             {
                 twoHands = true;
             }
@@ -102,19 +86,20 @@ void testApp::update()
             // check for zoom gesture
             if(twoHands)
             {
+                int zoomDistance = 80;
                 float distanceDifference = handsDistance - previousHandsDistance;
-                if(handsDistance > previousHandsDistance && distanceDifference > 100)
+                if(handsDistance > previousHandsDistance && distanceDifference > zoomDistance)
                 {
                     changeZoomLevel(1);
                 }
-                else if(handsDistance < previousHandsDistance && distanceDifference < -100)
+                else if(handsDistance < previousHandsDistance && distanceDifference < -zoomDistance)
                 {
                     changeZoomLevel(0);
                 }
             }
 
             // set hand drag
-            if( (rightShoulderZ - rightHandZ) > 450 && !twoHands)
+            if( (rightShoulderZ - rightHandZ) > 450 && !twoHands && cursor.coordsReady())
             {
                 cursor.cursorDrag = true;
             }
@@ -140,19 +125,7 @@ void testApp::changeZoomLevel(int _zoomLevel)
 
 void testApp::draw()
 {
-//    if(trackingHand)
-//    {
-//        SetCursorPos(cursorXPos + cursorRadius/2, cursorYPos + cursorRadius/2);
-//    }
-//    if (cursor.visible)
-//    {
-//        ofShowCursor();
-//    }
-//    else
-//    {
-//        ofHideCursor();
-//    }
-//    cout << "testApp cursor: " << ofToString(cursor.cursorDrag) << endl;
+
 }
 
 void testApp::exit()

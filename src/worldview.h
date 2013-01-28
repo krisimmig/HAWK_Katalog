@@ -20,6 +20,7 @@ public:
 protected:
 private:
     void draw(ofEventArgs &e);
+    void drawDebug();
     void update(ofEventArgs &e);
     void keyReleased(ofKeyEventArgs &e);
     void keyPressed(ofKeyEventArgs &e);
@@ -32,22 +33,29 @@ private:
 
     // environment + camera
     ofCamera camera;
-    ofLight light;
     float cameraHeight;
     float currentCameraHeight;
     float dragSpeed;
-    float currentDragSpeed;
+    float currentXDragSpeed;
+    float currentYDragSpeed;
     int zoomLevel;
     int random10;
+    int speedXCounter;
+    int speedYCounter;
+    float speedFactor;
 
     float pmouseX;
     float pmouseY;
+
+    float cameraX;
+    float cameraY;
 
     // 3d objects
     Object3D** mySphere;
     int currentSphere;
     int sphereSize;
     int gestureTimer;
+    ofVec3f closestObjectVector;
 
     // student stuff
     int numberOfStudents;

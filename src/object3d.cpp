@@ -116,7 +116,7 @@ bool Object3D::getClosestToCamera()
     return closestToCamera;
 }
 
-ofVec3f Object3D::getPostion()
+ofVec3f Object3D::getPosition()
 {
     ofVec3f pos;
     pos.set(x + image_portrait.getWidth()/2, y + image_portrait.getHeight()/2 , z);

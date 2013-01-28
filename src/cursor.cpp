@@ -50,7 +50,7 @@ void HandCursor::calculatePos()
     }
 
     float listSumX = 0.0f;
-    for(std::list<int>::iterator list_iter = listOfXPositions.begin(); list_iter != listOfXPositions.end(); list_iter++)
+    for(std::list<float>::iterator list_iter = listOfXPositions.begin(); list_iter != listOfXPositions.end(); list_iter++)
     {
         listSumX += *list_iter;
     }
@@ -65,11 +65,21 @@ void HandCursor::calculatePos()
     }
 
     float listSumY = 0.0f;
-    for(std::list<int>::iterator list_iter = listOfYPositions.begin(); list_iter != listOfYPositions.end(); list_iter++)
+    for(std::list<float>::iterator list_iter = listOfYPositions.begin(); list_iter != listOfYPositions.end(); list_iter++)
     {
         listSumY += *list_iter;
     }
 
     smoothYPos = listSumY / listOfYPositions.size();
+}
+
+
+bool HandCursor::coordsReady()
+{
+    if(listOfXPositions.size() == 15 && listOfXPositions.size() == 15)
+    {
+        return true;
+    }
+    return false;
 
 }
