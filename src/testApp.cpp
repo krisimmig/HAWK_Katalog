@@ -27,10 +27,9 @@ void testApp::setup()
         openNIDevice.addImageGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
-        openNIDevice.setMaxNumUsers(1);
+        openNIDevice.setMaxNumUsers(4);
         openNIDevice.start();
     }
-
 }
 
 void testApp::update()

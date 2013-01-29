@@ -25,6 +25,9 @@ public:
 
     ofImage image_portrait;
     ofImage image_project_01;
+    ofImage image_project_02;
+    ofImage image_project_03;
+    ofImage image_project_04;
     bool isMaster;
     bool isABC;
 
@@ -40,6 +43,9 @@ private:
     std::string last_name;
     std::string fullName;
     std::string file_project_01;
+    std::string file_project_02;
+    std::string file_project_03;
+    std::string file_project_04;
     std::string file_portrait;
 
     int size;

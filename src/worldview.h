@@ -59,6 +59,7 @@ private:
 
     // student stuff
     int numberOfStudents;
+    int currentStudent;
 //    int* studentIdArray;
     ofTrueTypeFont HelveticaXL;
     ofTrueTypeFont HelveticaL;

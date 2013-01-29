@@ -42,7 +42,7 @@ void Object3D::setup(int _x, int _y, int _z, int _size, int _id)
         break;
     }
 
-    zoomLevel = 3;
+    zoomLevel = 4;
 
     (ofRandom(10) > 7) ? isABC = true : isMaster = false;
     (ofRandom(10) > 8) ? isMaster = true : isMaster = false;
@@ -60,10 +60,10 @@ void Object3D::setup(int _x, int _y, int _z, int _size, int _id)
 void Object3D::draw()
 {
     int adjustedSize;
-    if(zoomLevel > 1) closestToCamera = false;
+    if(zoomLevel > 2) closestToCamera = false;
 
     // master marker
-    if(isMaster && zoomLevel < 3)
+    if(isMaster && zoomLevel < 4)
     {
         ofSetColor(200,200,0);
         ofRect(x-2,y-2,z,image_portrait.getWidth()+4, image_portrait.getHeight()+4);
@@ -79,7 +79,7 @@ void Object3D::draw()
     ofSetColor(255,255,255);
     image_portrait.draw(x,y,z);
 
-    if(isABC && zoomLevel == 2)
+    if(isABC && zoomLevel == 3)
     {
         ofEnableAlphaBlending();
         ofSetColor(10,10,10,180);
