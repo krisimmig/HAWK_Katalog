@@ -106,28 +106,17 @@ void WorldView::update(ofEventArgs &e)
     }
 
     // calcualte screen move speed
-    // X
     if(cursor->cursorDrag)
     {
-        float difference = cursor->smoothXPos - pmouseX;
+        // X
+        float difference = cursor->smoothRightXPos - pmouseX;
         if(difference > -30 && difference < 30) currentXDragSpeed = -difference * speedFactor;
-        if(speedXCounter = 10)
-        {
-            pmouseX = cursor->smoothXPos;
-            speedXCounter = 0;
-        }
-        else speedXCounter++;
-
         // Y
-        difference = cursor->smoothYPos - pmouseY;
+        difference = cursor->smoothRightYPos - pmouseY;
         if(difference > -30 && difference < 30) currentYDragSpeed = -difference  * speedFactor;
-        if(speedYCounter = 10)
-        {
-            pmouseY = cursor->smoothYPos;
-            speedYCounter = 0.0f;
-        }
-        else speedYCounter++;
     }
+    pmouseX = cursor->smoothRightXPos;
+    pmouseY = cursor->smoothRightYPos;
 
     // calculate kinetic scrolling
     if(!cursor->cursorDrag && zoomLevel > 1)
@@ -273,6 +262,26 @@ void WorldView::draw(ofEventArgs &e)
         ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
     }
 
+    // draw gesture indicators
+    ofSetColor(10,10,10);
+    ofNoFill();
+    float widthProgressBar = 100.0f;
+    float heightProgressBar = 20;
+    ofRect(10,10,widthProgressBar,heightProgressBar);
+    ofRect(10,40,widthProgressBar,heightProgressBar);
+    ofFill();
+
+    if(cursor->zoomInGestureTimer > 0)
+    {
+        float progressIn = (cursor->zoomInGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        ofRect(10,10,(widthProgressBar/100) * progressIn, heightProgressBar);
+    }
+    if(cursor->zoomOutGestureTimer > 0)
+    {
+        float progressOut = (cursor->zoomOutGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        ofRect(10,40,(widthProgressBar/100) * progressOut, heightProgressBar);
+    }
+
     drawDebug();
 }
 
@@ -368,7 +377,7 @@ void WorldView::zoomChangeListener(CustomEvent &e)
             }
             else
             {
-                cout << "Max Zoomout." << endl;
+                cout << "---- Max Zoomout." << endl;
             }
         }
 
@@ -386,15 +395,16 @@ void WorldView::zoomChangeListener(CustomEvent &e)
             }
             else
             {
-                cout << "Max Zoomin." << endl;
+                cout << "---- Max Zoomin." << endl;
             }
         }
 
+        cout << "---- ZoomLevel: " << ofToString(zoomLevel) << endl;
 
         // reset geture timer
         gestureTimer = 30;
     }
-    cout << "ZoomLevel: " << ofToString(zoomLevel) << endl;
+
 }
 
 void WorldView::mouseDragged(ofMouseEventArgs &e)
@@ -417,10 +427,10 @@ void WorldView::moveScreen(ofVec2f moveVector)
     // no scrolling in detail view
     if(zoomLevel > 1)
     {
-    // X
-    camera.truck(currentXDragSpeed);
-    // Y
-    camera.boom(currentYDragSpeed);
+        // X
+        camera.truck(currentXDragSpeed);
+        // Y
+        camera.boom(currentYDragSpeed);
     }
 
 }

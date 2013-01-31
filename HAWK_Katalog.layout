@@ -19,11 +19,11 @@
 	<File name="..\..\..\addons\ofxFEngine3DCore\src\ofxFEngineFreeCam.h" open="0" top="0" tabpos="7">
 		<Cursor position="1071" topLine="9" />
 	</File>
-	<File name="..\..\..\addons\ofxOpenNI\src\ofxOpenNI.cpp" open="0" top="0" tabpos="5">
+	<File name="..\..\..\addons\ofxOpenNI\src\ofxOpenNI.cpp" open="1" top="0" tabpos="7">
 		<Cursor position="124947" topLine="3254" />
 	</File>
-	<File name="..\..\..\addons\ofxOpenNI\src\ofxOpenNI.h" open="0" top="0" tabpos="3">
-		<Cursor position="5325" topLine="157" />
+	<File name="..\..\..\addons\ofxOpenNI\src\ofxOpenNI.h" open="1" top="0" tabpos="8">
+		<Cursor position="6295" topLine="169" />
 	</File>
 	<File name="..\..\..\addons\ofxOpenNI\src\ofxOpenNITypes.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="1185" topLine="0" />
@@ -52,11 +52,11 @@
 	<File name="src\constants.h" open="0" top="0" tabpos="13">
 		<Cursor position="143" topLine="0" />
 	</File>
-	<File name="src\cursor.cpp" open="0" top="0" tabpos="7">
-		<Cursor position="1477" topLine="40" />
+	<File name="src\cursor.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="2096" topLine="57" />
 	</File>
-	<File name="src\cursor.h" open="0" top="0" tabpos="8">
-		<Cursor position="230" topLine="0" />
+	<File name="src\cursor.h" open="1" top="0" tabpos="10">
+		<Cursor position="323" topLine="3" />
 	</File>
 	<File name="src\customevent.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="217" topLine="0" />
@@ -85,10 +85,10 @@
 	<File name="src\mycamera.h" open="0" top="0" tabpos="3">
 		<Cursor position="991" topLine="30" />
 	</File>
-	<File name="src\object3d.cpp" open="1" top="0" tabpos="2">
+	<File name="src\object3d.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="361" topLine="0" />
 	</File>
-	<File name="src\object3d.h" open="1" top="0" tabpos="3">
+	<File name="src\object3d.h" open="1" top="0" tabpos="4">
 		<Cursor position="605" topLine="0" />
 	</File>
 	<File name="src\overview.cpp" open="0" top="0" tabpos="7">
@@ -109,11 +109,11 @@
 	<File name="src\students.h" open="0" top="0" tabpos="12">
 		<Cursor position="532" topLine="0" />
 	</File>
-	<File name="src\testApp.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="797" topLine="91" />
+	<File name="src\testApp.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="5275" topLine="102" />
 	</File>
-	<File name="src\testApp.h" open="0" top="0" tabpos="4">
-		<Cursor position="363" topLine="1" />
+	<File name="src\testApp.h" open="1" top="0" tabpos="2">
+		<Cursor position="833" topLine="9" />
 	</File>
 	<File name="src\viewchangebutton.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="342" topLine="0" />
@@ -127,10 +127,10 @@
 	<File name="src\viewmanager.h" open="0" top="0" tabpos="6">
 		<Cursor position="311" topLine="0" />
 	</File>
-	<File name="src\worldview.cpp" open="1" top="1" tabpos="4">
-		<Cursor position="4733" topLine="138" />
+	<File name="src\worldview.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="8666" topLine="251" />
 	</File>
-	<File name="src\worldview.h" open="1" top="0" tabpos="5">
-		<Cursor position="1311" topLine="21" />
+	<File name="src\worldview.h" open="1" top="0" tabpos="6">
+		<Cursor position="1201" topLine="23" />
 	</File>
 </CodeBlocks_layout_file>

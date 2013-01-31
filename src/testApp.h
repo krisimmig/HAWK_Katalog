@@ -19,6 +19,7 @@ public:
     void draw();
     void exit();
     void changeZoomLevel(int _zoomLevel);
+    float smoothValue(float value);
 
     ofTrueTypeFont garamondRegularH1;
 
@@ -30,8 +31,17 @@ public:
     ofxOpenNIUser* user;
     bool useKinect;
     HandCursor cursor;
-    int cursorXPos;
-    int cursorYPos;
+    float cursorXPos;
+    float cursorYPos;
+
+    float leftHandX;
+    float leftHandY;
+
+    // gestures
+    int zoomOutGestureTimer;
+    int zoomInGestureTimer;
+    int gestureDuration;
+    int  minZoomGestureDistance;
 
     float kinectMovementX;
     float kinectMovementY;

@@ -5,7 +5,7 @@ HandCursor::HandCursor()
 
 }
 
-void HandCursor::setup(int x, int y)
+void HandCursor::setup(float x, float y)
 {
     xPos = x;
     yPos = y;
@@ -16,15 +16,24 @@ void HandCursor::setup(int x, int y)
     trackingHand = false;
 }
 
-void HandCursor::update(int x, int y)
+void HandCursor::update(float x, float y)
 {
     xPos = x;
     yPos = y;
 
     calculatePos();
 
-    moveVector.set(smoothXPos,smoothYPos);
-//    moveVector.set(xPos,yPos);
+    moveVector.set(smoothRightXPos,smoothRightYPos);
+}
+
+void HandCursor::updateLeftHanded(float x, float y)
+{
+    leftXPos = x;
+    leftYPos = y;
+
+    calculateLeftPos();
+
+    leftVector.set(smoothLeftXPos,smoothLeftYPos);
 }
 
 void HandCursor::draw()
@@ -32,16 +41,28 @@ void HandCursor::draw()
 
 }
 
+void HandCursor::emptyLists()
+{
+    listOfLeftXPositions.clear();
+    listOfLeftYPositions.clear();
+
+    float listSum = 0.0f;
+    for(std::list<float>::iterator list_iter = listOfLeftYPositions.begin(); list_iter != listOfLeftYPositions.end(); list_iter++)
+    {
+        listSum += *list_iter;
+    }
+    float sumY = listSum / listOfLeftYPositions.size();
+
+    listSum = 0.0f;
+    for(std::list<float>::iterator list_iter = listOfLeftXPositions.begin(); list_iter != listOfLeftXPositions.end(); list_iter++)
+    {
+        listSum += *list_iter;
+    }
+    float sumX = listSum / listOfLeftXPositions.size();
+}
+
 void HandCursor::calculatePos()
 {
-
-    // if not moving, empty lists
-    if(!cursorDrag)
-    {
-        listOfXPositions.empty();
-        listOfYPositions.empty();
-    }
-
     // x
     listOfXPositions.push_front(xPos);
     if(listOfXPositions.size() > 15)
@@ -55,7 +76,7 @@ void HandCursor::calculatePos()
         listSumX += *list_iter;
     }
 
-    smoothXPos = listSumX / listOfXPositions.size();
+    smoothRightXPos = listSumX / listOfXPositions.size();
 
     // y
     listOfYPositions.push_front(yPos);
@@ -70,16 +91,38 @@ void HandCursor::calculatePos()
         listSumY += *list_iter;
     }
 
-    smoothYPos = listSumY / listOfYPositions.size();
+    smoothRightYPos = listSumY / listOfYPositions.size();
 }
 
-
-bool HandCursor::coordsReady()
+void HandCursor::calculateLeftPos()
 {
-    if(listOfXPositions.size() == 15 && listOfXPositions.size() == 15)
-    {
-        return true;
-    }
-    return false;
+    // x
+    listOfLeftXPositions.push_front(leftXPos);
 
+    if(listOfLeftXPositions.size() > 15)
+    {
+        listOfLeftXPositions.pop_back();
+    }
+
+    float listSumX = 0.0f;
+    for(std::list<float>::iterator list_iter = listOfLeftXPositions.begin(); list_iter != listOfLeftXPositions.end(); list_iter++)
+    {
+        listSumX += *list_iter;
+    }
+
+    smoothLeftXPos = listSumX / listOfLeftXPositions.size();
+
+    // y
+    listOfLeftYPositions.push_front(leftYPos);
+    if(listOfLeftYPositions.size() > 15)
+    {
+        listOfLeftYPositions.pop_back();
+    }
+
+    float listSumY = 0.0f;
+    for(std::list<float>::iterator list_iter = listOfLeftYPositions.begin(); list_iter != listOfLeftYPositions.end(); list_iter++)
+    {
+        listSumY += *list_iter;
+    }
+    smoothLeftYPos = listSumY / listOfLeftYPositions.size();
 }
