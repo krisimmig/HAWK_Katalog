@@ -48,7 +48,7 @@ public:
     // gestures
     float zoomOutGestureTimer;
     float zoomInGestureTimer;
-    int gestureDuration;
+    int zoomGestureDuration;
 
 
 };

@@ -3540,7 +3540,7 @@
 1359829374 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.cpp
 	"cursor.h"
 
-1359903810 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.h
+1359997458 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\cursor.h
 	"ofMain.h"
 
 1359915551 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\customevent.cpp
@@ -3551,7 +3551,7 @@
 	"testApp.h"
 	"ofAppGlutWindow.h"
 
-1359921331 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.h
+1359997412 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.h
 	"constants.h"
 	"ofMain.h"
 	"cursor.h"
@@ -3590,7 +3590,7 @@
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1359926329 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
+1359999023 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
 	"ofMain.h"
 	"constants.h"
 	"cursor.h"
@@ -3631,7 +3631,7 @@
 1358191132 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
 	"students.h"
 
-1359925403 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
+1359997565 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
 	"testApp.h"
 	"stdio.h"
 
@@ -3641,7 +3641,7 @@
 1359916220 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1359926580 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1360000411 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
 
 1359316792 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp

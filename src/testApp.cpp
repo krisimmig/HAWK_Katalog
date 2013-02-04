@@ -34,13 +34,10 @@ void testApp::setup()
 
     zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
     zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
-    gestureDuration = cursor.gestureDuration = 28;
-    minZoomGestureDistance = 12;
-    swipeTimer = 5;
-    swipeLeftTimer = 0;
-    swipeRightTimer = 0;
-    swipeUpTimer = 0;
-    swipeDownTimer = 0;
+    zoomGestureDuration = cursor.zoomGestureDuration = 20;
+    minZoomGestureDistance = 10;
+    swipeTimer = 3;
+    swipeLeftTimer, swipeRightTimer, swipeUpTimer, swipeDownTimer = 0;
 }
 
 void testApp::update()
@@ -224,7 +221,7 @@ void testApp::kinectGestures()
         // zoomin
         if(handsDistance > previousHandsDistance && distanceDifference > minZoomGestureDistance)
         {
-            if (zoomInGestureTimer > gestureDuration) changeZoomLevel(ZOOM_IN);
+            if (zoomInGestureTimer > zoomGestureDuration) changeZoomLevel(ZOOM_IN);
             else
             {
                 zoomInGestureTimer++;
@@ -235,7 +232,7 @@ void testApp::kinectGestures()
         // zoomout
         else if(handsDistance < previousHandsDistance && distanceDifference < -minZoomGestureDistance)
         {
-            if (zoomOutGestureTimer > gestureDuration) changeZoomLevel(ZOOM_OUT);
+            if (zoomOutGestureTimer > zoomGestureDuration) changeZoomLevel(ZOOM_OUT);
             else
             {
                 zoomOutGestureTimer++;

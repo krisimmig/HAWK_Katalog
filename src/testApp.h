@@ -48,7 +48,7 @@ public:
     // gestures
     int zoomOutGestureTimer;
     int zoomInGestureTimer;
-    int gestureDuration;
+    int zoomGestureDuration;
     int swipeTimer;
     int swipeLeftTimer;
     int swipeRightTimer;

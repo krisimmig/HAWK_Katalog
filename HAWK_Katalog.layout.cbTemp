@@ -56,7 +56,7 @@
 		<Cursor position="920" topLine="39" />
 	</File>
 	<File name="src\cursor.h" open="1" top="0" tabpos="8">
-		<Cursor position="1001" topLine="11" />
+		<Cursor position="866" topLine="11" />
 	</File>
 	<File name="src\customevent.cpp" open="1" top="0" tabpos="9">
 		<Cursor position="261" topLine="0" />
@@ -110,10 +110,10 @@
 		<Cursor position="532" topLine="0" />
 	</File>
 	<File name="src\testApp.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="241" topLine="1" />
+		<Cursor position="4055" topLine="150" />
 	</File>
 	<File name="src\testApp.h" open="1" top="0" tabpos="2">
-		<Cursor position="998" topLine="26" />
+		<Cursor position="1326" topLine="26" />
 	</File>
 	<File name="src\viewchangebutton.cpp" open="0" top="0" tabpos="10">
 		<Cursor position="1028" topLine="27" />
@@ -128,9 +128,9 @@
 		<Cursor position="446" topLine="0" />
 	</File>
 	<File name="src\worldview.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="3542" topLine="96" />
+		<Cursor position="16722" topLine="532" />
 	</File>
 	<File name="src\worldview.h" open="1" top="0" tabpos="6">
-		<Cursor position="1761" topLine="48" />
+		<Cursor position="1781" topLine="39" />
 	</File>
 </CodeBlocks_layout_file>

@@ -26,6 +26,7 @@ private:
 
     void update(ofEventArgs &e);
     void updateZoomLevel();
+    void updateInfoPanelPosition();
     void updateScreenPosition();
 
     void keyReleased(ofKeyEventArgs &e);
@@ -72,13 +73,26 @@ private:
     // student stuff
     int numberOfStudents;
     int currentStudent;
+
+    // info panel
+    bool justArrived;
+    int infoPanelWidth;
     int projectImagesYPosition;
     int currentProjectImagesYPosition;
+    float infoPanelFinalYPosition;
+    float infoPanelYPosition;
+    float futureProjectImagesYPosition;
+    float infoPanelXPosition;
+    float infoPanelResetPosition;
+    bool infoPanelToLeft;
+    bool infoPanelToRight;
     int currentImageNumber;
     int currentImageHeight;
     std::string fullName;
     std::string description;
 //    int* studentIdArray;
+
+    // fonts
     ofTrueTypeFont HelveticaXL;
     ofTrueTypeFont HelveticaL;
     ofTrueTypeFont HelveticaS;

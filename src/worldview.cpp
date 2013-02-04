@@ -40,11 +40,19 @@ WorldView::WorldView()
     numberOfStudents = 92;
     currentStudent = -1;
     random10 = ofRandom(10);
+
+    // info panel
+    justArrived = false;
     projectImagesYPosition = 0;
     currentProjectImagesYPosition = 0;
+    futureProjectImagesYPosition = 0;
     currentImageHeight = 0;
     currentImageNumber = 1;
-
+    infoPanelWidth = 1100;
+    infoPanelXPosition = ofGetWidth()/2 - infoPanelWidth * 0.25;
+    infoPanelResetPosition = infoPanelXPosition;
+    infoPanelFinalYPosition = 0;
+    infoPanelYPosition = 0;
     mySphere = new Object3D*[numberOfStudents];
 
     // spheres
@@ -83,15 +91,9 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
+    updateInfoPanelPosition();
     updateZoomLevel();
     updateScreenPosition();
-
-//    if(currentProjectImagesYPosition != projectImagesYPosition) currentProjectImagesYPosition = projectImagesYPosition;
-
-//    if(currentProjectImagesYPosition < projectImagesYPosition) currentProjectImagesYPosition *= 1.1f;
-//    if(currentProjectImagesYPosition > projectImagesYPosition) currentProjectImagesYPosition *= 0.9f;
-
-    cout << "currentProjectImagesYPosition: " << ofToString(currentProjectImagesYPosition) << endl;
 
     // zoom gesture timer
     if(gestureTimerZoom > 0)
@@ -102,6 +104,79 @@ void WorldView::update(ofEventArgs &e)
     if(gestureTimerSwipe > 0)
     {
         gestureTimerSwipe--;
+    }
+}
+
+void WorldView::updateInfoPanelPosition()
+{
+    // coming from zoomin
+    cout << "infoPanelYPosition:" << ofToString(infoPanelYPosition) << endl;
+    if(justArrived)
+    {
+        infoPanelYPosition = ofGetHeight();
+        justArrived = false;
+    }
+
+    if(infoPanelYPosition > infoPanelFinalYPosition)
+    {
+        infoPanelYPosition -= (infoPanelFinalYPosition + infoPanelYPosition) * 0.25f;
+    }
+    else
+    {
+        infoPanelYPosition = infoPanelFinalYPosition;
+    }
+
+    // swipe up/down image position update
+    float distance = currentProjectImagesYPosition - futureProjectImagesYPosition;
+
+    if(fabs(distance) > 1.5f)
+    {
+        currentProjectImagesYPosition -= distance * 0.2f;
+    }
+
+    // swipe to left infopanel position
+    if(infoPanelToLeft)
+    {
+        float distance = infoPanelXPosition - infoPanelResetPosition;
+        if(infoPanelXPosition > - infoPanelWidth && infoPanelXPosition <= infoPanelResetPosition) infoPanelXPosition -= 150;
+        else if(infoPanelXPosition <= - infoPanelWidth )
+        {
+            infoPanelXPosition = ofGetWidth() + infoPanelWidth;
+            currentProjectImagesYPosition = 0;
+            futureProjectImagesYPosition = 0;
+            currentImageNumber = 1;
+            currentStudent++;
+        }
+
+        else if(distance > 2.5f) infoPanelXPosition -= distance * 0.2f;
+        else
+        {
+            infoPanelXPosition = infoPanelResetPosition;
+            infoPanelToLeft = false;
+        }
+    }
+
+    // swipe to right infopanel position
+    if(infoPanelToRight)
+    {
+        float distance = infoPanelXPosition - infoPanelResetPosition;
+        if(distance < 0) distance *= -1;
+        if(infoPanelXPosition < ofGetWidth() && infoPanelXPosition >= infoPanelResetPosition) infoPanelXPosition += 150;
+        else if(infoPanelXPosition >= ofGetWidth() )
+        {
+            infoPanelXPosition = -infoPanelWidth;
+            currentProjectImagesYPosition = 0;
+            futureProjectImagesYPosition = 0;
+            currentImageNumber = 1;
+            currentStudent--;
+        }
+
+        else if(distance > 2.5f) infoPanelXPosition += distance * 0.2f;
+        else
+        {
+            infoPanelXPosition = infoPanelResetPosition;
+            infoPanelToRight = false;
+        }
     }
 }
 
@@ -143,35 +218,26 @@ void WorldView::updateScreenPosition()
     // center on closest in zoomlevel 2
     if(zoomLevel == 2 && !cursor->cursorDrag && !zooming)
     {
-        float distanceX = camera.getPosition().x - closestObjectVector.x;
-        float distanceY = camera.getPosition().y - closestObjectVector.y;
-        if(distanceX < -1.0f || distanceX > 1.0f)
+        if(fabs(currentXDragSpeed) < 1.2f && fabs(currentYDragSpeed) < 1.2f )
         {
-            distanceX *= 0.1f;
-            camera.truck(-distanceX);
-        }
-        if(distanceY < -1.0f || distanceY > 1.0f)
-        {
-            distanceY *= 0.1f;
-            camera.boom(distanceY);
+            float distanceX = camera.getPosition().x - closestObjectVector.x;
+            float distanceY = camera.getPosition().y - closestObjectVector.y;
+            if(distanceX < -1.0f || distanceX > 1.0f)
+            {
+                distanceX *= 0.1f;
+                camera.truck(-distanceX);
+            }
+            if(distanceY < -1.0f || distanceY > 1.0f)
+            {
+                distanceY *= 0.1f;
+                camera.boom(distanceY);
+            }
         }
     }
 }
 
 void WorldView::updateZoomLevel()
 {
-    switch(zoomLevel)
-    {
-    case 2:
-        speedFactor = 0.5f;
-        break;
-    case 3:
-        speedFactor = 1.5f;
-        break;
-    case 4:
-        speedFactor = 1.5f;
-        break;
-    }
 
     // zoomout
     if(camera.getPosition().z > currentCameraHeight)
@@ -202,14 +268,10 @@ void WorldView::draw(ofEventArgs &e)
     camera.begin();
 
     // draw all objects if not detail view
-//    if(zoomLevel > 1)
-//    {
     for(int i = 0; i < numberOfStudents; i++)
     {
         mySphere[i]->draw();
     }
-//    }
-
 
     kinectMove();
 
@@ -224,23 +286,27 @@ void WorldView::drawInfo()
 {
     int previousHeight = 50;
     int imageHeight = 0;
+    int totalImageColumnHeight = 0;
     switch(zoomLevel)
     {
         // student detail view
     case 1:
+
         // draw opaque background
         ofEnableAlphaBlending();
-        ofSetColor(255,255,255, 200);
+        ofSetColor(170,170,170, 98);
         ofRect(0,0,ofGetWidth(),ofGetHeight());
         ofDisableAlphaBlending();
+        ofPushMatrix();
+        ofTranslate(infoPanelXPosition, infoPanelYPosition);
 
         // draw  left infocards
         ofSetColor(255,255,255);
-        ofRect(25,25,350, ofGetHeight()- 95);
+        ofRect(25,25,350, 850);
         // draw left infocard border
         ofSetColor(170,170,170);
         ofNoFill();
-        ofRect(25,25,350, ofGetHeight()- 95);
+        ofRect(25,25,350, 850);
         ofFill();
 
         // draw portrait
@@ -249,24 +315,26 @@ void WorldView::drawInfo()
         // draw project images
         ofPushMatrix();
         ofTranslate(0, 0 + currentProjectImagesYPosition);
+
         // draw  right infocards
+        for(int i = 0; i <= mySphere[currentStudent]->totalNumberProjectImages; i++)
+        {
+            totalImageColumnHeight += mySphere[currentStudent]->getProjectImageSize(i) + 30;
+        }
         ofSetColor(255,255,255);
-        ofRect(25,25,350, ofGetHeight()- 95);
-        ofRect(450,25,ofGetWidth() - 500 , ofGetHeight()- 95);
+        ofRect(475,25,750,totalImageColumnHeight);
         // draw right infocard border
         ofSetColor(170,170,170);
         ofNoFill();
-        ofRect(450,25,ofGetWidth() - 500 , ofGetHeight() + 4*700);
+        ofRect(475,25,750,totalImageColumnHeight);
         ofFill();
         for(int i = 0; i < mySphere[currentStudent]->totalNumberProjectImages; i++)
         {
             if(i > 0) imageHeight = mySphere[currentStudent]->getProjectImageSize(i);
             mySphere[currentStudent]->drawProjectImage(500, imageHeight + previousHeight, i + 1);
-            previousHeight += imageHeight + 50;
+            previousHeight += imageHeight + 30;
         }
 
-        currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber);
-        cout << "currentImageNumber: " << ofToString(currentImageNumber) << " currentImageHeight: " << ofToString(currentImageHeight) << endl;
         ofPopMatrix();
 
         // prepare text
@@ -276,6 +344,8 @@ void WorldView::drawInfo()
         ofSetColor(10,10,10);
         HelveticaL.drawString(fullName, 60,250);
         HelveticaS.drawString(description, 60, 300);
+
+        ofPopMatrix();
         break;
         // name view
     case 2:
@@ -424,12 +494,12 @@ void WorldView::drawBottomInterface()
     ofSetColor(10,10,10);
     if(cursor->zoomInGestureTimer > 0)
     {
-        float progressIn = (cursor->zoomInGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        float progressIn = (cursor->zoomInGestureTimer - 1) / (cursor->zoomGestureDuration / 100.0f);
         ofRect(ofGetWidth()/2 + 20,gestureIndicatorYPos,(widthProgressBar/100) * progressIn, heightProgressBar);
     }
     if(cursor->zoomOutGestureTimer > 0)
     {
-        float progressOut = (cursor->zoomOutGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        float progressOut = (cursor->zoomOutGestureTimer - 1) / (cursor->zoomGestureDuration / 100.0f);
         ofRect(ofGetWidth()/2 - 20,gestureIndicatorYPos,(widthProgressBar/100) * -progressOut, heightProgressBar);
     }
 }
@@ -494,6 +564,7 @@ void WorldView::swipeGestureEvent(swipeGesturesEnum _swipeDirection)
 
 void WorldView::zoomChangeListener(CustomEvent &e)
 {
+
     float zoomAmount = (cameraHeight+500)/2;
 
     if(gestureTimerZoom == 0)
@@ -541,6 +612,23 @@ void WorldView::zoomChangeListener(CustomEvent &e)
         gestureTimerZoom = gestureTimeout;
     }
 
+    // change speed to new zoomlevel and activate justarrived bool
+    switch(zoomLevel)
+    {
+    case 1:
+        justArrived = true;
+        break;
+    case 2:
+        speedFactor = 0.7f;
+        break;
+    case 3:
+        speedFactor = 1.5f;
+        break;
+    case 4:
+        speedFactor = 1.5f;
+        break;
+    }
+
 }
 
 void WorldView::swipeGestureListener(CustomEvent &e)
@@ -552,20 +640,36 @@ void WorldView::swipeGestureListener(CustomEvent &e)
         {
 
         case SWIPE_LEFT:
-            if(currentStudent < numberOfStudents) currentStudent++;
+            if(currentStudent < numberOfStudents)
+            {
+                infoPanelToLeft = true;
+            }
             else cout << "studentlist end reached." << endl;
             break;
         case SWIPE_RIGHT:
-            if(currentStudent > 0) currentStudent--;
+            if(currentStudent > 0)
+            {
+                infoPanelToRight = true;
+            }
             else cout << "studentlist beginning reached." << endl;
             break;
         case SWIPE_UP:
-            currentProjectImagesYPosition -= currentImageHeight;
-            if(currentImageNumber < mySphere[currentStudent]->totalNumberProjectImages) currentImageNumber++;
+            cout << "up" << endl;
+            if(currentImageNumber < mySphere[currentStudent]->totalNumberProjectImages)
+            {
+                currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber);
+                futureProjectImagesYPosition -= currentImageHeight + 30;
+                currentImageNumber++;
+            }
             break;
         case SWIPE_DOWN:
-            currentProjectImagesYPosition += currentImageHeight;
-            if(currentImageNumber > 1) currentImageNumber--;
+            cout << "up" << endl;
+            if(currentImageNumber > 1)
+            {
+                currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber - 1);
+                futureProjectImagesYPosition += currentImageHeight + 30;
+                currentImageNumber--;
+            }
             break;
         }
 
