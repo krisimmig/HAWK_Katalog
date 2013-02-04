@@ -42,7 +42,7 @@ void ViewManager::viewChanged(CustomEvent &e)
     }
 }
 
-void ViewManager::deleteOldView(enum_views oldView)
+void ViewManager::deleteOldView(viewsEnum oldView)
 {
     switch (oldView)
     {

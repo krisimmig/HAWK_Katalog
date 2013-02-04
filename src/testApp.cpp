@@ -27,7 +27,8 @@ void testApp::setup()
         openNIDevice.addImageGenerator();
         openNIDevice.setMirror(true);
         openNIDevice.addUserGenerator();
-        openNIDevice.setMaxNumUsers(4);
+        numberOfMaxUsers = 6;
+        openNIDevice.setMaxNumUsers(numberOfMaxUsers);
         openNIDevice.start();
     }
 
@@ -35,6 +36,11 @@ void testApp::setup()
     zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
     gestureDuration = cursor.gestureDuration = 28;
     minZoomGestureDistance = 12;
+    swipeTimer = 5;
+    swipeLeftTimer = 0;
+    swipeRightTimer = 0;
+    swipeUpTimer = 0;
+    swipeDownTimer = 0;
 }
 
 void testApp::update()
@@ -45,106 +51,207 @@ void testApp::update()
         int numUsers = openNIDevice.getNumTrackedUsers();
         int numHands = openNIDevice.getNumTrackedHands();
 
-        (numUsers > 0) ? cursor.trackingUser = true : cursor.trackingUser = false;
-        if(numUsers == 0) cursor.calibratingUser = false;
+        if(numUsers == 0) cursor.isActiveUser = false;
 
+        // -------------
+        // USERS
+        // -------------
         for (int i = 0; i < numUsers; i++)
         {
             user = &openNIDevice.getTrackedUser(i);
-            (user->isCalibrating()) ?  cursor.calibratingUser = true : cursor.calibratingUser = false;
 
-            float rightHandX = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().x;
-            float rightHandY = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().y;
-            float rightHandZ = user->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
-            cursorXPos = rightHandX;
-            cursorYPos = rightHandY;
+            float userPos = user->getCenter().x;
+            cursor.usersPos[i] = userPos;
 
-            leftHandX = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
-            leftHandY = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
-
-            // depth check right
-            float rightShoulderZ = user->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
-
-            // depth check left
-            float leftHandZ = user->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
-            float leftShoulderZ = user->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
-            float leftZDistance = leftShoulderZ - leftHandZ;
-            if( leftZDistance > 450 )
+            if(userPos > -130 && userPos < 130 && user->isSkeleton())
             {
-                twoHands = true;
-                cursor.updateLeftHanded(leftHandX, leftHandY);
+                activeUserId = i;
+                activeUser = user;
+                activeUserId = cursor.activeUserId = i;
+
+                isActiveUser = cursor.isActiveUser = true;
+                cursor.activeUserPos = activeUser->getCenter().x;
+
+                kinectGestures();
             }
             else
             {
-                twoHands = false;
-                cursor.emptyLists();
-            }
-
-            // check for zoom gesture
-            if(twoHands)
-            {
-
-                ofVec2f leftHand = cursor.leftVector;
-                ofVec2f rightHand = cursor.moveVector;
-
-                float handsDistance = leftHand.distance(rightHand);
-
-                int distanceDifference = handsDistance - previousHandsDistance;
-//                cout    << "l: " << ofToString(leftHand.x)  << "/" << ofToString(leftHand.y)  << " r: " << ofToString(rightHand.x)  << "/" << ofToString(rightHand.y)
-//                        << "  || Dis: " << ofToString(handsDistance)  << " pD: " << ofToString(previousHandsDistance)
-//                        << "  || Dif: " << ofToString(distanceDifference)
-//                        << "  || Out: " << ofToString(zoomOutGestureTimer) << " In: " << ofToString(zoomInGestureTimer) << endl;
-
-                if(handsDistance < previousHandsDistance) zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
-                if(handsDistance > previousHandsDistance) zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
-
-                // zoomin
-                if(handsDistance > previousHandsDistance && distanceDifference > minZoomGestureDistance)
+                if(i <= activeUserId && activeUserId != -1)
                 {
-                    if (zoomInGestureTimer > gestureDuration) changeZoomLevel(1);
-                    else
-                    {
-                        zoomInGestureTimer++;
-                        cursor.zoomInGestureTimer = zoomInGestureTimer;
-                    }
+                    activeUser = NULL;
+                    isActiveUser = cursor.isActiveUser = false;
+                    cursor.activeUserId = -1;
+                    cursor.activeUserPos = -5000;
                 }
-
-                // zoomout
-                else if(handsDistance < previousHandsDistance && distanceDifference < -minZoomGestureDistance)
-                {
-                    if (zoomOutGestureTimer > gestureDuration) changeZoomLevel(0);
-                   else
-                    {
-                        zoomOutGestureTimer++;
-                        cursor.zoomOutGestureTimer = zoomOutGestureTimer;
-                    }
-                }
-                previousHandsDistance = handsDistance;
             }
+        }
+    }
+
+
+}
+
+void testApp::kinectGestures()
+{
+    // -------------
+    // RIGHTHAND MOVEMENT / CURSOR
+    // -------------
+
+    float rightHandX = activeUser->getJoint(JOINT_RIGHT_HAND).getWorldPosition().x;
+    float rightHandY = activeUser->getJoint(JOINT_RIGHT_HAND).getWorldPosition().y;
+    float rightHandZ = activeUser->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
+    cursorXPos = rightHandX;
+    cursorYPos = rightHandY;
+    // upadte cursor position
+    cursor.update(cursorXPos, cursorYPos);
+
+    // -------------
+    // MOVESCREEN
+    // -------------
+    // depth check right for handdrag -> movescreen
+    float rightShoulderZ = activeUser->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
+
+    // set hand drag
+    if( (rightShoulderZ - rightHandZ) > 450 && !twoHands)
+    {
+        cursor.cursorDrag = true;
+    }
+    else
+    {
+        cursor.cursorDrag = false;
+    }
+
+    // -------------
+    // SWIPE
+    // -------------
+    if(cursor.cursorDrag)
+    {
+
+        float swipeDistanceX = cursor.smoothRightXPos - previousSmoothRightX;
+        // left
+        if(cursor.smoothRightXPos < previousSmoothRightX && swipeDistanceX < -20 )
+        {
+            swipeLeftTimer++;
+            if(swipeLeftTimer > swipeTimer)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_LEFT;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipeLeftTimer = 0;
+            }
+        } else swipeLeftTimer = 0;
+
+        // right
+        if(cursor.smoothRightXPos > previousSmoothRightX  && swipeDistanceX > 20)
+        {
+            swipeRightTimer++;
+            if(swipeRightTimer > swipeTimer)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipeRightTimer = 0;
+            }
+        } else swipeRightTimer = 0;
+
+        previousSmoothRightX = cursor.smoothRightXPos;
+
+        // up
+        float swipeDistanceY = cursor.smoothRightYPos - previousSmoothRightY;
+        if(cursor.smoothRightYPos > previousSmoothRightY && swipeDistanceY > 20 )
+        {
+            swipeUpTimer++;
+            if(swipeUpTimer > swipeTimer)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_UP;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipeUpTimer = 0;
+            }
+        } else swipeUpTimer = 0;
+
+        // down
+        if(cursor.smoothRightYPos < previousSmoothRightY && swipeDistanceY < -20 )
+        {
+            swipeDownTimer++;
+            if(swipeDownTimer > swipeTimer)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_DOWN;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipeDownTimer = 0;
+            }
+        } else swipeDownTimer = 0;
+        previousSmoothRightY = cursor.smoothRightYPos;
+    }
+
+    // -------------
+    // ZOOM
+    // -------------
+    // depth check left for twohanded -> zoomgestures
+    float leftHandZ = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().z;
+    float leftShoulderZ = activeUser->getJoint(JOINT_LEFT_SHOULDER).getWorldPosition().z;
+    float leftZDistance = leftShoulderZ - leftHandZ;
+
+    // smooth coords from cursor
+    leftHandX = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
+    leftHandY = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
+
+    if( leftZDistance > 450 )
+    {
+        twoHands = true;
+        cursor.updateLeftHanded(leftHandX, leftHandY);
+    }
+    else
+    {
+        twoHands = false;
+        cursor.emptyLists();
+    }
+
+    // check for zoom gesture
+    if(twoHands)
+    {
+        // get smooth coords for hands position
+        ofVec2f leftHand = cursor.leftVector;
+        ofVec2f rightHand = cursor.moveVector;
+
+        float handsDistance = leftHand.distance(rightHand);
+
+        int distanceDifference = handsDistance - previousHandsDistance;
+
+        if(handsDistance < previousHandsDistance) zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
+        if(handsDistance > previousHandsDistance) zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
+
+        // zoomin
+        if(handsDistance > previousHandsDistance && distanceDifference > minZoomGestureDistance)
+        {
+            if (zoomInGestureTimer > gestureDuration) changeZoomLevel(ZOOM_IN);
             else
             {
-                zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
-                zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
-            }
-
-            // set hand drag
-            if( (rightShoulderZ - rightHandZ) > 450 && !twoHands)
-            {
-                cursor.cursorDrag = true;
-            }
-            else
-            {
-                cursor.cursorDrag = false;
+                zoomInGestureTimer++;
+                cursor.zoomInGestureTimer = zoomInGestureTimer;
             }
         }
 
-        // upadte cursor position
-        cursor.update(cursorXPos, cursorYPos);
-
+        // zoomout
+        else if(handsDistance < previousHandsDistance && distanceDifference < -minZoomGestureDistance)
+        {
+            if (zoomOutGestureTimer > gestureDuration) changeZoomLevel(ZOOM_OUT);
+            else
+            {
+                zoomOutGestureTimer++;
+                cursor.zoomOutGestureTimer = zoomOutGestureTimer;
+            }
+        }
+        previousHandsDistance = handsDistance;
+    }
+    else
+    {
+        zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
+        zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
     }
 }
 
-void testApp::changeZoomLevel(int _zoomLevel)
+void testApp::changeZoomLevel(zoomLevelEnum _zoomLevel)
 {
     static CustomEvent changeZoomLevel;
     changeZoomLevel.zoomLevel = _zoomLevel;

@@ -15,6 +15,8 @@ public:
     void calculateLeftPos();
     void draw();
 
+    float usersPos[6];
+
     float xPos;
     float yPos;
 
@@ -27,6 +29,9 @@ public:
     std::list<float> listOfXPositions;
     std::list<float> listOfYPositions;
 
+    int activeUserId;
+    float activeUserPos;
+
     float smoothLeftXPos;
     float smoothLeftYPos;
 
@@ -37,8 +42,7 @@ public:
     ofVec2f moveVector;
     ofVec2f leftVector;
 
-    bool calibratingUser;
-    bool trackingUser;
+    bool isActiveUser;
     bool trackingHand;
 
     // gestures

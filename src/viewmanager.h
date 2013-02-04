@@ -13,13 +13,13 @@ class ViewManager
 public:
     ViewManager();
     void setCursor(HandCursor &_cursor);
-    enum_views currentView;
+    viewsEnum currentView;
 
 protected:
 private:
     void deptChanged(CustomEvent &e);
     void viewChanged(CustomEvent &e);
-    void deleteOldView(enum_views oldView);
+    void deleteOldView(viewsEnum oldView);
 
     std::string currentDept;
     MainMenu* m_view;

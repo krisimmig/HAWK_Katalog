@@ -8,10 +8,11 @@ class CustomEvent : public ofEventArgs
 {
     public:
 
-        enum_views view;
+        viewsEnum view;
         string dept;
         int objectId;
-        int zoomLevel;
+        zoomLevelEnum zoomLevel;
+        swipeGesturesEnum swipeDirection;
 
         CustomEvent(){
 
@@ -21,6 +22,7 @@ class CustomEvent : public ofEventArgs
         static ofEvent <CustomEvent> viewChange;
         static ofEvent <CustomEvent> nearObject;
         static ofEvent <CustomEvent> zoomChange;
+        static ofEvent <CustomEvent> swipeGesture;
 };
 
 #endif // CUSTOMEVENT_H

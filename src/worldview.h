@@ -20,15 +20,24 @@ public:
 protected:
 private:
     void draw(ofEventArgs &e);
-    void drawDebug();
+    void drawInfo();
+    void drawSucher();
+    void drawBottomInterface();
+
     void update(ofEventArgs &e);
+    void updateZoomLevel();
+    void updateScreenPosition();
+
     void keyReleased(ofKeyEventArgs &e);
     void keyPressed(ofKeyEventArgs &e);
     void mouseDragged(ofMouseEventArgs &e);
-    void changeZoomLevel(int zoomLevel);
+    void changeZoomLevel(zoomLevelEnum zoomLevel);
+    void swipeGestureEvent(swipeGesturesEnum swipeDirection);
     void zoomChangeListener(CustomEvent &e);
+    void swipeGestureListener(CustomEvent &e);
     void moveScreen(ofVec2f moveVector);
     void kinectMove();
+    string wrapString(string text, int width);
     HandCursor* cursor;
 
     // environment + camera
@@ -39,6 +48,7 @@ private:
     float currentXDragSpeed;
     float currentYDragSpeed;
     int zoomLevel;
+    bool zooming;
     int random10;
     int speedXCounter;
     int speedYCounter;
@@ -54,12 +64,20 @@ private:
     Object3D** mySphere;
     int currentSphere;
     int sphereSize;
-    int gestureTimer;
+    int gestureTimerZoom;
+    int gestureTimerSwipe;
+    int gestureTimeout;
     ofVec3f closestObjectVector;
 
     // student stuff
     int numberOfStudents;
     int currentStudent;
+    int projectImagesYPosition;
+    int currentProjectImagesYPosition;
+    int currentImageNumber;
+    int currentImageHeight;
+    std::string fullName;
+    std::string description;
 //    int* studentIdArray;
     ofTrueTypeFont HelveticaXL;
     ofTrueTypeFont HelveticaL;

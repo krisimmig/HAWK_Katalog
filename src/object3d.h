@@ -12,15 +12,22 @@ public:
     virtual ~Object3D();
     void setup(int x, int y, int z, int size, int id);
     void draw();
+    void drawPortrait(int x, int y);
+    void drawProjectImage(int x, int y, int projectImageNumber);
     void setZoomLevel(int zoomLevel);
     void setFont(ofTrueTypeFont &font1);
     void setClosestToCamera(bool closest);
+    void loadProjectImages();
+    int getProjectImageSize(int imageNumber);
     bool getClosestToCamera();
     std::string getFullName();
 
     ofVec3f getPosition();
     int id;
+    int totalNumberProjectImages;
     std::string letter;
+    std::string project_title;
+    std::string description;
     vector<string> letters;
 
     ofImage image_portrait;
@@ -30,6 +37,7 @@ public:
     ofImage image_project_04;
     bool isMaster;
     bool isABC;
+    bool projectImagesLoaded;
 
 private:
 

@@ -1,6 +1,6 @@
 #include "viewchangebutton.h"
 //
-ViewChangeButton::ViewChangeButton(std::string l, enum_views t, int x, int y)
+ViewChangeButton::ViewChangeButton(std::string l, viewsEnum t, int x, int y)
 {
     //ctor
     label = l;
@@ -37,19 +37,16 @@ void ViewChangeButton::draw(ofEventArgs &e)
 {
     if(active)
     {
-
         if(hoovering)
         {
             ofFill();
             ofSetColor(255,0,0);
             ofRect(xPos, yPos, width/actionDelay * actionTimer, height);
         }
-
         ofNoFill();
         ofSetColor(0, 0, 0);
         ofRect(xPos, yPos, width, height);
         ofDrawBitmapString(label, xPos + 15, yPos + 15);
-
     }
 }
 
@@ -70,7 +67,7 @@ void ViewChangeButton::mouseMoved(ofMouseEventArgs &args)
     }
 }
 
-void ViewChangeButton::changeView(enum_views target)
+void ViewChangeButton::changeView(viewsEnum target)
 {
     static CustomEvent changeViewEvent;
     changeViewEvent.view = target;

@@ -11,9 +11,12 @@ void HandCursor::setup(float x, float y)
     yPos = y;
 
     cursorDrag = false;
-    calibratingUser = false;
+    isActiveUser = false;
     trackingHand = false;
     trackingHand = false;
+
+    activeUserId = -1;
+
 }
 
 void HandCursor::update(float x, float y)

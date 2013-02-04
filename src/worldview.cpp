@@ -7,15 +7,18 @@ WorldView::WorldView()
     ofAddListener(ofEvents().update, this, &WorldView::update);
     ofAddListener(ofEvents().keyReleased, this, &WorldView::keyReleased);
     ofAddListener(ofEvents().keyPressed, this, &WorldView::keyPressed);
-    ofAddListener(ofEvents().mouseDragged, this, &WorldView::mouseDragged);
     ofAddListener(CustomEvent().zoomChange, this, &WorldView::zoomChangeListener);
+    ofAddListener(CustomEvent().swipeGesture, this, &WorldView::swipeGestureListener);
 
     HelveticaXL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 50);
-    HelveticaL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 30);
-    HelveticaS.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 15);
+    HelveticaL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 26);
+    HelveticaS.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 18);
     ofEnableSmoothing();
-    gestureTimer = 0;
-    random10 = ofRandom(10);
+
+    // gestures
+    gestureTimerZoom = 0;
+    gestureTimerSwipe = 0;
+    gestureTimeout = 30;
 
     // camera
     cameraHeight = -2500;
@@ -36,6 +39,11 @@ WorldView::WorldView()
     // student setup
     numberOfStudents = 92;
     currentStudent = -1;
+    random10 = ofRandom(10);
+    projectImagesYPosition = 0;
+    currentProjectImagesYPosition = 0;
+    currentImageHeight = 0;
+    currentImageNumber = 1;
 
     mySphere = new Object3D*[numberOfStudents];
 
@@ -75,36 +83,30 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
-    switch(zoomLevel)
-    {
-    case 2:
-        speedFactor = 0.5f;
-        break;
-    case 3:
-        speedFactor = 1.5f;
-        break;
-    case 4:
-        speedFactor = 1.5f;
-        break;
-    }
+    updateZoomLevel();
+    updateScreenPosition();
 
-    // zoomout
-    if(camera.getPosition().z > currentCameraHeight)
-    {
-        camera.dolly(40);
-    }
-    // zoomin
-    if(camera.getPosition().z < currentCameraHeight)
-    {
-        camera.dolly(-40);
-    }
+//    if(currentProjectImagesYPosition != projectImagesYPosition) currentProjectImagesYPosition = projectImagesYPosition;
 
-    // set zoomlevel for obejcts
-    for(int i = 0; i < numberOfStudents; i++)
-    {
-        mySphere[i]->setZoomLevel(zoomLevel);
-    }
+//    if(currentProjectImagesYPosition < projectImagesYPosition) currentProjectImagesYPosition *= 1.1f;
+//    if(currentProjectImagesYPosition > projectImagesYPosition) currentProjectImagesYPosition *= 0.9f;
 
+    cout << "currentProjectImagesYPosition: " << ofToString(currentProjectImagesYPosition) << endl;
+
+    // zoom gesture timer
+    if(gestureTimerZoom > 0)
+    {
+        gestureTimerZoom--;
+    }
+    // swipe gesture timer
+    if(gestureTimerSwipe > 0)
+    {
+        gestureTimerSwipe--;
+    }
+}
+
+void WorldView::updateScreenPosition()
+{
     // calcualte screen move speed
     if(cursor->cursorDrag)
     {
@@ -119,6 +121,7 @@ void WorldView::update(ofEventArgs &e)
     pmouseY = cursor->smoothRightYPos;
 
     // calculate kinetic scrolling
+    // if dragSpeed slower than +-0.5, set to 0, else mulitply by 0.9
     if(!cursor->cursorDrag && zoomLevel > 1)
     {
         // X
@@ -138,7 +141,7 @@ void WorldView::update(ofEventArgs &e)
     }
 
     // center on closest in zoomlevel 2
-    if(zoomLevel == 2 && !cursor->cursorDrag)
+    if(zoomLevel == 2 && !cursor->cursorDrag && !zooming)
     {
         float distanceX = camera.getPosition().x - closestObjectVector.x;
         float distanceY = camera.getPosition().y - closestObjectVector.y;
@@ -153,11 +156,42 @@ void WorldView::update(ofEventArgs &e)
             camera.boom(distanceY);
         }
     }
+}
 
-    // gesture timer
-    if(gestureTimer > 0)
+void WorldView::updateZoomLevel()
+{
+    switch(zoomLevel)
     {
-        gestureTimer--;
+    case 2:
+        speedFactor = 0.5f;
+        break;
+    case 3:
+        speedFactor = 1.5f;
+        break;
+    case 4:
+        speedFactor = 1.5f;
+        break;
+    }
+
+    // zoomout
+    if(camera.getPosition().z > currentCameraHeight)
+    {
+        zooming = true;
+        camera.dolly(40);
+
+    }
+    // zoomin
+    else if(camera.getPosition().z < currentCameraHeight)
+    {
+        zooming = true;
+        camera.dolly(-40);
+    }
+    else zooming = false;
+
+    // set zoomlevel for obejcts
+    for(int i = 0; i < numberOfStudents; i++)
+    {
+        mySphere[i]->setZoomLevel(zoomLevel);
     }
 }
 
@@ -167,18 +201,131 @@ void WorldView::draw(ofEventArgs &e)
     ofBackgroundGradient(ofColor(255), ofColor(175));
     camera.begin();
 
-    // draw all objects
+    // draw all objects if not detail view
+//    if(zoomLevel > 1)
+//    {
     for(int i = 0; i < numberOfStudents; i++)
     {
         mySphere[i]->draw();
     }
+//    }
+
 
     kinectMove();
 
     camera.end();
-    // overview -- draw fachbereich string
-    if(zoomLevel == 4)
+
+    drawInfo();
+    if(zoomLevel < 4 && zoomLevel > 1) drawSucher();
+    drawBottomInterface();
+}
+
+void WorldView::drawInfo()
+{
+    int previousHeight = 50;
+    int imageHeight = 0;
+    switch(zoomLevel)
     {
+        // student detail view
+    case 1:
+        // draw opaque background
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255, 200);
+        ofRect(0,0,ofGetWidth(),ofGetHeight());
+        ofDisableAlphaBlending();
+
+        // draw  left infocards
+        ofSetColor(255,255,255);
+        ofRect(25,25,350, ofGetHeight()- 95);
+        // draw left infocard border
+        ofSetColor(170,170,170);
+        ofNoFill();
+        ofRect(25,25,350, ofGetHeight()- 95);
+        ofFill();
+
+        // draw portrait
+        mySphere[currentStudent]->drawPortrait(60,70);
+
+        // draw project images
+        ofPushMatrix();
+        ofTranslate(0, 0 + currentProjectImagesYPosition);
+        // draw  right infocards
+        ofSetColor(255,255,255);
+        ofRect(25,25,350, ofGetHeight()- 95);
+        ofRect(450,25,ofGetWidth() - 500 , ofGetHeight()- 95);
+        // draw right infocard border
+        ofSetColor(170,170,170);
+        ofNoFill();
+        ofRect(450,25,ofGetWidth() - 500 , ofGetHeight() + 4*700);
+        ofFill();
+        for(int i = 0; i < mySphere[currentStudent]->totalNumberProjectImages; i++)
+        {
+            if(i > 0) imageHeight = mySphere[currentStudent]->getProjectImageSize(i);
+            mySphere[currentStudent]->drawProjectImage(500, imageHeight + previousHeight, i + 1);
+            previousHeight += imageHeight + 50;
+        }
+
+        currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber);
+        cout << "currentImageNumber: " << ofToString(currentImageNumber) << " currentImageHeight: " << ofToString(currentImageHeight) << endl;
+        ofPopMatrix();
+
+        // prepare text
+        fullName = mySphere[currentStudent]->getFullName();
+        description = wrapString(mySphere[currentStudent]->description, 300);
+        // draw text
+        ofSetColor(10,10,10);
+        HelveticaL.drawString(fullName, 60,250);
+        HelveticaS.drawString(description, 60, 300);
+        break;
+        // name view
+    case 2:
+        if(!zooming)
+        {
+            for(int i = 0; i < numberOfStudents; i++)
+            {
+                ofVec3f wordlXYZ = mySphere[i]->getPosition();
+                ofVec3f screenXYZ = camera.worldToScreen(wordlXYZ, ofGetCurrentViewport() );
+
+                ofVec2f screenMid;
+                ofVec2f objectPos;
+
+                screenMid.set(ofGetWidth()/2,ofGetHeight()/2);
+                objectPos.set(screenXYZ.x, screenXYZ.y);
+                // set closest - currentstudent id
+                (screenMid.distance(objectPos) < 140) ? mySphere[i]->setClosestToCamera(true) : mySphere[i]->setClosestToCamera(false);
+                if(mySphere[i]->getClosestToCamera())
+                {
+                    closestObjectVector = mySphere[i]->getPosition();
+                    currentStudent = i;
+                }
+            }
+        }
+        for(int i = 0; i < numberOfStudents; i++)
+        {
+            if(mySphere[i]->getClosestToCamera())
+            {
+                fullName = mySphere[i]->getFullName();
+
+                ofVec3f worldXYZ = mySphere[i]->getPosition();
+                ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
+
+                int x = screenXYZ.x + 47;
+                int y = screenXYZ.y + 10;
+
+                ofSetColor(10,10,10);
+                ofRectangle infoRect = HelveticaL.getStringBoundingBox(fullName, 0,0);
+                ofRect(x - 5, y - infoRect.height - 5, infoRect.width + 10, infoRect.height +10);
+                ofSetColor(255,255,255);
+                HelveticaL.drawString(fullName, x, y);
+            }
+        }
+
+        break;
+        // alphabet view
+    case 3:
+        break;
+        // choose fachbereich
+    case 4:
         ofVec3f middleWordlXYZ = mySphere[numberOfStudents/2]->getPosition();
         ofVec3f middleScreenXYZ = camera.worldToScreen(middleWordlXYZ, ofGetCurrentViewport() );
 
@@ -194,127 +341,97 @@ void WorldView::draw(ofEventArgs &e)
 
         HelveticaL.drawString(fachbereich, x, y);
         ofPopMatrix();
+        break;
     }
-
-    // toggle center object highlight
-    if(zoomLevel == 2)
-    {
-        for(int i = 0; i < numberOfStudents; i++)
-        {
-            ofVec3f wordlXYZ = mySphere[i]->getPosition();
-            ofVec3f screenXYZ = camera.worldToScreen(wordlXYZ, ofGetCurrentViewport() );
-
-            ofVec2f screenMid;
-            ofVec2f objectPos;
-
-            screenMid.set(ofGetWidth()/2,ofGetHeight()/2);
-            objectPos.set(screenXYZ.x, screenXYZ.y);
-            // set closest - currentstudent id
-            (screenMid.distance(objectPos) < 140) ? mySphere[i]->setClosestToCamera(true) : mySphere[i]->setClosestToCamera(false);
-            if(mySphere[i]->getClosestToCamera())
-            {
-                closestObjectVector = mySphere[i]->getPosition();
-                currentStudent = i;
-            }
-        }
-    }
-
-    // draw student detail info
-    if(zoomLevel == 1)
-    {
-        ofEnableAlphaBlending();
-        ofSetColor(10,10,10,100);
-        ofRect(0,0,ofGetWidth(), ofGetHeight());
-        ofDisableAlphaBlending();
-        std::string fullName = mySphere[currentStudent]->getFullName();
-        ofSetColor(255,255,255);
-        HelveticaXL.drawString(fullName, 100,100);
-    }
-
-    for(int i = 0; i < numberOfStudents; i++)
-    {
-        if(mySphere[i]->getClosestToCamera())
-        {
-            std::string fullName = mySphere[i]->getFullName();
-
-            ofVec3f worldXYZ = mySphere[i]->getPosition();
-            ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
-
-            int x = screenXYZ.x + 47;
-            int y = screenXYZ.y + 10;
-
-            ofSetColor(10,10,10);
-            ofRectangle infoRect = HelveticaL.getStringBoundingBox(fullName, 0,0);
-            ofRect(x - 5, y - infoRect.height - 5, infoRect.width + 10, infoRect.height +10);
-            ofSetColor(255,255,255);
-            HelveticaL.drawString(fullName, x, y);
-        }
-    }
-
-    // draw sucher
-    if(zoomLevel < 4)
-    {
-        ofNoFill();
-        ofEnableAlphaBlending();
-        ofSetColor(10,10,10,130);
-        ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
-        ofSetColor(10,10,10,100);
-        ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
-    }
-
-    // draw gesture indicators
-    ofSetColor(10,10,10);
-    ofNoFill();
-    float widthProgressBar = 100.0f;
-    float heightProgressBar = 20;
-    ofRect(10,10,widthProgressBar,heightProgressBar);
-    ofRect(10,40,widthProgressBar,heightProgressBar);
-    ofFill();
-
-    if(cursor->zoomInGestureTimer > 0)
-    {
-        float progressIn = (cursor->zoomInGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
-        ofRect(10,10,(widthProgressBar/100) * progressIn, heightProgressBar);
-    }
-    if(cursor->zoomOutGestureTimer > 0)
-    {
-        float progressOut = (cursor->zoomOutGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
-        ofRect(10,40,(widthProgressBar/100) * progressOut, heightProgressBar);
-    }
-
-    drawDebug();
 }
-
-void WorldView::drawDebug()
+void WorldView::drawSucher()
 {
-    // draw hand user tracking indicators
-    // hand
+    ofNoFill();
+    ofEnableAlphaBlending();
+    ofSetColor(10,10,10,130);
+    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
+    ofSetColor(10,10,10,100);
+    ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
+
+    // sucher active drag
     if(cursor->cursorDrag)
     {
-        ofFill();
         ofEnableAlphaBlending();
         ofSetColor(255,255,255, 100);
         ofEllipse(ofGetWidth() / 2, ofGetHeight() / 2, 140, 140);
         ofDisableAlphaBlending();
     }
 
+    ofFill();
+}
 
-    // user
-    (cursor->trackingUser) ? ofFill() : ofNoFill();
-    ofEllipse(ofGetWidth() - 100, ofGetHeight() - 50, 40, 40);
+void WorldView::drawBottomInterface()
+{
+    ofFill();
+    int bottomDebugHeight = 45;
+    int inactiveUserIndicatorSize = 15;
+    int activeUserIndicatorSize = inactiveUserIndicatorSize * 1.8;
 
-    // calibrating user
-    if(cursor->calibratingUser)
+    // draw bottom interface background
+    ofSetColor(255,255,255);
+    ofRect(0,ofGetHeight()- bottomDebugHeight, ofGetWidth(), bottomDebugHeight);
+    // draw top line
+    ofSetColor(170,170,170);
+    ofRect(0,ofGetHeight() - bottomDebugHeight, ofGetWidth(), 1);
+    // active area top line
+    ofSetColor(10,10,10);
+    float indicatorWidth = ofGetWidth() * 0.1;
+    ofRect(ofGetWidth()/2-indicatorWidth/2,ofGetHeight() - bottomDebugHeight, indicatorWidth, 1);
+
+    // draw inactiveUser indicators
+    for(int i = 0; i < 6; i++)
     {
-        ofSetColor(200,10,10);
-        ofEllipse(ofGetWidth() - 100, ofGetHeight() - 50, 40, 40);
+        float userXPos = cursor->usersPos[i];
+        if(userXPos != 0.0f)
+        {
+            float newUserXPos = userXPos + 1200;
+            float pos = (ofGetWidth()/100) * (newUserXPos / 24);
+            ofSetColor(100,100,100);
+            ofEllipse(pos, ofGetHeight() - bottomDebugHeight, inactiveUserIndicatorSize, inactiveUserIndicatorSize );
+        }
     }
 
-    // gesture timer
-    ofSetColor(200,10,10);
-    (gestureTimer != 0) ? ofFill() : ofNoFill();
-    ofEllipse(100, ofGetHeight() - 50, 40, 40);
-    ofFill();
+    // draw activeUser indicator
+    if(cursor->isActiveUser && cursor->activeUserPos != 0.0f)
+    {
+        ofSetColor(10,10,10);
+        // draw active User indicator
+        float activeUserXPos = cursor->activeUserPos + 1200;
+        float pos = (ofGetWidth()/100) * (activeUserXPos / 24);
+        ofNoFill();
+        ofEllipse(pos, ofGetHeight() - bottomDebugHeight, activeUserIndicatorSize, activeUserIndicatorSize );
+        ofFill();
+        ofSetColor(255,255,255);
+        ofEllipse(pos, ofGetHeight() - bottomDebugHeight, activeUserIndicatorSize, activeUserIndicatorSize );
+    }
+
+    // draw gesture indicators
+    float widthProgressBar = 100.0f;
+    float heightProgressBar = 6;
+    float gestureIndicatorYPos = ofGetHeight() - bottomDebugHeight/2 - heightProgressBar/2;
+    int distanceToMiddle = 35;
+    // draw boxes
+    ofSetColor(200,200,200);
+    ofRect(ofGetWidth()/2 - widthProgressBar - distanceToMiddle,gestureIndicatorYPos,widthProgressBar,heightProgressBar);
+    ofRect(ofGetWidth()/2 + distanceToMiddle,gestureIndicatorYPos,widthProgressBar,heightProgressBar);
+
+    // draw progress
+    ofSetColor(10,10,10);
+    if(cursor->zoomInGestureTimer > 0)
+    {
+        float progressIn = (cursor->zoomInGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        ofRect(ofGetWidth()/2 + 20,gestureIndicatorYPos,(widthProgressBar/100) * progressIn, heightProgressBar);
+    }
+    if(cursor->zoomOutGestureTimer > 0)
+    {
+        float progressOut = (cursor->zoomOutGestureTimer - 1) / (cursor->gestureDuration / 100.0f);
+        ofRect(ofGetWidth()/2 - 20,gestureIndicatorYPos,(widthProgressBar/100) * -progressOut, heightProgressBar);
+    }
 }
 
 void WorldView::keyReleased(ofKeyEventArgs &e)
@@ -322,10 +439,10 @@ void WorldView::keyReleased(ofKeyEventArgs &e)
     switch(e.key)
     {
     case 'e':
-        changeZoomLevel(1);
+        changeZoomLevel(ZOOM_IN);
         break;
     case 'q':
-        changeZoomLevel(0);
+        changeZoomLevel(ZOOM_OUT);
         break;
     }
 }
@@ -346,24 +463,43 @@ void WorldView::keyPressed(ofKeyEventArgs &e)
     case 'd':
         camera.truck(50.0f);
         break;
+    case 'u':
+        swipeGestureEvent(SWIPE_UP);
+        break;
+    case 'j':
+        swipeGestureEvent(SWIPE_DOWN);
+        break;
+    case 'h':
+        swipeGestureEvent(SWIPE_LEFT);
+        break;
+    case 'k':
+        swipeGestureEvent(SWIPE_RIGHT);
+        break;
     }
 }
 
-void WorldView::changeZoomLevel(int _zoomLevel)
+void WorldView::changeZoomLevel(zoomLevelEnum _zoomLevel)
 {
     static CustomEvent changeZoomLevel;
     changeZoomLevel.zoomLevel = _zoomLevel;
     ofNotifyEvent(CustomEvent::zoomChange, changeZoomLevel);
 }
 
+void WorldView::swipeGestureEvent(swipeGesturesEnum _swipeDirection)
+{
+    static CustomEvent swipeGesture;
+    swipeGesture.swipeDirection = _swipeDirection;
+    ofNotifyEvent(CustomEvent::swipeGesture, swipeGesture);
+}
+
 void WorldView::zoomChangeListener(CustomEvent &e)
 {
     float zoomAmount = (cameraHeight+500)/2;
 
-    if(gestureTimer == 0)
+    if(gestureTimerZoom == 0)
     {
-        // 0 = zoomout
-        if(e.zoomLevel == 0)
+        // zoomout
+        if(e.zoomLevel == ZOOM_OUT)
         {
             if(zoomLevel == 1)
             {
@@ -381,8 +517,8 @@ void WorldView::zoomChangeListener(CustomEvent &e)
             }
         }
 
-        // 1 = zoomin
-        else if (e.zoomLevel == 1)
+        // zoomin
+        else if (e.zoomLevel == ZOOM_IN)
         {
             if(zoomLevel > 2)
             {
@@ -401,19 +537,45 @@ void WorldView::zoomChangeListener(CustomEvent &e)
 
         cout << "---- ZoomLevel: " << ofToString(zoomLevel) << endl;
 
-        // reset geture timer
-        gestureTimer = 30;
+        // reset gesture timer
+        gestureTimerZoom = gestureTimeout;
     }
 
 }
 
-void WorldView::mouseDragged(ofMouseEventArgs &e)
+void WorldView::swipeGestureListener(CustomEvent &e)
 {
-    ofVec2f mouseCoords;
-    mouseCoords.set(e.x, e.y);
-    moveScreen(mouseCoords);
+
+    if(zoomLevel == 1 && gestureTimerSwipe == 0)
+    {
+        switch(e.swipeDirection)
+        {
+
+        case SWIPE_LEFT:
+            if(currentStudent < numberOfStudents) currentStudent++;
+            else cout << "studentlist end reached." << endl;
+            break;
+        case SWIPE_RIGHT:
+            if(currentStudent > 0) currentStudent--;
+            else cout << "studentlist beginning reached." << endl;
+            break;
+        case SWIPE_UP:
+            currentProjectImagesYPosition -= currentImageHeight;
+            if(currentImageNumber < mySphere[currentStudent]->totalNumberProjectImages) currentImageNumber++;
+            break;
+        case SWIPE_DOWN:
+            currentProjectImagesYPosition += currentImageHeight;
+            if(currentImageNumber > 1) currentImageNumber--;
+            break;
+        }
+
+        cout << "cs: " << ofToString(currentStudent) << endl;
+
+        // reset gesture timer
+        gestureTimerSwipe = gestureTimeout;
+    }
 }
-//
+
 void WorldView::kinectMove()
 {
     if(cursor->cursorDrag)
@@ -438,6 +600,38 @@ void WorldView::moveScreen(ofVec2f moveVector)
 void WorldView::setCursor(HandCursor *c)
 {
     cursor = c;
+}
+
+
+// function to wrap text string into box, input textstring and box width (from c++ forums), returns textstring with added '/n' for formatting
+string WorldView::wrapString(string text, int width)
+{
+    string typeWrapped = "";
+    string tempString = "";
+    vector <string> words = ofSplitString(text, " ");
+    for(int i=0; i<words.size(); i++)
+    {
+        string wrd = words[i];
+        // if we aren't on the first word, add a space
+        if (i > 0)
+        {
+            tempString += " ";
+        }
+        tempString += wrd;
+        int stringwidth = HelveticaS.stringWidth(tempString);
+        if(stringwidth >= width)
+        {
+            typeWrapped += "\n";
+            tempString = wrd;       // make sure we're including the extra word on the next line
+        }
+        else if (i > 0)
+        {
+            // if we aren't on the first word, add a space
+            typeWrapped += " ";
+        }
+        typeWrapped += wrd;
+    }
+    return typeWrapped;
 }
 
 

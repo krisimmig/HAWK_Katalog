@@ -18,7 +18,8 @@ public:
     void update();
     void draw();
     void exit();
-    void changeZoomLevel(int _zoomLevel);
+    void changeZoomLevel(zoomLevelEnum _zoomLevel);
+    void kinectGestures();
     float smoothValue(float value);
 
     ofTrueTypeFont garamondRegularH1;
@@ -26,10 +27,17 @@ public:
     // views
     ViewManager viewmanager;
 
-    // cursor
+    // kinect - user
     ofxOpenNI openNIDevice;
     ofxOpenNIUser* user;
+    ofxOpenNIUser* activeUser;
+    bool isActiveUser;
     bool useKinect;
+    std::string userInfo;
+    int activeUserId;
+    int numberOfMaxUsers;
+
+    // cursor
     HandCursor cursor;
     float cursorXPos;
     float cursorYPos;
@@ -41,18 +49,23 @@ public:
     int zoomOutGestureTimer;
     int zoomInGestureTimer;
     int gestureDuration;
-    int  minZoomGestureDistance;
+    int swipeTimer;
+    int swipeLeftTimer;
+    int swipeRightTimer;
+    int swipeUpTimer;
+    int swipeDownTimer;
+    int minZoomGestureDistance;
 
     float kinectMovementX;
     float kinectMovementY;
     float kinectMovementZ;
     float handsDistance;
     float previousHandsDistance;
+    float previousSmoothRightX;
+    float previousSmoothRightY;
 
     bool twoHands;
-    std::string userInfo;
 
-    int userId;
 
 };
 
