@@ -3531,7 +3531,7 @@
 	"constants.h"
 	"customevent.h"
 
-1359916591 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\constants.h
+1360184578 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\constants.h
 
 1359916559 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\customevent.h
 	"ofMain.h"
@@ -3585,22 +3585,24 @@
 	"viewchangebutton.h"
 	"students.h"
 
-1357245538 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.h
+1360179098 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.h
 	"constants.h"
 	"ofMain.h"
 	"ofxSQLiteHeaders.h"
 
-1359999023 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
+1360190009 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.h
 	"ofMain.h"
 	"constants.h"
 	"cursor.h"
 	"object3d.h"
 	"customevent.h"
+	"students.h"
 
-1359920419 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
+1360190688 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
 	"ofMain.h"
 	"constants.h"
 	"customevent.h"
+	"ofxSQLiteHeaders.h"
 
 1355856211 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.h
 	"ofMain.h"
@@ -3615,10 +3617,10 @@
 	"ofMain.h"
 	"constants.h"
 
-1359920514 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
+1360191091 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
 	"object3d.h"
 
-1357230185 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
+1360178688 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
 	"overview.h"
 
 1355527951 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\singleview.cpp
@@ -3628,7 +3630,7 @@
 	"constants.h"
 	"ofMain.h"
 
-1358191132 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
+1360186418 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\students.cpp
 	"students.h"
 
 1360177218 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\testapp.cpp
@@ -3641,7 +3643,7 @@
 1359916220 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1360175115 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1360191289 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
 
 1359316792 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp

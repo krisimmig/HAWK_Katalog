@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "constants.h"
 #include "customevent.h"
+#include "ofxSQLiteHeaders.h"
 
 class Object3D
 {
@@ -26,8 +27,11 @@ public:
     int id;
     int totalNumberProjectImages;
     std::string letter;
-    std::string project_title;
+    std::string titel;
     std::string description;
+
+
+    std::string fachbereich;
     vector<string> letters;
 
     ofImage image_portrait;
@@ -50,6 +54,7 @@ private:
     std::string first_name;
     std::string last_name;
     std::string fullName;
+    std::string image_01;
     std::string file_project_01;
     std::string file_project_02;
     std::string file_project_03;
@@ -58,10 +63,9 @@ private:
 
     int size;
     int zoomLevel;
-    float sphereColor_1;
-    float sphereColor_2;
 
     bool closestToCamera;
+    ofxSQLite* sqlite;
 
 
 };

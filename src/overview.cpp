@@ -3,21 +3,21 @@
 Overview::Overview(std::string cd)
 {
     //ctor
-    ofBackground(200,200,200);
-    fachbereich = cd;
-    ofAddListener(ofEvents().draw, this, &Overview::draw);
-    buttonToMainmenu = new ViewChangeButton("Main", MAINMENU, 800, 150);
-    buttonToWorldview = new ViewChangeButton("Worldview", WORLDVIEW, 800, 200);
-
-    // get array of all student IDs from fachbereich
-    studentIDs = Students::getStudentIds(fachbereich);
-    count = Students::countAll(fachbereich);
-    allStudentsFromDept = new Students*[count];
-
-    for (int i = 0; i < count; i++)
-    {
-        allStudentsFromDept[i] = new Students(studentIDs[i]);
-    }
+//    ofBackground(200,200,200);
+//    fachbereich = cd;
+//    ofAddListener(ofEvents().draw, this, &Overview::draw);
+//    buttonToMainmenu = new ViewChangeButton("Main", MAINMENU, 800, 150);
+//    buttonToWorldview = new ViewChangeButton("Worldview", WORLDVIEW, 800, 200);
+//
+//    // get array of all student IDs from fachbereich
+//    studentIDs = Students::getStudentIds(fachbereich);
+//    count = Students::countAll(fachbereich);
+//    allStudentsFromDept = new Students*[count];
+//
+//    for (int i = 0; i < count; i++)
+//    {
+//        allStudentsFromDept[i] = new Students(studentIDs[i]);
+//    }
 }
 
 Overview::~Overview()

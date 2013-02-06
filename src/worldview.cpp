@@ -36,10 +36,21 @@ WorldView::WorldView()
     speedXCounter = 0;
     speedYCounter = 0;
 
-    // student setup
-    numberOfStudents = 92;
+    // currentDepartment setup
+    fachbereichArray = {FACHBEREICH_ALL,FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
+    departmentChanged = false;
+    totalDeptNumber = 9; // 10 ?!?
+    currentDept = 5; // start at GD
+    currentDepartment = Students::convertFBEnumToString(fachbereichArray[currentDept]);
+    numberOfStudents = Students::countAll(fachbereichArray[currentDept]);
     currentStudent = -1;
     random10 = ofRandom(10);
+    firstStart = true;
+
+    // studentObjects
+    studentObjectsSize = 350;
+    studentObjectAbstandX = 146;
+    studentObjectAbstandY = 174;
 
     // info panel
     justArrived = false;
@@ -53,31 +64,10 @@ WorldView::WorldView()
     infoPanelResetPosition = infoPanelXPosition;
     infoPanelFinalYPosition = 0;
     infoPanelYPosition = 0;
-    mySphere = new Object3D*[numberOfStudents];
 
-    // spheres
-    sphereSize = 350;
-    int abstandX = 146;
-    int abstandY = 174;
-    int counter = 0;
-    for(int i = 0; i < numberOfStudents; i++)
-    {
-        for(int j = 0; j < sqrt(numberOfStudents); j++)
-//        for(int j = 0; j < 17; j++)
-        {
-            if(counter < numberOfStudents)
-            {
-                int x = abstandX * i;
-                int y = abstandY * j;
-                int z = 0;
-                mySphere[counter] = new Object3D();
-                mySphere[counter]->setup(x,y,z, sphereSize, counter);
-                mySphere[counter]->setFont(HelveticaXL);
-                counter++;
-            }
-        }
-    }
-    ofFill();
+
+
+
 }
 
 WorldView::~WorldView()
@@ -86,11 +76,18 @@ WorldView::~WorldView()
     ofRemoveListener(ofEvents().draw, this, &WorldView::draw);
     ofRemoveListener(ofEvents().update, this, &WorldView::update);
     ofRemoveListener(ofEvents().keyReleased, this, &WorldView::keyReleased);
-    delete mySphere;
+    delete studentObjects;
 }
 
 void WorldView::update(ofEventArgs &e)
 {
+    if(departmentChanged || firstStart)
+    {
+        updateDepartment();
+        departmentChanged = false;
+        firstStart = false;
+    }
+
     if(zoomLevel > 1) updateScreenPosition();
     if(zoomLevel == 1) updateInfoPanelPosition();
     updateZoomLevel();
@@ -104,6 +101,37 @@ void WorldView::update(ofEventArgs &e)
     if(gestureTimerSwipe > 0)
     {
         gestureTimerSwipe--;
+    }
+}
+
+void WorldView::updateDepartment()
+{
+    // make new objects
+    delete[] studentObjects;
+    delete studentIdArray;
+    numberOfStudents = Students::countAll(fachbereichArray[currentDept]);
+    currentDepartment = Students::convertFBEnumToString(fachbereichArray[currentDept]);
+
+    studentObjects = new Object3D*[numberOfStudents];
+    studentIdArray = Students::getStudentIds(fachbereichArray[currentDept]);
+
+    // objects
+    int counter = 0;
+    for(int i = 0; i < numberOfStudents; i++)
+    {
+        for(int j = 0; j < sqrt(numberOfStudents); j++)
+        {
+            if(counter < numberOfStudents)
+            {
+                int x = studentObjectAbstandX * i;
+                int y = studentObjectAbstandY * j;
+                int z = 0;
+                studentObjects[counter] = new Object3D();
+                studentObjects[counter]->setup(x,y,z, studentObjectsSize, studentIdArray[counter]);
+                studentObjects[counter]->setFont(HelveticaXL);
+                counter++;
+            }
+        }
     }
 }
 
@@ -256,7 +284,7 @@ void WorldView::updateZoomLevel()
     // set zoomlevel for obejcts
     for(int i = 0; i < numberOfStudents; i++)
     {
-        mySphere[i]->setZoomLevel(zoomLevel);
+        studentObjects[i]->setZoomLevel(zoomLevel);
     }
 }
 
@@ -269,7 +297,7 @@ void WorldView::draw(ofEventArgs &e)
     // draw all objects if not detail view
     for(int i = 0; i < numberOfStudents; i++)
     {
-        mySphere[i]->draw();
+        studentObjects[i]->draw();
     }
 
     kinectMove();
@@ -287,7 +315,8 @@ void WorldView::draw(ofEventArgs &e)
         ofSetColor(255,255,255, 200);
         ofEllipse(150, 150, 50, 50);
         ofDisableAlphaBlending();
-    } else if(cursor->twoHands)
+    }
+    else if(cursor->twoHands)
     {
         ofEnableAlphaBlending();
         ofSetColor(255,255,255, 200);
@@ -324,16 +353,16 @@ void WorldView::drawInfo()
         ofFill();
 
         // draw portrait
-        mySphere[currentStudent]->drawPortrait(60,70);
+        studentObjects[currentStudent]->drawPortrait(60,70);
 
         // draw project images
         ofPushMatrix();
         ofTranslate(0, 0 + currentProjectImagesYPosition);
 
         // draw  right infocards
-        for(int i = 0; i <= mySphere[currentStudent]->totalNumberProjectImages; i++)
+        for(int i = 0; i <= studentObjects[currentStudent]->totalNumberProjectImages; i++)
         {
-            totalImageColumnHeight += mySphere[currentStudent]->getProjectImageSize(i) + 30;
+            totalImageColumnHeight += studentObjects[currentStudent]->getProjectImageSize(i) + 30;
         }
         ofSetColor(255,255,255);
         ofRect(475,25,750,totalImageColumnHeight);
@@ -342,18 +371,18 @@ void WorldView::drawInfo()
         ofNoFill();
         ofRect(475,25,750,totalImageColumnHeight);
         ofFill();
-        for(int i = 0; i < mySphere[currentStudent]->totalNumberProjectImages; i++)
+        for(int i = 0; i < studentObjects[currentStudent]->totalNumberProjectImages; i++)
         {
-            if(i > 0) imageHeight = mySphere[currentStudent]->getProjectImageSize(i);
-            mySphere[currentStudent]->drawProjectImage(500, imageHeight + previousHeight, i + 1);
+            if(i > 0) imageHeight = studentObjects[currentStudent]->getProjectImageSize(i);
+            studentObjects[currentStudent]->drawProjectImage(500, imageHeight + previousHeight, i + 1);
             previousHeight += imageHeight + 30;
         }
 
         ofPopMatrix();
 
         // prepare text
-        fullName = mySphere[currentStudent]->getFullName();
-        description = wrapString(mySphere[currentStudent]->description, 300);
+        fullName = studentObjects[currentStudent]->getFullName();
+        description = wrapString(studentObjects[currentStudent]->description, 300);
         // draw text
         ofSetColor(10,10,10);
         HelveticaL.drawString(fullName, 60,250);
@@ -367,7 +396,7 @@ void WorldView::drawInfo()
         {
             for(int i = 0; i < numberOfStudents; i++)
             {
-                ofVec3f wordlXYZ = mySphere[i]->getPosition();
+                ofVec3f wordlXYZ = studentObjects[i]->getPosition();
                 ofVec3f screenXYZ = camera.worldToScreen(wordlXYZ, ofGetCurrentViewport() );
 
                 ofVec2f screenMid;
@@ -376,21 +405,21 @@ void WorldView::drawInfo()
                 screenMid.set(ofGetWidth()/2,ofGetHeight()/2);
                 objectPos.set(screenXYZ.x, screenXYZ.y);
                 // set closest - currentstudent id
-                (screenMid.distance(objectPos) < 140) ? mySphere[i]->setClosestToCamera(true) : mySphere[i]->setClosestToCamera(false);
-                if(mySphere[i]->getClosestToCamera())
+                (screenMid.distance(objectPos) < 140) ? studentObjects[i]->setClosestToCamera(true) : studentObjects[i]->setClosestToCamera(false);
+                if(studentObjects[i]->getClosestToCamera())
                 {
-                    closestObjectVector = mySphere[i]->getPosition();
+                    closestObjectVector = studentObjects[i]->getPosition();
                     currentStudent = i;
                 }
             }
         }
         for(int i = 0; i < numberOfStudents; i++)
         {
-            if(mySphere[i]->getClosestToCamera())
+            if(studentObjects[i]->getClosestToCamera())
             {
-                fullName = mySphere[i]->getFullName();
+                fullName = studentObjects[i]->getFullName();
 
-                ofVec3f worldXYZ = mySphere[i]->getPosition();
+                ofVec3f worldXYZ = studentObjects[i]->getPosition();
                 ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
 
                 int x = screenXYZ.x + 47;
@@ -408,22 +437,15 @@ void WorldView::drawInfo()
         // alphabet view
     case 3:
         break;
-        // choose fachbereich
+        // choose currentDepartment
     case 4:
-        ofVec3f middleWordlXYZ = mySphere[numberOfStudents/2]->getPosition();
-        ofVec3f middleScreenXYZ = camera.worldToScreen(middleWordlXYZ, ofGetCurrentViewport() );
-
-        std::string fachbereich = "GRAFIKDESIGN";
-        ofSetColor(10,10,10);
-        ofRectangle fachbereichRect = HelveticaL.getStringBoundingBox(fachbereich, 0,0);
-        int x = middleScreenXYZ.x - fachbereichRect.width / 2;
-        int y = middleScreenXYZ.y + fachbereichRect.height / 2;
         ofPushMatrix();
-        ofTranslate(0,0,50);
-        ofRect(x - 5, y - fachbereichRect.height - 5, fachbereichRect.width + 10, fachbereichRect.height +10);
+        ofTranslate(ofGetWidth()/2,100,0);
+        ofSetColor(10,10,10);
+        ofRectangle fachbereichRect = HelveticaL.getStringBoundingBox(currentDepartment,0,0);
+        ofRect(0,0,0, fachbereichRect.height+10);
         ofSetColor(255,255,255);
-
-        HelveticaL.drawString(fachbereich, x, y);
+        HelveticaL.drawString(currentDepartment, 0, 0);
         ofPopMatrix();
         break;
     }
@@ -637,7 +659,32 @@ void WorldView::zoomChangeListener(CustomEvent &e)
 
 void WorldView::swipeGestureListener(CustomEvent &e)
 {
+    // in overview
+    if(zoomLevel == 4)
+    {
+        switch(e.swipeDirection)
+        {
 
+        case SWIPE_LEFT:
+            if(currentDept < totalDeptNumber)
+            {
+                currentDept++;
+                departmentChanged = true;
+            }
+            else cout << "last dept reached." << endl;
+            break;
+        case SWIPE_RIGHT:
+            if(currentDept > 0)
+            {
+                currentDept--;
+                departmentChanged = true;
+            }
+            else cout << "first dept reached." << endl;
+            break;
+        }
+    }
+
+    // in info view
     if(zoomLevel == 1 && gestureTimerSwipe == 0)
     {
         switch(e.swipeDirection)
@@ -661,9 +708,9 @@ void WorldView::swipeGestureListener(CustomEvent &e)
             break;
         case SWIPE_UP:
             cout << "----------------------------------up" << endl;
-            if(currentImageNumber < mySphere[currentStudent]->totalNumberProjectImages)
+            if(currentImageNumber < studentObjects[currentStudent]->totalNumberProjectImages)
             {
-                currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber);
+                currentImageHeight = studentObjects[currentStudent]->getProjectImageSize(currentImageNumber);
                 futureProjectImagesYPosition -= currentImageHeight + 30;
                 currentImageNumber++;
             }
@@ -672,7 +719,7 @@ void WorldView::swipeGestureListener(CustomEvent &e)
             cout << "*********************************down" << endl;
             if(currentImageNumber > 1)
             {
-                currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber - 1);
+                currentImageHeight = studentObjects[currentStudent]->getProjectImageSize(currentImageNumber - 1);
                 futureProjectImagesYPosition += currentImageHeight + 30;
                 currentImageNumber--;
             }

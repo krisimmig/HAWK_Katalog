@@ -17,63 +17,49 @@ void Object3D::setup(int _x, int _y, int _z, int _size, int _id)
     x = _x;
     y = _y;
     z = _z;
-    size = 50;
 
-    letters=ofSplitString("a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z", ",");
-    letter = ofToString(letters[ofRandom(0,25)]);
-    description = "Käferkunde ist eine App, mit der Käfer gelernt, nachgeschlagen,bestimmt oder gezeigt werden können. Allein in Deutschland gibt es ca. 6.500 verschiedene Käferarten. Während wir sie kaum beachten, müssen Förster sie kennen und lernen. Mit der Käferkunde-App ist das Lernen/Nachschlagen von Käfern jetzt schnell und einfach möglich. Daneben können gesichtete Käfer auf einer interaktiven Karte mit Foto eingezeichnet oder mit Hilfe der Filterfunktion schnell bestimmt werden. kaeferkunde.fovea.eu";
+    id = _id;
 
-    int number = ofRandom(1,5);
-    switch(number)
+    // make DB QUERY
+    sqlite = new ofxSQLite(DB_NAME);
+    // -- query students for all first names
+    ofxSQLiteSelect dbQuery = sqlite->select("vorname, nachname, fachbereich, titel, beschreibung, image_01")
+                              .from("students")
+                              .where("id", id);
+
+    dbQuery.execute().begin();
+
+    // process query result, store names
+    first_name = dbQuery.getString(0);
+    last_name = dbQuery.getString(1);
+    fachbereich = dbQuery.getString(2);
+    titel = dbQuery.getString(3);
+    description = dbQuery.getString(4);
+    image_01 = dbQuery.getString(5);
+
+    fullName = first_name + " " + last_name;
+    // load image
+    if(!image_portrait.loadImage(PORTRAITS_DIR "/" + image_01))
     {
-    case 1:
-        fullName = "Katrin Mahler";
-        break;
-    case 2:
-        fullName = "Stefanie Ernst";
-        break;
-    case 3:
-        fullName = "Melanie Stahl";
-        break;
-    case 4:
-        fullName = "Katharina Eberts";
-        break;
-    case 5:
-        fullName = "Claudia Blau";
-        break;
+        cout << "error loading image: " << image_01 << endl;
     }
+    cout << "Students::setup(int _id)" << endl;
+    delete sqlite;
 
     zoomLevel = 4;
 
-    (ofRandom(10) > 7) ? isABC = true : isMaster = false;
-    (ofRandom(10) > 8) ? isMaster = true : isMaster = false;
-
-    int portraitNumber = ofRandom(1, 5);
-    totalNumberProjectImages = ofRandom(3, 4);
-
-    file_portrait = ofToString(portraitNumber) + ".jpg";
-
-    int one = ofRandom(1, 10);
-    int two = ofRandom(1, 10);
-    int three = ofRandom(1, 10);
-    int four = ofRandom(1, 10);
-    file_project_01 = ofToString(one) + ".jpg";
-    file_project_02 = ofToString(two) + ".jpg";
-    file_project_03 = ofToString(three) + ".jpg";
-    file_project_04 = ofToString(four) + ".jpg";
-
-    // load image
-    image_portrait.loadImage(PORTRAITS_DIR "/" + file_portrait);
-
+    isMaster = false;
     projectImagesLoaded = false;
+    totalNumberProjectImages = ofRandom(3, 4);
+    file_project_01 = "project_image.jpg";
 }
 
 void Object3D::loadProjectImages()
 {
     image_project_01.loadImage(IMAGE_DIR "/" + file_project_01);
-    image_project_02.loadImage(IMAGE_DIR "/" + file_project_02);
-    image_project_03.loadImage(IMAGE_DIR "/" + file_project_03);
-    image_project_04.loadImage(IMAGE_DIR "/" + file_project_04);
+    image_project_02.loadImage(IMAGE_DIR "/" + file_project_01);
+    image_project_03.loadImage(IMAGE_DIR "/" + file_project_01);
+    image_project_04.loadImage(IMAGE_DIR "/" + file_project_01);
     projectImagesLoaded = true;
 }
 
@@ -111,23 +97,6 @@ void Object3D::draw()
 
     ofRect(x-rahmen,y-rahmen,z,image_portrait.getWidth() + rahmen*2, image_portrait.getHeight() + rahmen*2);
     image_portrait.draw(x,y,z);
-
-    // master marker
-    if(isMaster && zoomLevel < 4)
-    {
-        ofSetColor(200,200,0);
-        ofRect(x+image_portrait.getWidth() * 0.9,y-rahmen,z,image_portrait.getWidth() * 0.12, image_portrait.getHeight()*0.25);
-    }
-
-    if(isABC && zoomLevel == 3)
-    {
-        ofEnableAlphaBlending();
-        ofSetColor(10,10,10,180);
-        ofRect(x-5,y-5,z,image_portrait.getWidth()+10, image_portrait.getHeight()+10);
-        ofDisableAlphaBlending();
-        ofSetColor(255,255,255);
-        font1->drawString(ofToUpper(letter), x + 15,y + 70);
-    }
 }
 
 void Object3D::drawProjectImage(int _x, int _y, int _imageNumber)
@@ -170,7 +139,6 @@ void Object3D::drawPortrait(int _x, int _y)
 
 std::string Object3D::getFullName()
 {
-//    std::string fullName = first_name + " " + last_name;
     return fullName;
 }
 

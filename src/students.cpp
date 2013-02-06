@@ -4,15 +4,12 @@ Students::Students()
 {
     //ctor
     cout << "Students ctor" << endl;
-//    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
-//    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
 }
 
 Students::Students(int id)
 {
     //ctor
-//    garamondRegularH1.loadFont("fonts/AGaramondPro-Regular.otf", 18);
-//    garamondRegularP.loadFont("fonts/AGaramondPro-Regular.otf", 14);
+
     setup(id);
 }
 
@@ -140,15 +137,14 @@ void Students::drawImage(int x, int y, int r)
 // count number of records in DB
 int Students::countAll()
 {
-    return countAll("");
+    return countAll(FACHBEREICH_ALL);
 }
 
 // count number of records in DB
-int Students::countAll(std::string fb)
+int Students::countAll(fachbereichEnum _fb)
 {
     ofxSQLite* sqlite = new ofxSQLite(DB_NAME);
-
-    if(fb == "")
+    if(_fb == FACHBEREICH_ALL)
     {
         // count entries
         ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
@@ -160,9 +156,10 @@ int Students::countAll(std::string fb)
     else
     {
         // count entries
+        std::string fbString = Students::convertFBEnumToString(_fb);
         ofxSQLiteSelect selectCount = sqlite->select("count(*) as total")
                                       .from("students")
-                                      .where("fachbereich", fb)
+                                      .where("fachbereich", fbString)
                                       .execute().begin();
         delete sqlite;
         return selectCount.getInt();
@@ -171,24 +168,26 @@ int Students::countAll(std::string fb)
 
 int* Students::getStudentIds()
 {
-    return getStudentIds("");
+    return getStudentIds(FACHBEREICH_ALL);
 }
 
 // return array of student IDs
-int* Students::getStudentIds(std::string fb)
+int* Students::getStudentIds(fachbereichEnum _fb)
 {
+
+    std::string fb = Students::convertFBEnumToString(_fb);
     ofxSQLite* sqlite = new ofxSQLite(DB_NAME);
     // count entries
     int count;
 
-    if(fb == "")
+    if(_fb == FACHBEREICH_ALL)
     {
         count = Students::countAll();
         // make query for all IDs
         ofxSQLiteSelect sel = sqlite->select("id")
-              .from("students")
-              .order("id", " ASC ")
-              .execute().begin();
+                              .from("students")
+                              .order("id", " ASC ")
+                              .execute().begin();
         delete sqlite;
 
         // create new int studentIdArray
@@ -198,7 +197,6 @@ int* Students::getStudentIds(std::string fb)
         while(sel.hasNext())
         {
             int id = sel.getInt();
-            cout << "(getStudentIds) put IDs into array, id: " << id << endl;
             studentIdArray[i] = id;
             i++;
             sel.next();
@@ -208,14 +206,14 @@ int* Students::getStudentIds(std::string fb)
     }
     else
     {
-        count = Students::countAll(fb);
+        count = Students::countAll(_fb);
 
         // make query for all IDs
         ofxSQLiteSelect sel = sqlite->select("id")
-              .from("students")
-              .where("fachbereich", fb)
-              .order("id", " ASC ")
-              .execute().begin();
+                              .from("students")
+                              .where("fachbereich", fb)
+                              .order("id", " ASC ")
+                              .execute().begin();
         delete sqlite;
 
         // create new int studentIdArray
@@ -225,7 +223,6 @@ int* Students::getStudentIds(std::string fb)
         while(sel.hasNext())
         {
             int id = sel.getInt();
-            cout << "(getStudentIds) put IDs into array, id: " << id << endl;
             studentIdArray[i] = id;
             i++;
             sel.next();
@@ -266,6 +263,44 @@ string Students::wrapString(string text, int width)
         typeWrapped += wrd;
     }
     return typeWrapped;
+}
+
+//
+std::string Students::convertFBEnumToString(fachbereichEnum _fb)
+{
+    switch(_fb)
+    {
+    case FACHBEREICH_ALL:
+        return "ALL";
+        break;
+    case FACHBEREICH_AD:
+        return "AD";
+        break;
+    case FACHBEREICH_CICD:
+        return "CICD";
+        break;
+    case FACHBEREICH_DM:
+        return "DM";
+        break;
+    case FACHBEREICH_FG:
+        return "FG";
+        break;
+    case FACHBEREICH_GD:
+        return "GD";
+        break;
+    case FACHBEREICH_IAID:
+        return "IAID";
+        break;
+    case FACHBEREICH_LD:
+        return "LD";
+        break;
+    case FACHBEREICH_MG:
+        return "MG";
+        break;
+    case FACHBEREICH_PD:
+        return "PD";
+        break;
+    }
 }
 
 Students::~Students()

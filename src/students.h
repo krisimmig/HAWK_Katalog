@@ -35,17 +35,19 @@ class Students
 
         // count records in db
         static int countAll();
-        static int countAll(std::string fb);
+        static int countAll(fachbereichEnum fb);
+        static std::string convertFBEnumToString(fachbereichEnum fb);
 
         // get array of student IDs
         static int* getStudentIds();
-        static int* getStudentIds(std::string fb);
+        static int* getStudentIds(fachbereichEnum fb);
 
 
     protected:
         ofxSQLite* sqlite;
 
     private:
+
 
 
 };

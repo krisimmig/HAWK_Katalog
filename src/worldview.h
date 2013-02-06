@@ -6,6 +6,7 @@
 #include "cursor.h"
 #include "object3d.h"
 #include "customevent.h"
+#include "students.h"
 
 
 
@@ -25,6 +26,7 @@ private:
     void drawBottomInterface();
 
     void update(ofEventArgs &e);
+    void updateDepartment();
     void updateZoomLevel();
     void updateInfoPanelPosition();
     void updateScreenPosition();
@@ -40,6 +42,7 @@ private:
     void kinectMove();
     string wrapString(string text, int width);
     HandCursor* cursor;
+    bool firstStart;
 
     // environment + camera
     ofCamera camera;
@@ -61,18 +64,33 @@ private:
     float cameraX;
     float cameraY;
 
-    // 3d objects
-    Object3D** mySphere;
-    int currentSphere;
-    int sphereSize;
+    // gestures
     int gestureTimerZoom;
     int gestureTimerSwipe;
     int gestureTimeout;
+
+    // studentObjects
+    Object3D** studentObjects;
+    int studentObjectAbstandX;
+    int studentObjectAbstandY;
+    int currentSphere;
+    int studentObjectsSize;
     ofVec3f closestObjectVector;
 
     // student stuff
     int numberOfStudents;
     int currentStudent;
+    std::string fullName;
+    std::string description;
+    int* studentIdArray;
+
+    // fachbereich stuff
+    int currentDept;
+    int totalDeptNumber;
+    fachbereichEnum fachbereichArray[10];
+    bool departmentChanged;
+    std::string currentDepartment;
+
 
     // info panel
     bool justArrived;
@@ -88,9 +106,7 @@ private:
     bool infoPanelToRight;
     int currentImageNumber;
     int currentImageHeight;
-    std::string fullName;
-    std::string description;
-//    int* studentIdArray;
+
 
     // fonts
     ofTrueTypeFont HelveticaXL;
