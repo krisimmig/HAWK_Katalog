@@ -37,7 +37,10 @@ void testApp::setup()
     zoomGestureDuration = cursor.zoomGestureDuration = 20;
     minZoomGestureDistance = 10;
     swipeTimer = 3;
-    swipeLeftTimer, swipeRightTimer, swipeUpTimer, swipeDownTimer = 0;
+    swipeLeftTimer = swipeRightTimer = swipeTimerDefaultX = 30;
+    swipeUpTimer = swipeDownTimer = swipeTimerDefaultY = 8;
+    swipingLeft = swipingRight = swipingUp = swipingDown = false;
+
 }
 
 void testApp::update()
@@ -100,6 +103,7 @@ void testApp::kinectGestures()
     cursorYPos = rightHandY;
     // upadte cursor position
     cursor.update(cursorXPos, cursorYPos);
+    cursor.activeUserXpos = activeUser->getJoint(JOINT_RIGHT_HIP).getWorldPosition().x;
 
     // -------------
     // MOVESCREEN
@@ -108,7 +112,7 @@ void testApp::kinectGestures()
     float rightShoulderZ = activeUser->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
 
     // set hand drag
-    if( (rightShoulderZ - rightHandZ) > 450 && !twoHands)
+    if( (rightShoulderZ - rightHandZ) > 350 && !twoHands)
     {
         cursor.cursorDrag = true;
     }
@@ -120,66 +124,121 @@ void testApp::kinectGestures()
     // -------------
     // SWIPE
     // -------------
-    if(cursor.cursorDrag)
+
+    // SWIPE DISTANCE
+    float smoothActiveUserXPos = cursor.smoothActiveUserXPos;
+    float dist1;
+    dist1 = smoothActiveUserXPos - cursor.smoothRightXPos;
+//    cout << "x: " << ofToString(smoothActiveUserXPos) << " hX: " << ofToString(cursor.smoothRightXPos) <<  " - d: " << ofToString(dist1) <<  " || l: " << ofToString(swipingLeft) <<  " t: " << ofToString(swipeLeftTimer) << endl;
+
+
+
+    // SWIPE LEFT
+    if(dist1 < -320 && !swipingRight)
     {
-
-        float swipeDistanceX = cursor.smoothRightXPos - previousSmoothRightX;
-        // left
-        if(cursor.smoothRightXPos < previousSmoothRightX && swipeDistanceX < -20 )
+        swipingLeft = true;
+    }
+    if(swipingLeft)
+    {
+        swipeLeftTimer--;
+        if(swipeLeftTimer >= 0 && dist1 > 180)
         {
-            swipeLeftTimer++;
-            if(swipeLeftTimer > swipeTimer)
-            {
-                static CustomEvent swipeGestureEvent;
-                swipeGestureEvent.swipeDirection = SWIPE_LEFT;
-                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-                swipeLeftTimer = 0;
-            }
-        } else swipeLeftTimer = 0;
-
-        // right
-        if(cursor.smoothRightXPos > previousSmoothRightX  && swipeDistanceX > 20)
+            static CustomEvent swipeGestureEvent;
+            swipeGestureEvent.swipeDirection = SWIPE_LEFT;
+            ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+            swipingLeft = false;
+            swipeLeftTimer = swipeTimerDefaultX;
+            cout << "SWIPE LEFT!" << endl;
+        }
+        else if(swipeLeftTimer <= 0)
         {
-            swipeRightTimer++;
-            if(swipeRightTimer > swipeTimer)
-            {
-                static CustomEvent swipeGestureEvent;
-                swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
-                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-                swipeRightTimer = 0;
-            }
-        } else swipeRightTimer = 0;
+            swipingLeft = false;
+            swipeLeftTimer = swipeTimerDefaultX;
+        }
+    }
 
-        previousSmoothRightX = cursor.smoothRightXPos;
+    // SWIPE RIGHT
+    if(dist1 > 230 && !swipingLeft)
+    {
+        swipingRight = true;
+    }
 
-        // up
-        float swipeDistanceY = cursor.smoothRightYPos - previousSmoothRightY;
-        if(cursor.smoothRightYPos > previousSmoothRightY && swipeDistanceY > 20 )
+    if(swipingRight)
+    {
+        swipeRightTimer--;
+        if(swipeRightTimer >= 0 && dist1 < -270)
         {
-            swipeUpTimer++;
-            if(swipeUpTimer > swipeTimer)
+            static CustomEvent swipeGestureEvent;
+            swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
+            ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+            swipingRight = false;
+            swipeRightTimer = swipeTimerDefaultX;
+            cout << "SWIPE RIGHT!" << endl;
+        }
+        else if(swipeRightTimer <= 0)
+        {
+            swipingRight = false;
+            swipeRightTimer = swipeTimerDefaultX;
+        }
+    }
+
+    // SWIPE UP
+    if((rightShoulderZ - rightHandZ) > 350 )
+    {
+        cout << "y: " << ofToString(rightHandY) << " td: " << ofToString(swipeUpTimer)  << " tu: " << ofToString(swipeDownTimer) << endl;
+        if(rightHandY > 100 && rightHandY < 550 && !swipingDown && previousSmoothRightY < rightHandY && swipeUpTimer == swipeTimerDefaultY)
+        {
+            swipingUp = true;
+//            cout << "Swipe UP Start" << endl;
+        }
+        if(swipingUp)
+        {
+            swipeUpTimer--;
+            if(swipeUpTimer >= 0 && rightHandY > 550)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_UP;
                 ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-                swipeUpTimer = 0;
+                swipingUp = false;
+                swipeUpTimer = swipeTimerDefaultY;
+//                cout << "Swipe UP Event --" << endl;
             }
-        } else swipeUpTimer = 0;
+            else if(swipeUpTimer <= 0)
+            {
+                swipingUp = false;
+                swipeUpTimer = swipeTimerDefaultY;
+            }
+        }
 
-        // down
-        if(cursor.smoothRightYPos < previousSmoothRightY && swipeDistanceY < -20 )
+        // SWIPE DOWN
+        float rightHandHeight = cursor.smoothRightYPos;
+
+        if(rightHandY > 450 && swipeDownTimer == swipeTimerDefaultY && !swipingUp && previousSmoothRightY > rightHandY)
         {
-            swipeDownTimer++;
-            if(swipeDownTimer > swipeTimer)
+            swipingDown = true;
+//            cout << "Swipe DOWN Start" << endl;
+        }
+        if(swipingDown)
+        {
+            swipeDownTimer--;
+            if(swipeDownTimer >= 0 && rightHandY < 250)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_DOWN;
                 ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-                swipeDownTimer = 0;
+                swipingDown = false;
+                swipeDownTimer = swipeTimerDefaultY;
+//                cout << "Swipe DOWN Event --" << endl;
             }
-        } else swipeDownTimer = 0;
-        previousSmoothRightY = cursor.smoothRightYPos;
+            else if(swipeDownTimer <= 0)
+            {
+                swipingDown = false;
+                swipeDownTimer = swipeTimerDefaultY;
+            }
+        }
+        previousSmoothRightY = rightHandY;
     }
+
 
     // -------------
     // ZOOM
@@ -193,7 +252,7 @@ void testApp::kinectGestures()
     leftHandX = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
     leftHandY = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
 
-    if( leftZDistance > 450 )
+    if( leftZDistance > 250 )
     {
         twoHands = true;
         cursor.updateLeftHanded(leftHandX, leftHandY);

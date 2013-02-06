@@ -11,32 +11,33 @@ public:
     void update(float x, float y);
     void updateLeftHanded(float x, float y);
     void calculatePos();
-    void emptyLists();
     void calculateLeftPos();
+    void calculateActiveUserMiddlePosX();
+    void emptyLists();
     void draw();
 
     float usersPos[6];
 
     float xPos;
     float yPos;
-
     float leftXPos;
     float leftYPos;
+    float activeUserXpos;
+    float activeUserPos;
+    int activeUserId;
 
     float smoothRightXPos;
     float smoothRightYPos;
-
-    std::list<float> listOfXPositions;
-    std::list<float> listOfYPositions;
-
-    int activeUserId;
-    float activeUserPos;
-
+    float smoothActiveUserXPos;
     float smoothLeftXPos;
     float smoothLeftYPos;
 
+    std::list<float> listOfXPositions;
+    std::list<float> listOfYPositions;
     std::list<float> listOfLeftXPositions;
     std::list<float> listOfLeftYPositions;
+    std::list<float> listOfXPositionActiveUser;
+    int listSize;
 
     bool cursorDrag;
     ofVec2f moveVector;

@@ -91,9 +91,9 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
-    updateInfoPanelPosition();
+    if(zoomLevel > 1) updateScreenPosition();
+    if(zoomLevel == 1) updateInfoPanelPosition();
     updateZoomLevel();
-    updateScreenPosition();
 
     // zoom gesture timer
     if(gestureTimerZoom > 0)
@@ -110,7 +110,6 @@ void WorldView::update(ofEventArgs &e)
 void WorldView::updateInfoPanelPosition()
 {
     // coming from zoomin
-    cout << "infoPanelYPosition:" << ofToString(infoPanelYPosition) << endl;
     if(justArrived)
     {
         infoPanelYPosition = ofGetHeight();
@@ -135,7 +134,7 @@ void WorldView::updateInfoPanelPosition()
     }
 
     // swipe to left infopanel position
-    if(infoPanelToLeft)
+    if(infoPanelToLeft && !infoPanelToRight)
     {
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(infoPanelXPosition > - infoPanelWidth && infoPanelXPosition <= infoPanelResetPosition) infoPanelXPosition -= 150;
@@ -157,7 +156,7 @@ void WorldView::updateInfoPanelPosition()
     }
 
     // swipe to right infopanel position
-    if(infoPanelToRight)
+    if(infoPanelToRight && !infoPanelToLeft)
     {
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(distance < 0) distance *= -1;
@@ -640,21 +639,23 @@ void WorldView::swipeGestureListener(CustomEvent &e)
         {
 
         case SWIPE_LEFT:
-            if(currentStudent < numberOfStudents)
+            if(currentStudent < numberOfStudents && !infoPanelToRight)
             {
+                infoPanelToRight = false;
                 infoPanelToLeft = true;
             }
             else cout << "studentlist end reached." << endl;
             break;
         case SWIPE_RIGHT:
-            if(currentStudent > 0)
+            if(currentStudent > 0 && !infoPanelToLeft)
             {
+                infoPanelToLeft = false;
                 infoPanelToRight = true;
             }
             else cout << "studentlist beginning reached." << endl;
             break;
         case SWIPE_UP:
-            cout << "up" << endl;
+            cout << "----------------------------------up" << endl;
             if(currentImageNumber < mySphere[currentStudent]->totalNumberProjectImages)
             {
                 currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber);
@@ -663,7 +664,7 @@ void WorldView::swipeGestureListener(CustomEvent &e)
             }
             break;
         case SWIPE_DOWN:
-            cout << "up" << endl;
+            cout << "*********************************down" << endl;
             if(currentImageNumber > 1)
             {
                 currentImageHeight = mySphere[currentStudent]->getProjectImageSize(currentImageNumber - 1);

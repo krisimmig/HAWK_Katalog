@@ -54,7 +54,13 @@ public:
     int swipeRightTimer;
     int swipeUpTimer;
     int swipeDownTimer;
+    int swipeTimerDefaultX;
+    int swipeTimerDefaultY;
     int minZoomGestureDistance;
+    bool swipingLeft;
+    bool swipingRight;
+    bool swipingUp;
+    bool swipingDown;
 
     float kinectMovementX;
     float kinectMovementY;
