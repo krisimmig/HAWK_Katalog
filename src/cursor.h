@@ -39,12 +39,14 @@ public:
     std::list<float> listOfXPositionActiveUser;
     int listSize;
 
-    bool cursorDrag;
+
     ofVec2f moveVector;
     ofVec2f leftVector;
 
     bool isActiveUser;
     bool trackingHand;
+    bool twoHands;
+    bool cursorDrag;
 
     // gestures
     float zoomOutGestureTimer;

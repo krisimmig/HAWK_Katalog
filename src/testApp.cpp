@@ -38,8 +38,11 @@ void testApp::setup()
     minZoomGestureDistance = 10;
     swipeTimer = 3;
     swipeLeftTimer = swipeRightTimer = swipeTimerDefaultX = 30;
-    swipeUpTimer = swipeDownTimer = swipeTimerDefaultY = 8;
+    swipeTimerDefaultDOWN = swipeDownTimer = 15;
+    swipeUpTimer = swipeTimerDefaultY = 8;
     swipingLeft = swipingRight = swipingUp = swipingDown = false;
+    zoomOut = zoomIn = false;
+    zoomInTimer = zoomOutTimer = zoomTimerDefault = 15;
 
 }
 
@@ -61,9 +64,9 @@ void testApp::update()
             user = &openNIDevice.getTrackedUser(i);
 
             float userPos = user->getCenter().x;
-            cursor.usersPos[i] = userPos;
+//            cursor.usersPos[i] = userPos;
 
-            if(userPos > -130 && userPos < 130 && user->isSkeleton())
+            if(userPos > -150 && userPos < 150 && user->isSkeleton())
             {
                 activeUserId = i;
                 activeUser = user;
@@ -76,18 +79,16 @@ void testApp::update()
             }
             else
             {
-                if(i <= activeUserId && activeUserId != -1)
-                {
-                    activeUser = NULL;
-                    isActiveUser = cursor.isActiveUser = false;
-                    cursor.activeUserId = -1;
-                    cursor.activeUserPos = -5000;
-                }
+//                if(i <= activeUserId && activeUserId != -1)
+//                {
+                activeUser = NULL;
+                isActiveUser = cursor.isActiveUser = false;
+                cursor.activeUserId = -1;
+                cursor.activeUserPos = -5000;
+//                }
             }
         }
     }
-
-
 }
 
 void testApp::kinectGestures()
@@ -128,80 +129,86 @@ void testApp::kinectGestures()
     // SWIPE DISTANCE
     float smoothActiveUserXPos = cursor.smoothActiveUserXPos;
     float dist1;
-    dist1 = smoothActiveUserXPos - cursor.smoothRightXPos;
+//    dist1 = smoothActiveUserXPos - cursor.smoothRightXPos;
+    dist1 = cursor.activeUserXpos - cursorXPos;
 //    cout << "x: " << ofToString(smoothActiveUserXPos) << " hX: " << ofToString(cursor.smoothRightXPos) <<  " - d: " << ofToString(dist1) <<  " || l: " << ofToString(swipingLeft) <<  " t: " << ofToString(swipeLeftTimer) << endl;
 
-
-
-    // SWIPE LEFT
-    if(dist1 < -320 && !swipingRight)
+    // only if depth reached
+    if(cursor.cursorDrag)
     {
-        swipingLeft = true;
-    }
-    if(swipingLeft)
-    {
-        swipeLeftTimer--;
-        if(swipeLeftTimer >= 0 && dist1 > 180)
+
+        // SWIPE LEFT
+        if(dist1 < -320 && !swipingRight && previousRightX > rightHandX)
         {
-            static CustomEvent swipeGestureEvent;
-            swipeGestureEvent.swipeDirection = SWIPE_LEFT;
-            ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-            swipingLeft = false;
-            swipeLeftTimer = swipeTimerDefaultX;
-            cout << "SWIPE LEFT!" << endl;
+            swipingLeft = true;
         }
-        else if(swipeLeftTimer <= 0)
+        if(swipingLeft)
         {
-            swipingLeft = false;
-            swipeLeftTimer = swipeTimerDefaultX;
+            swipeLeftTimer--;
+            if(swipeLeftTimer >= 0 && dist1 > 100  && previousRightX > rightHandX)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_LEFT;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipingLeft = false;
+                swipeLeftTimer = swipeTimerDefaultX;
+                cout << "SWIPE LEFT!" << endl;
+            }
+            else if(swipeLeftTimer <= 0)
+            {
+                swipingLeft = false;
+                swipeLeftTimer = swipeTimerDefaultX;
+            }
         }
-    }
 
-    // SWIPE RIGHT
-    if(dist1 > 230 && !swipingLeft)
-    {
-        swipingRight = true;
-    }
-
-    if(swipingRight)
-    {
-        swipeRightTimer--;
-        if(swipeRightTimer >= 0 && dist1 < -270)
+        // SWIPE RIGHT
+        if(dist1 > 200 && !swipingLeft  && previousRightX < rightHandX)
         {
-            static CustomEvent swipeGestureEvent;
-            swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
-            ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
-            swipingRight = false;
-            swipeRightTimer = swipeTimerDefaultX;
-            cout << "SWIPE RIGHT!" << endl;
+            swipingRight = true;
         }
-        else if(swipeRightTimer <= 0)
-        {
-            swipingRight = false;
-            swipeRightTimer = swipeTimerDefaultX;
-        }
-    }
 
-    // SWIPE UP
-    if((rightShoulderZ - rightHandZ) > 350 )
-    {
-        cout << "y: " << ofToString(rightHandY) << " td: " << ofToString(swipeUpTimer)  << " tu: " << ofToString(swipeDownTimer) << endl;
-        if(rightHandY > 100 && rightHandY < 550 && !swipingDown && previousSmoothRightY < rightHandY && swipeUpTimer == swipeTimerDefaultY)
+        if(swipingRight)
+        {
+            swipeRightTimer--;
+            if(swipeRightTimer >= 0 && dist1 < -270  && previousRightX < rightHandX)
+            {
+                static CustomEvent swipeGestureEvent;
+                swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
+                ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
+                swipingRight = false;
+                swipeRightTimer = swipeTimerDefaultX;
+                cout << "SWIPE RIGHT!" << endl;
+            }
+            else if(swipeRightTimer <= 0)
+            {
+                swipingRight = false;
+                swipeRightTimer = swipeTimerDefaultX;
+            }
+        }
+
+        previousRightX = rightHandX;
+
+        // SWIPE UP
+//        cout     << "x: " << ofToString(rightHandX) << " tl: " << ofToString(swipeLeftTimer)  << " tr: " << ofToString(swipeRightTimer)
+//                 << " || y: " << ofToString(rightHandY) << " tu: " << ofToString(swipeUpTimer)  << " td: " << ofToString(swipeDownTimer)
+//                 << endl;
+
+        if(rightHandY > 100 && rightHandY < 550 && !swipingDown && previousRightY < rightHandY && swipeUpTimer == swipeTimerDefaultY)
         {
             swipingUp = true;
-//            cout << "Swipe UP Start" << endl;
+            cout << "Swipe UP Start" << endl;
         }
         if(swipingUp)
         {
             swipeUpTimer--;
-            if(swipeUpTimer >= 0 && rightHandY > 550)
+            if(swipeUpTimer >= 0 && rightHandY > 550 && previousRightY < rightHandY )
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_UP;
                 ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
                 swipingUp = false;
                 swipeUpTimer = swipeTimerDefaultY;
-//                cout << "Swipe UP Event --" << endl;
+                cout << "Swipe UP Event --" << endl;
             }
             else if(swipeUpTimer <= 0)
             {
@@ -213,32 +220,39 @@ void testApp::kinectGestures()
         // SWIPE DOWN
         float rightHandHeight = cursor.smoothRightYPos;
 
-        if(rightHandY > 450 && swipeDownTimer == swipeTimerDefaultY && !swipingUp && previousSmoothRightY > rightHandY)
+        if(rightHandY > 600 && swipeDownTimer == swipeTimerDefaultDOWN && !swipingUp && previousRightY > rightHandY)
         {
             swipingDown = true;
-//            cout << "Swipe DOWN Start" << endl;
+            cout << "Swipe DOWN Start" << endl;
         }
         if(swipingDown)
         {
             swipeDownTimer--;
-            if(swipeDownTimer >= 0 && rightHandY < 250)
+            if(swipeDownTimer >= 0 && rightHandY < 400  && previousRightY > rightHandY)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_DOWN;
                 ofNotifyEvent(CustomEvent::swipeGesture, swipeGestureEvent);
                 swipingDown = false;
-                swipeDownTimer = swipeTimerDefaultY;
-//                cout << "Swipe DOWN Event --" << endl;
+                swipeDownTimer = swipeTimerDefaultDOWN;
+                cout << "Swipe DOWN Event end" << endl;
             }
             else if(swipeDownTimer <= 0)
             {
                 swipingDown = false;
-                swipeDownTimer = swipeTimerDefaultY;
+                swipeDownTimer = swipeTimerDefaultDOWN;
             }
         }
-        previousSmoothRightY = rightHandY;
+        previousRightY = rightHandY;
     }
-
+    // if no crusor drag, reset all timers and gesture bools
+    else
+    {
+        swipingDown = swipingUp = swipingRight = swipingLeft = false;
+        swipeDownTimer = swipeTimerDefaultDOWN;
+        swipeLeftTimer = swipeRightTimer = swipeTimerDefaultX;
+        swipeUpTimer = swipeTimerDefaultY;
+    }
 
     // -------------
     // ZOOM
@@ -254,56 +268,75 @@ void testApp::kinectGestures()
 
     if( leftZDistance > 250 )
     {
-        twoHands = true;
+        twoHands = cursor.twoHands = true;
         cursor.updateLeftHanded(leftHandX, leftHandY);
     }
     else
     {
-        twoHands = false;
+        twoHands = cursor.twoHands = false;
         cursor.emptyLists();
     }
 
     // check for zoom gesture
+//    leftHandX, rightHandX, cursor.activeUserXpos
+    float dist2 = cursor.activeUserXpos - leftHandX;
+    cout << "dist2: " << ofToString(dist2) << " dist1: " << ofToString(dist1)  << " ot: " << ofToString(zoomOutTimer)   << " it: " << ofToString(zoomInTimer) << endl;
     if(twoHands)
     {
-        // get smooth coords for hands position
-        ofVec2f leftHand = cursor.leftVector;
-        ofVec2f rightHand = cursor.moveVector;
-
-        float handsDistance = leftHand.distance(rightHand);
-
-        int distanceDifference = handsDistance - previousHandsDistance;
-
-        if(handsDistance < previousHandsDistance) zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
-        if(handsDistance > previousHandsDistance) zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
-
-        // zoomin
-        if(handsDistance > previousHandsDistance && distanceDifference > minZoomGestureDistance)
+        // ZOOM OUT
+        if(dist2 > 600 && dist1 < -350 && !zoomIn && !zoomOut && zoomOutTimer == zoomTimerDefault)
         {
-            if (zoomInGestureTimer > zoomGestureDuration) changeZoomLevel(ZOOM_IN);
-            else
+            zoomOut = true;
+        }
+
+        if(zoomOut)
+        {
+            zoomOutTimer--;
+            if(zoomOutTimer <= 0 && dist2 < 200 && dist1 > -100)
             {
-                zoomInGestureTimer++;
-                cursor.zoomInGestureTimer = zoomInGestureTimer;
+                static CustomEvent zoomGestureEvent;
+                zoomGestureEvent.zoomLevel = ZOOM_OUT;
+                ofNotifyEvent(CustomEvent::zoomChange, zoomGestureEvent);
+                cout << "zoom out" << endl;
+                zoomOut = false;
+                zoomOutTimer = zoomTimerDefault;
+            }
+            else if(zoomOutTimer <= 0)
+            {
+                zoomOut = false;
+                zoomOutTimer = zoomTimerDefault;
             }
         }
 
-        // zoomout
-        else if(handsDistance < previousHandsDistance && distanceDifference < -minZoomGestureDistance)
+        // ZOOM IN
+        if(dist2 < 200 && dist1 > -50 && !zoomIn && !zoomOut && zoomInTimer == zoomTimerDefault)
         {
-            if (zoomOutGestureTimer > zoomGestureDuration) changeZoomLevel(ZOOM_OUT);
-            else
+            zoomIn = true;
+        }
+
+        if(zoomIn)
+        {
+            zoomInTimer--;
+            if(zoomInTimer <= 0 && dist2 > 350 && dist1 < -150)
             {
-                zoomOutGestureTimer++;
-                cursor.zoomOutGestureTimer = zoomOutGestureTimer;
+                static CustomEvent zoomGestureEvent;
+                zoomGestureEvent.zoomLevel = ZOOM_IN;
+                ofNotifyEvent(CustomEvent::zoomChange, zoomGestureEvent);
+                cout << "zoom in" << endl;
+                zoomIn = false;
+                zoomOutTimer = zoomTimerDefault;
+            }
+            else if(zoomInTimer <= 0)
+            {
+                zoomIn = false;
+                zoomInTimer = zoomTimerDefault;
             }
         }
-        previousHandsDistance = handsDistance;
     }
     else
     {
-        zoomInGestureTimer = cursor.zoomInGestureTimer = 0;
-        zoomOutGestureTimer = cursor.zoomOutGestureTimer = 0;
+        zoomIn = zoomOut = false;
+        zoomInTimer = zoomOutTimer = zoomTimerDefault;
     }
 }
 

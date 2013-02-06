@@ -11,6 +11,7 @@ void HandCursor::setup(float x, float y)
     yPos = y;
 
     cursorDrag = false;
+    twoHands = false;
     isActiveUser = false;
     trackingHand = false;
     trackingHand = false;

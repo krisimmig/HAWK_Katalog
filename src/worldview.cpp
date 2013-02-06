@@ -279,6 +279,22 @@ void WorldView::draw(ofEventArgs &e)
     drawInfo();
     if(zoomLevel < 4 && zoomLevel > 1) drawSucher();
     drawBottomInterface();
+
+    // draw hands active indicator
+    if(cursor->cursorDrag && !cursor->twoHands)
+    {
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255, 200);
+        ofEllipse(150, 150, 50, 50);
+        ofDisableAlphaBlending();
+    } else if(cursor->twoHands)
+    {
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255, 200);
+        ofEllipse(150, 150, 50, 50);
+        ofEllipse(150, 175, 50, 50);
+        ofDisableAlphaBlending();
+    }
 }
 
 void WorldView::drawInfo()
@@ -290,7 +306,6 @@ void WorldView::drawInfo()
     {
         // student detail view
     case 1:
-
         // draw opaque background
         ofEnableAlphaBlending();
         ofSetColor(170,170,170, 98);
@@ -421,16 +436,6 @@ void WorldView::drawSucher()
     ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,150, 150);
     ofSetColor(10,10,10,100);
     ofEllipse(ofGetWidth() / 2, ofGetHeight()/2,140, 140);
-
-    // sucher active drag
-    if(cursor->cursorDrag)
-    {
-        ofEnableAlphaBlending();
-        ofSetColor(255,255,255, 100);
-        ofEllipse(ofGetWidth() / 2, ofGetHeight() / 2, 140, 140);
-        ofDisableAlphaBlending();
-    }
-
     ofFill();
 }
 
