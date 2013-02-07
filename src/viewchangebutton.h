@@ -10,6 +10,9 @@ class ViewChangeButton
 public:
     ViewChangeButton(std::string label, viewsEnum targetView, int x, int y);
     virtual ~ViewChangeButton();
+    viewsEnum targetView;
+
+    void changeView(viewsEnum target);
 
 protected:
 private:
@@ -22,10 +25,9 @@ private:
     int actionTimer;
     bool hoovering;
     string label;
-    viewsEnum targetView;
+
 
     void draw(ofEventArgs &e);
-    void changeView(viewsEnum target);
     bool hoverState(int x, int y);
     void mouseReleased(ofMouseEventArgs &args);
     void mouseMoved(ofMouseEventArgs &args);

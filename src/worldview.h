@@ -92,13 +92,12 @@ private:
     int* studentIdArray;
 
     // fachbereich stuff
-    int currentDept;
+    int currentDeptNumber;
     int totalDeptNumber;
     fachbereichEnum fachbereichArray[10];
     bool departmentChangedToLeft;
     bool departmentChangedToRight;
-    std::string currentDepartment;
-
+    std::string currentDepartmentString;
 
     // info panel
     bool justArrived;

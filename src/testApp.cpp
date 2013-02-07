@@ -43,6 +43,9 @@ void testApp::setup()
     swipingLeft = swipingRight = swipingUp = swipingDown = false;
     zoomOut = zoomIn = false;
     zoomInTimer = zoomOutTimer = zoomTimerDefault = 15;
+    cursor.isActiveUser = isActiveUser = false;
+
+    activeUserId = -1;
 
 }
 
@@ -54,7 +57,7 @@ void testApp::update()
         int numUsers = openNIDevice.getNumTrackedUsers();
         int numHands = openNIDevice.getNumTrackedHands();
 
-        if(numUsers == 0) cursor.isActiveUser = false;
+        if(numUsers == 0) cursor.isActiveUser = isActiveUser = false;
 
         // -------------
         // USERS
@@ -62,32 +65,45 @@ void testApp::update()
         for (int i = 0; i < numUsers; i++)
         {
             user = &openNIDevice.getTrackedUser(i);
-
             float userPos = user->getCenter().x;
-//            cursor.usersPos[i] = userPos;
 
             if(userPos > -150 && userPos < 150 && user->isSkeleton())
             {
-                activeUserId = i;
-                activeUser = user;
-                activeUserId = cursor.activeUserId = i;
+                if(!isActiveUser)
+                {
+                    activeUserId = i;
+                    activeUser = user;
+                    activeUserId = cursor.activeUserId = i;
+                    isActiveUser = cursor.isActiveUser = true;
+                    cursor.activeUserPos = activeUser->getCenter().x;
+                    cout <<  "switch activeUser. nU: " << ofToString(numUsers) <<  " nAU: " << ofToString(activeUserId) << endl;
 
-                isActiveUser = cursor.isActiveUser = true;
-                cursor.activeUserPos = activeUser->getCenter().x;
-
+                }
                 kinectGestures();
             }
-            else
+        }
+
+        if(isActiveUser)
+        {
+            float activeUserPos = activeUser->getCenter().x;
+            if(activeUserPos < -150 || activeUserPos > 150 || activeUserPos == 0.0f)
             {
-//                if(i <= activeUserId && activeUserId != -1)
-//                {
+                cout << "deactivate activeUser. activeUser pos outside range." << endl;
                 activeUser = NULL;
                 isActiveUser = cursor.isActiveUser = false;
-                cursor.activeUserId = -1;
+                cursor.activeUserId = activeUserId = -1;
                 cursor.activeUserPos = -5000;
-//                }
+            }
+            else if(numUsers == 0)
+            {
+                cout << "deactivate activeUser. 0 user found." << endl;
+                activeUser = NULL;
+                isActiveUser = cursor.isActiveUser = false;
+                cursor.activeUserId = activeUserId = -1;
+                cursor.activeUserPos = -5000;
             }
         }
+//  cout << "nU: " << ofToString(numUsers) <<  " nAU: " << ofToString(activeUserId) << " isActiveUser: " << ofToString(isActiveUser) << endl;
     }
 }
 
@@ -115,7 +131,7 @@ void testApp::kinectGestures()
     float rightShoulderZ = activeUser->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
 
     // set hand drag
-    if( (rightShoulderZ - rightHandZ) > 300)
+    if( (rightShoulderZ - rightHandZ) > 350)
     {
         cursor.cursorDrag = true;
     }
@@ -216,7 +232,7 @@ void testApp::kinectGestures()
         // SWIPE DOWN
         float rightHandHeight = cursor.smoothRightYPos;
 
-        if(rightHandY > 550 && swipeDownTimer == swipeTimerDefaultDOWN && !swipingUp && previousRightY > rightHandY)
+        if(rightHandY > 450 && swipeDownTimer == swipeTimerDefaultDOWN && !swipingUp && previousRightY > rightHandY)
         {
             swipingDown = true;
             cout << "Swipe DOWN Start" << endl;

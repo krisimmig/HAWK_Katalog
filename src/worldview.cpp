@@ -36,13 +36,13 @@ WorldView::WorldView()
     speedXCounter = 0;
     speedYCounter = 0;
 
-    // currentDepartment setup
+    // currentDepartmentString setup
     fachbereichArray = {FACHBEREICH_ALL,FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
     departmentChangedToLeft = departmentChangedToRight = false;
     totalDeptNumber = 9; // 10 ?!?
-    currentDept = 5; // start at GD
-    currentDepartment = Students::convertFBEnumToString(fachbereichArray[currentDept]);
-    numberOfStudents = Students::countAll(fachbereichArray[currentDept]);
+    currentDeptNumber = 5; // start at GD
+    currentDepartmentString = Students::convertFBEnumToString(fachbereichArray[currentDeptNumber]);
+    numberOfStudents = Students::countAll(fachbereichArray[currentDeptNumber]);
     currentStudent = -1;
     random10 = ofRandom(10);
     firstStart = true;
@@ -54,7 +54,7 @@ WorldView::WorldView()
 
     // info panel
     shakingTimer = 0;
-    justArrived = false;
+    justArrived = infoPanelToLeft = infoPanelToRight = false;
     projectImagesYPosition = 0;
     currentProjectImagesYPosition = 0;
     futureProjectImagesYPosition = 0;
@@ -79,6 +79,7 @@ WorldView::~WorldView()
 void WorldView::update(ofEventArgs &e)
 {
 
+    cout << "cD: " << ofToString(currentDeptNumber) << endl;
 
     if(firstStart)
     {
@@ -121,7 +122,7 @@ void WorldView::updateStudenObjectsPosition()
         {
             studentObjectsXPos = 2000.0f;
             studentObjectsXPosFuture = studentObjectsXPosDefault;
-            currentDept++;
+            currentDeptNumber++;
             updateDepartment();
         }
         else if(studentObjectsXPos > 3.0f)
@@ -145,7 +146,7 @@ void WorldView::updateStudenObjectsPosition()
         {
             studentObjectsXPos = -2000.0f;
             studentObjectsXPosFuture = studentObjectsXPosDefault;
-            currentDept--;
+            currentDeptNumber--;
             updateDepartment();
         }
         else if(studentObjectsXPos < -3.0f)
@@ -164,11 +165,10 @@ void WorldView::updateDepartment()
     // make new objects
     delete[] studentObjects;
     delete studentIdArray;
-    numberOfStudents = Students::countAll(fachbereichArray[currentDept]);
-    currentDepartment = Students::convertFBEnumToString(fachbereichArray[currentDept]);
+    numberOfStudents = Students::countAll(fachbereichArray[currentDeptNumber]);
 
     studentObjects = new Object3D*[numberOfStudents];
-    studentIdArray = Students::getStudentIds(fachbereichArray[currentDept]);
+    studentIdArray = Students::getStudentIds(fachbereichArray[currentDeptNumber]);
 
     // objects
     int counter = 0;
@@ -200,7 +200,7 @@ void WorldView::updateInfoPanelPosition()
         infoPanelYPosition = 2000;
         justArrived = false;
     }
-    cout << "infoPanelYPosition " << ofToString(infoPanelYPosition) << endl;
+//    cout << "infoPanelYPosition " << ofToString(infoPanelYPosition) << endl;
 
     if(infoPanelYPosition > 3.0f)
     {
@@ -218,6 +218,7 @@ void WorldView::updateInfoPanelPosition()
     // swipe to left infopanel position
     if(infoPanelToLeft && !infoPanelToRight)
     {
+        cout << "toleft" << endl;
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(infoPanelXPosition > - infoPanelWidth && infoPanelXPosition <= infoPanelResetPosition) infoPanelXPosition -= 150;
         else if(infoPanelXPosition <= - infoPanelWidth )
@@ -369,22 +370,6 @@ void WorldView::draw(ofEventArgs &e)
     if(zoomLevel < 3 && zoomLevel > 1) drawSucher();
     drawBottomInterface();
 
-    // draw hands active indicator
-    if(cursor->cursorDrag && !cursor->twoHands)
-    {
-        ofEnableAlphaBlending();
-        ofSetColor(255,255,255, 200);
-        ofEllipse(150, 150, 50, 50);
-        ofDisableAlphaBlending();
-    }
-    else if(cursor->twoHands)
-    {
-        ofEnableAlphaBlending();
-        ofSetColor(255,255,255, 200);
-        ofEllipse(150, 150, 50, 50);
-        ofEllipse(150, 175, 50, 50);
-        ofDisableAlphaBlending();
-    }
 }
 
 void WorldView::shakeInfoPanel()
@@ -404,6 +389,8 @@ void WorldView::drawInfo()
     int previousHeight = 50;
     int imageHeight = 0;
     int totalImageColumnHeight = 0;
+
+    int abstandDeptLabels;
     switch(zoomLevel)
     {
         // student detail view
@@ -505,16 +492,27 @@ void WorldView::drawInfo()
             }
         }
         break;
-        // choose currentDepartment
+        // choose currentDepartmentString
     case 3:
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255,200);
+        ofRect(0,0,ofGetWidth(), 80);
+        ofDisableAlphaBlending();
+        abstandDeptLabels = 120;
         ofPushMatrix();
-        ofTranslate(ofGetWidth()/2,100,10);
-        ofSetColor(255,255,255);
-        ofRectangle fachbereichRect = HelveticaL.getStringBoundingBox(currentDepartment,0,0);
-        ofEllipse(15,-15, 70,70);
-
         ofSetColor(10,10,10);
-        HelveticaL.drawString(currentDepartment, 0, 0);
+        ofRect(0,80, ofGetWidth(), 1);
+        ofTranslate(ofGetWidth()/2-((totalDeptNumber*abstandDeptLabels)/2),65,10);
+
+        for(int i = 0; i <= totalDeptNumber; i++)
+        {
+            ofRect(15-abstandDeptLabels/2 + abstandDeptLabels*currentDeptNumber,17, abstandDeptLabels,4);
+            currentDepartmentString = Students::convertFBEnumToString(fachbereichArray[i]);
+            if(i == currentDeptNumber) ofSetColor(10,10,10);
+            else ofSetColor(100,100,100);
+            HelveticaL.drawString(currentDepartmentString, abstandDeptLabels*i, 0);
+            ofSetColor(10,10,10);
+        }
         ofPopMatrix();
         break;
     }
@@ -534,27 +532,24 @@ void WorldView::drawSucher()
 void WorldView::drawBottomInterface()
 {
     ofFill();
-    int bottomDebugHeight = 100;
+    int bottomDebugHeight = 80;
     int inactiveUserIndicatorSize = 15;
     int activeUserIndicatorSize = inactiveUserIndicatorSize * 1.8;
 
     // draw bottom interface background
     ofSetColor(255,255,255);
     ofRect(0,ofGetHeight()- bottomDebugHeight, ofGetWidth(), bottomDebugHeight);
+
     // draw top line
-    ofSetColor(170,170,170);
-    ofRect(0,ofGetHeight() - bottomDebugHeight, ofGetWidth(), 1);
-    // active area top line
     ofSetColor(10,10,10);
-    float indicatorWidth = ofGetWidth() * 0.1;
-    ofRect(ofGetWidth()/2-indicatorWidth/2,ofGetHeight() - bottomDebugHeight, indicatorWidth, 1);
+    ofRect(0,ofGetHeight() - bottomDebugHeight, ofGetWidth(), 1);
 
     // active user indicator
     ofSetColor(255,255,255);
     ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 80,80);
     if(cursor->isActiveUser)
     {
-        ofSetColor(200,255,255);
+        ofSetColor(200,255,200);
         ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 75,75);
     }
 
@@ -563,7 +558,7 @@ void WorldView::drawBottomInterface()
     ofEllipse(ofGetWidth()/2 + 50, ofGetHeight()- bottomDebugHeight, 50,50);
     if(cursor->cursorDrag)
     {
-        ofSetColor(200,255,255);
+        ofSetColor(200,255,200);
         ofEllipse(ofGetWidth()/2+ 50, ofGetHeight()- bottomDebugHeight, 45,45);
     }
 
@@ -572,7 +567,7 @@ void WorldView::drawBottomInterface()
     ofEllipse(ofGetWidth()/2 - 50,ofGetHeight()-  bottomDebugHeight, 50,50);
     if(cursor->twoHands)
     {
-        ofSetColor(200,255,255);
+        ofSetColor(200,255,200);
         ofEllipse(ofGetWidth()/2 - 50, ofGetHeight()- bottomDebugHeight, 45,45);
     }
 }
@@ -711,22 +706,22 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
         switch(e.swipeDirection)
         {
         case SWIPE_LEFT:
-            if(currentDept < totalDeptNumber)
+            if(currentDeptNumber == totalDeptNumber)
             {
-                cout << "WorldView::listenerSwipeGesture. LEFT zoomLevel == 3" << endl;
-                studentObjectsXPosFuture = -2000;
-                departmentChangedToLeft = true;
+                currentDeptNumber = -1;
             }
-            else cout << "last dept reached." << endl;
+            cout << "WorldView::listenerSwipeGesture. LEFT zoomLevel == 3" << endl;
+            studentObjectsXPosFuture = -2000;
+            departmentChangedToLeft = true;
             break;
         case SWIPE_RIGHT:
-            if(currentDept > 0)
+            if(currentDeptNumber == 0)
             {
-                cout << "WorldView::listenerSwipeGesture. RIGHT zoomLevel == 3" << endl;
-                studentObjectsXPosFuture = 2000;
-                departmentChangedToRight = true;
+                currentDeptNumber = totalDeptNumber+1;
             }
-            else cout << "first dept reached." << endl;
+            cout << "WorldView::listenerSwipeGesture. RIGHT zoomLevel == 3" << endl;
+            studentObjectsXPosFuture = 2000;
+            departmentChangedToRight = true;
             break;
         }
     }
@@ -752,6 +747,7 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
             }
             else shakingTimer = 12;
             break;
+
         case SWIPE_UP:
             if(currentImageNumber < studentObjects[currentStudent]->totalNumberProjectImages)
             {
@@ -760,6 +756,7 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
                 currentImageNumber++;
             }
             break;
+
         case SWIPE_DOWN:
             if(currentImageNumber > 1)
             {
@@ -770,7 +767,7 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
             break;
         }
 
-        cout << "cs: " << ofToString(currentStudent)  << "ns: " << ofToString(numberOfStudents) << endl;
+//        cout << "cs: " << ofToString(currentStudent)  << "ns: " << ofToString(numberOfStudents) << endl;
 
         // reset gesture timer
         gestureTimerSwipe = gestureTimeout;
