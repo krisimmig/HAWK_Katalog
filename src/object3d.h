@@ -25,6 +25,7 @@ public:
 
     ofVec3f getPosition();
     int id;
+    int number;
     int totalNumberProjectImages;
     std::string letter;
     std::string titel;

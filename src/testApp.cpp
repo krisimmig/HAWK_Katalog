@@ -102,6 +102,7 @@ void testApp::kinectGestures()
     float rightHandZ = activeUser->getJoint(JOINT_RIGHT_HAND).getWorldPosition().z;
     cursorXPos = rightHandX;
     cursorYPos = rightHandY;
+
     // upadte cursor position
     cursor.update(cursorXPos, cursorYPos);
     cursor.activeUserXpos = activeUser->getJoint(JOINT_RIGHT_HIP).getWorldPosition().x;
@@ -109,11 +110,12 @@ void testApp::kinectGestures()
     // -------------
     // MOVESCREEN
     // -------------
+
     // depth check right for handdrag -> movescreen
     float rightShoulderZ = activeUser->getJoint(JOINT_RIGHT_SHOULDER).getWorldPosition().z;
 
     // set hand drag
-    if( (rightShoulderZ - rightHandZ) > 350 && !twoHands)
+    if( (rightShoulderZ - rightHandZ) > 300)
     {
         cursor.cursorDrag = true;
     }
@@ -129,23 +131,21 @@ void testApp::kinectGestures()
     // SWIPE DISTANCE
     float smoothActiveUserXPos = cursor.smoothActiveUserXPos;
     float dist1;
-//    dist1 = smoothActiveUserXPos - cursor.smoothRightXPos;
     dist1 = cursor.activeUserXpos - cursorXPos;
-//    cout << "x: " << ofToString(smoothActiveUserXPos) << " hX: " << ofToString(cursor.smoothRightXPos) <<  " - d: " << ofToString(dist1) <<  " || l: " << ofToString(swipingLeft) <<  " t: " << ofToString(swipeLeftTimer) << endl;
 
     // only if depth reached
     if(cursor.cursorDrag)
     {
 
         // SWIPE LEFT
-        if(dist1 < -320 && !swipingRight && previousRightX > rightHandX)
+        if(dist1 < -300 && !swipingRight && previousRightX > rightHandX)
         {
             swipingLeft = true;
         }
         if(swipingLeft)
         {
             swipeLeftTimer--;
-            if(swipeLeftTimer >= 0 && dist1 > 100  && previousRightX > rightHandX)
+            if(swipeLeftTimer > 0 && dist1 > 50  && previousRightX > rightHandX)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_LEFT;
@@ -162,7 +162,7 @@ void testApp::kinectGestures()
         }
 
         // SWIPE RIGHT
-        if(dist1 > 200 && !swipingLeft  && previousRightX < rightHandX)
+        if(dist1 > 150 && !swipingLeft  && previousRightX < rightHandX)
         {
             swipingRight = true;
         }
@@ -170,7 +170,7 @@ void testApp::kinectGestures()
         if(swipingRight)
         {
             swipeRightTimer--;
-            if(swipeRightTimer >= 0 && dist1 < -270  && previousRightX < rightHandX)
+            if(swipeRightTimer > 0 && dist1 < -270  && previousRightX < rightHandX)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_RIGHT;
@@ -189,11 +189,7 @@ void testApp::kinectGestures()
         previousRightX = rightHandX;
 
         // SWIPE UP
-//        cout     << "x: " << ofToString(rightHandX) << " tl: " << ofToString(swipeLeftTimer)  << " tr: " << ofToString(swipeRightTimer)
-//                 << " || y: " << ofToString(rightHandY) << " tu: " << ofToString(swipeUpTimer)  << " td: " << ofToString(swipeDownTimer)
-//                 << endl;
-
-        if(rightHandY > 100 && rightHandY < 550 && !swipingDown && previousRightY < rightHandY && swipeUpTimer == swipeTimerDefaultY)
+        if(rightHandY > 200 && rightHandY < 450 && !swipingDown && previousRightY < rightHandY && swipeUpTimer == swipeTimerDefaultY)
         {
             swipingUp = true;
             cout << "Swipe UP Start" << endl;
@@ -201,7 +197,7 @@ void testApp::kinectGestures()
         if(swipingUp)
         {
             swipeUpTimer--;
-            if(swipeUpTimer >= 0 && rightHandY > 550 && previousRightY < rightHandY )
+            if(swipeUpTimer > 0 && rightHandY > 450 && previousRightY < rightHandY )
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_UP;
@@ -220,7 +216,7 @@ void testApp::kinectGestures()
         // SWIPE DOWN
         float rightHandHeight = cursor.smoothRightYPos;
 
-        if(rightHandY > 600 && swipeDownTimer == swipeTimerDefaultDOWN && !swipingUp && previousRightY > rightHandY)
+        if(rightHandY > 550 && swipeDownTimer == swipeTimerDefaultDOWN && !swipingUp && previousRightY > rightHandY)
         {
             swipingDown = true;
             cout << "Swipe DOWN Start" << endl;
@@ -228,7 +224,7 @@ void testApp::kinectGestures()
         if(swipingDown)
         {
             swipeDownTimer--;
-            if(swipeDownTimer >= 0 && rightHandY < 400  && previousRightY > rightHandY)
+            if(swipeDownTimer > 0 && rightHandY < 400  && previousRightY > rightHandY)
             {
                 static CustomEvent swipeGestureEvent;
                 swipeGestureEvent.swipeDirection = SWIPE_DOWN;
@@ -266,7 +262,7 @@ void testApp::kinectGestures()
     leftHandX = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().x;
     leftHandY = activeUser->getJoint(JOINT_LEFT_HAND).getWorldPosition().y;
 
-    if( leftZDistance > 250 )
+    if(cursor.cursorDrag && leftZDistance > 250)
     {
         twoHands = cursor.twoHands = true;
         cursor.updateLeftHanded(leftHandX, leftHandY);
@@ -278,21 +274,21 @@ void testApp::kinectGestures()
     }
 
     // check for zoom gesture
-//    leftHandX, rightHandX, cursor.activeUserXpos
     float dist2 = cursor.activeUserXpos - leftHandX;
-    cout << "dist2: " << ofToString(dist2) << " dist1: " << ofToString(dist1)  << " ot: " << ofToString(zoomOutTimer)   << " it: " << ofToString(zoomInTimer) << endl;
+
     if(twoHands)
     {
         // ZOOM OUT
-        if(dist2 > 600 && dist1 < -350 && !zoomIn && !zoomOut && zoomOutTimer == zoomTimerDefault)
+        if(dist2 > 500 && dist1 < -250 && !zoomIn && !zoomOut && zoomOutTimer == zoomTimerDefault)
         {
             zoomOut = true;
+            cout << "zoom out started" << endl;
         }
 
         if(zoomOut)
         {
             zoomOutTimer--;
-            if(zoomOutTimer <= 0 && dist2 < 200 && dist1 > -100)
+            if(zoomOutTimer > 0 && dist2 < 250 && dist1 > -100)
             {
                 static CustomEvent zoomGestureEvent;
                 zoomGestureEvent.zoomLevel = ZOOM_OUT;
@@ -312,12 +308,13 @@ void testApp::kinectGestures()
         if(dist2 < 200 && dist1 > -50 && !zoomIn && !zoomOut && zoomInTimer == zoomTimerDefault)
         {
             zoomIn = true;
+            cout << "zoom in started" << endl;
         }
 
         if(zoomIn)
         {
             zoomInTimer--;
-            if(zoomInTimer <= 0 && dist2 > 350 && dist1 < -150)
+            if(zoomInTimer > 0 && dist2 > 350 && dist1 < -150)
             {
                 static CustomEvent zoomGestureEvent;
                 zoomGestureEvent.zoomLevel = ZOOM_IN;

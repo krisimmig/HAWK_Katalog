@@ -38,7 +38,7 @@ void Students::setup(int _id)
     {
         cout << "error loading image: " << image_01 << endl;
     }
-    cout << "Students::setup(int _id)" << endl;
+
     delete sqlite;
 
 }

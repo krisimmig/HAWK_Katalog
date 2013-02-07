@@ -27,17 +27,19 @@ private:
 
     void update(ofEventArgs &e);
     void updateDepartment();
+    void updateStudenObjectsPosition();
     void updateZoomLevel();
     void updateInfoPanelPosition();
     void updateScreenPosition();
+    void shakeInfoPanel();
 
     void keyReleased(ofKeyEventArgs &e);
     void keyPressed(ofKeyEventArgs &e);
     void mouseDragged(ofMouseEventArgs &e);
     void changeZoomLevel(zoomLevelEnum zoomLevel);
     void swipeGestureEvent(swipeGesturesEnum swipeDirection);
-    void zoomChangeListener(CustomEvent &e);
-    void swipeGestureListener(CustomEvent &e);
+    void listenerZoomChange(CustomEvent &e);
+    void listenerSwipeGesture(CustomEvent &e);
     void moveScreen(ofVec2f moveVector);
     void kinectMove();
     string wrapString(string text, int width);
@@ -74,8 +76,13 @@ private:
     int studentObjectAbstandX;
     int studentObjectAbstandY;
     int currentSphere;
-    int studentObjectsSize;
     ofVec3f closestObjectVector;
+    float studentObjectsXPos;
+    float studentObjectsYPos;
+    float studentObjectsXPosFuture;
+    float studentObjectsYPosFuture;
+    float studentObjectsXPosDefault;
+    float studentObjectsYPosDefault;
 
     // student stuff
     int numberOfStudents;
@@ -88,16 +95,19 @@ private:
     int currentDept;
     int totalDeptNumber;
     fachbereichEnum fachbereichArray[10];
-    bool departmentChanged;
+    bool departmentChangedToLeft;
+    bool departmentChangedToRight;
     std::string currentDepartment;
 
 
     // info panel
     bool justArrived;
+    int shakingTimer;
     int infoPanelWidth;
     int projectImagesYPosition;
     int currentProjectImagesYPosition;
     float infoPanelFinalYPosition;
+    float infoPanelFinalXPosition;
     float infoPanelYPosition;
     float futureProjectImagesYPosition;
     float infoPanelXPosition;
