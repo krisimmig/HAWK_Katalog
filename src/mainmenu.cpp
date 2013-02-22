@@ -27,5 +27,5 @@ void MainMenu::draw(ofEventArgs &e)
 {
     ofSetColor(0, 0, 0);
     ofDrawBitmapString("Mainview", 300, 50);
-    buttonToWorldview->changeView(buttonToWorldview->targetView);
+//    buttonToWorldview->changeView(buttonToWorldview->targetView);
 }

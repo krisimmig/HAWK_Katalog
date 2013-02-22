@@ -8,7 +8,7 @@ class HandCursor
 public:
     HandCursor();
     void setup(float x, float y);
-    void update(float x, float y);
+    void update(float rightX, float rightY, float leftX, float leftY);
     void updateLeftHanded(float x, float y);
     void calculatePos();
     void calculateLeftPos();
@@ -45,8 +45,10 @@ public:
 
     bool isActiveUser;
     bool trackingHand;
-    bool twoHands;
-    bool cursorDrag;
+    bool leftHand;
+    bool leftHandRaised;
+    bool rightHandRaised;
+    bool rightHand;
 
     // gestures
     float zoomOutGestureTimer;

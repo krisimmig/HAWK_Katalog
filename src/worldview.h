@@ -24,6 +24,7 @@ private:
     void drawInfo();
     void drawSucher();
     void drawBottomInterface();
+    void drawHandIndicator();
 
     void update(ofEventArgs &e);
     void updateDepartment();
@@ -40,7 +41,7 @@ private:
     void swipeGestureEvent(swipeGesturesEnum swipeDirection);
     void listenerZoomChange(CustomEvent &e);
     void listenerSwipeGesture(CustomEvent &e);
-    void moveScreen(ofVec2f moveVector);
+    void moveScreen();
     void kinectMove();
     string wrapString(string text, int width);
     HandCursor* cursor;
@@ -116,11 +117,24 @@ private:
     int currentImageNumber;
     int currentImageHeight;
 
+    // left hand menu
+    int xPosLeftHandMenu;
+    int yPosLeftHandMenu;
+    bool menuActivated;
+    bool menuActive;
+    bool justZoomed;
+    ofVec2f menuMiddle;
+
 
     // fonts
     ofTrueTypeFont HelveticaXL;
     ofTrueTypeFont HelveticaL;
     ofTrueTypeFont HelveticaS;
+
+    // audio
+    ofSoundPlayer menuOpen;
+    ofSoundPlayer menuClick;
+    ofSoundPlayer error;
 
 };
 

@@ -35,6 +35,7 @@ WorldView::WorldView()
     currentYDragSpeed = dragSpeed;
     speedXCounter = 0;
     speedYCounter = 0;
+    speedFactor = 1.5f;
 
     // currentDepartmentString setup
     fachbereichArray = {FACHBEREICH_ALL,FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
@@ -65,6 +66,16 @@ WorldView::WorldView()
     infoPanelResetPosition = infoPanelXPosition;
     infoPanelFinalYPosition = 0;
     infoPanelYPosition = 0;
+
+    // left hand menu
+    menuActivated = false;
+    menuActive = false;
+    justZoomed = false;
+
+    // audio IMAGE_DIR "/" + file_project_01);
+    menuOpen.loadSound(AUDIO_DIR "/menuOpen.wav");
+    menuClick.loadSound(AUDIO_DIR "/menuClick.wav");
+    error.loadSound(AUDIO_DIR "/error.wav");
 }
 
 WorldView::~WorldView()
@@ -78,22 +89,34 @@ WorldView::~WorldView()
 
 void WorldView::update(ofEventArgs &e)
 {
-
-    cout << "cD: " << ofToString(currentDeptNumber) << endl;
-
+    // initialize
     if(firstStart)
     {
         updateDepartment();
         firstStart = false;
     }
-    updateStudenObjectsPosition();
+
+    // screen position
     if(zoomLevel > 1) updateScreenPosition();
+
+    // detail info panel view
     if(zoomLevel == 1)
     {
         shakeInfoPanel();
         updateInfoPanelPosition();
     }
+
+    if(zoomLevel == 3) updateStudenObjectsPosition();
+
     updateZoomLevel();
+
+    // menu activation
+    if(cursor->leftHand && !menuActive)
+    {
+        menuActivated = true;
+        cursor->leftHand = false;
+    }
+
 
     // zoom gesture timer
     if(gestureTimerZoom > 0)
@@ -106,7 +129,6 @@ void WorldView::update(ofEventArgs &e)
         gestureTimerSwipe--;
     }
 }
-
 
 void WorldView::updateStudenObjectsPosition()
 {
@@ -162,15 +184,19 @@ void WorldView::updateStudenObjectsPosition()
 
 void WorldView::updateDepartment()
 {
-    // make new objects
-    delete[] studentObjects;
-    delete studentIdArray;
-    numberOfStudents = Students::countAll(fachbereichArray[currentDeptNumber]);
+    // delete old objects if not first time here
+    if(!firstStart)
+    {
+        delete[] studentObjects;
+        delete studentIdArray;
+    }
 
+    // make new objects arrays
+    numberOfStudents = Students::countAll(fachbereichArray[currentDeptNumber]);
     studentObjects = new Object3D*[numberOfStudents];
     studentIdArray = Students::getStudentIds(fachbereichArray[currentDeptNumber]);
 
-    // objects
+    // setup objects
     int counter = 0;
     int width = sqrt(numberOfStudents) * studentObjectAbstandX;
     int height = sqrt(numberOfStudents) * studentObjectAbstandY;
@@ -190,6 +216,7 @@ void WorldView::updateDepartment()
             }
         }
     }
+
 }
 
 void WorldView::updateInfoPanelPosition()
@@ -200,7 +227,6 @@ void WorldView::updateInfoPanelPosition()
         infoPanelYPosition = 2000;
         justArrived = false;
     }
-//    cout << "infoPanelYPosition " << ofToString(infoPanelYPosition) << endl;
 
     if(infoPanelYPosition > 3.0f)
     {
@@ -218,7 +244,7 @@ void WorldView::updateInfoPanelPosition()
     // swipe to left infopanel position
     if(infoPanelToLeft && !infoPanelToRight)
     {
-        cout << "toleft" << endl;
+
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(infoPanelXPosition > - infoPanelWidth && infoPanelXPosition <= infoPanelResetPosition) infoPanelXPosition -= 150;
         else if(infoPanelXPosition <= - infoPanelWidth )
@@ -265,28 +291,30 @@ void WorldView::updateInfoPanelPosition()
 void WorldView::updateScreenPosition()
 {
     // center in overview
-    if(zoomLevel == 3)
+    if(zoomLevel == 3 && !cursor->rightHand)
     {
         if(fabs(camera.getGlobalPosition().x) > 1.0f) camera.truck(-camera.getGlobalPosition().x * 0.1f);
         if(fabs(camera.getGlobalPosition().y) > 1.0f) camera.boom(camera.getGlobalPosition().y * 0.1f);
     }
 
     // calcualte screen move speed
-    if(cursor->cursorDrag && zoomLevel < 3 && !cursor->twoHands)
+    if(cursor->rightHand && !cursor->leftHand)
     {
         // X
         float difference = cursor->smoothRightXPos - pmouseX;
-        if(difference > -30 && difference < 30) currentXDragSpeed = -difference * speedFactor;
+        if(difference > -30.0f && difference < 30.0f) currentXDragSpeed = -difference * speedFactor;
+
         // Y
         difference = cursor->smoothRightYPos - pmouseY;
-        if(difference > -30 && difference < 30) currentYDragSpeed = -difference  * speedFactor;
+        if(difference > -30.0f && difference < 30.0f) currentYDragSpeed = -difference  * speedFactor;
     }
+
     pmouseX = cursor->smoothRightXPos;
     pmouseY = cursor->smoothRightYPos;
 
     // calculate kinetic scrolling
     // if dragSpeed slower than +-0.5, set to 0, else mulitply by 0.9
-    if(!cursor->cursorDrag && zoomLevel > 1 && zoomLevel < 3)
+    if(!cursor->rightHand && zoomLevel != 3)
     {
         // X
         if(currentXDragSpeed < -0.5f || currentXDragSpeed > 0.5f)
@@ -294,7 +322,11 @@ void WorldView::updateScreenPosition()
             currentXDragSpeed *= 0.9f;
             camera.truck(currentXDragSpeed);
         }
-        else currentXDragSpeed = 0.0f;
+        else
+        {
+            currentXDragSpeed = 0.0f;
+        }
+
         // Y
         if(currentYDragSpeed < -0.5f || currentYDragSpeed > 0.5f)
         {
@@ -305,7 +337,7 @@ void WorldView::updateScreenPosition()
     }
 
     // center on closest in zoomlevel 2
-    if(zoomLevel == 2 && !cursor->cursorDrag && !zooming)
+    if(zoomLevel == 2 && !cursor->rightHand && !zooming)
     {
         if(fabs(currentXDragSpeed) < 1.2f && fabs(currentYDragSpeed) < 1.2f )
         {
@@ -321,6 +353,15 @@ void WorldView::updateScreenPosition()
                 distanceY *= 0.1f;
                 camera.boom(distanceY);
             }
+        }
+    }
+
+    // center studentObjects
+    if(zoomLevel == 3 && !cursor->rightHand)
+    {
+        if(studentObjectsXPos < -0.5f || studentObjectsXPos > 0.5f)
+        {
+            studentObjectsXPos *= 0.9f;
         }
     }
 }
@@ -369,11 +410,12 @@ void WorldView::draw(ofEventArgs &e)
     drawInfo();
     if(zoomLevel < 3 && zoomLevel > 1) drawSucher();
     drawBottomInterface();
-
+    if(!zooming) drawHandIndicator();
 }
 
 void WorldView::shakeInfoPanel()
 {
+    if(!error.getIsPlaying()) error.play();
     if(shakingTimer > 0)
     {
         infoPanelYPosition += ofRandom(-15,15);
@@ -384,6 +426,176 @@ void WorldView::shakeInfoPanel()
         shakingTimer = 0;
     }
 }
+
+void WorldView::drawHandIndicator()
+{
+    ofPushMatrix();
+    ofTranslate(ofGetWidth() * 0.4 , ofGetHeight() * 0.9);
+    ofEnableAlphaBlending();
+    float x = cursor->smoothRightXPos;
+    float y = -cursor->smoothRightYPos;
+
+    // active menu
+    if(menuActivated)
+    {
+        xPosLeftHandMenu = x;
+        yPosLeftHandMenu = y;
+        menuMiddle.set(xPosLeftHandMenu, -yPosLeftHandMenu);
+        menuActivated = false;
+        menuActive = true;
+        if(!menuOpen.getIsPlaying()) menuOpen.play();
+    }
+
+    if(menuActive && menuMiddle.distance(cursor->moveVector) > 210)
+    {
+
+        menuActive = false;
+        cursor->rightHand = false;
+    }
+
+    if(menuActive)
+    {
+        ofPushMatrix();
+        ofTranslate(xPosLeftHandMenu, yPosLeftHandMenu);
+
+        ofSetColor(255,255,255,200);
+        ofNoFill();
+        ofEllipse(0, 0, 400,400);
+        ofFill();
+
+        ofSetColor(0,255,255,100);
+        ofEllipse(0, 0, 120,120);
+
+        switch(zoomLevel)
+        {
+        case 3:
+            if(x < xPosLeftHandMenu - 50)
+            {
+                ofSetColor(10,10,10);
+                ofRect(-250,-5, 150,-40);
+                ofSetColor(255,255,255);
+                HelveticaL.drawString("AUSWÄHLEN", -250, -5);
+                if(cursor->rightHand && !zooming)
+                {
+                    changeZoomLevel(ZOOM_IN);
+                    if(!menuClick.getIsPlaying()) menuClick.play();
+                }
+            }
+            else
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,-5, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("AUSWÄHLEN", -250, -5);
+            }
+
+            break;
+        case 2:
+            // upper butoon
+            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20)
+            {
+                ofSetColor(10,10,10);
+                ofRect(-250,-50, 150,-40);
+                ofSetColor(255,255,255);
+                HelveticaL.drawString("AUSWÄHLEN", -250, -50);
+                if(cursor->rightHand && !zooming)
+                {
+                    changeZoomLevel(ZOOM_IN);
+                    if(!menuClick.getIsPlaying()) menuClick.play();
+                }
+            }
+            else
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,-50, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("AUSWÄHLEN", -250, -50);
+            }
+
+            // lower button
+            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 50)
+            {
+                ofSetColor(10,10,10);
+                ofRect(-250,100, 150,-40);
+                ofSetColor(255,255,255);
+                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                if(cursor->rightHand && !zooming)
+                {
+                    changeZoomLevel(ZOOM_OUT);
+                    if(!menuClick.getIsPlaying()) menuClick.play();
+                }
+            }
+            else
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,100, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+            }
+            break;
+        case 1:
+            // upper butoon
+            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20)
+            {
+                ofSetColor(10,10,10);
+                ofRect(-250,-50, 150,-40);
+                ofSetColor(255,255,255);
+                HelveticaL.drawString("ÜBERSICHT", -250, -50);
+                if(cursor->rightHand && !zooming)
+                {
+                    changeZoomLevel(ZOOM_OUT);
+                    if(!menuClick.getIsPlaying()) menuClick.play();
+                }
+            }
+            else
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,-50, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("ÜBERSICHT", -250, -50);
+            }
+
+            // lower button
+            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 50)
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,100, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                if(cursor->rightHand && !zooming)
+                {
+                    changeZoomLevel(ZOOM_RESET);
+                    if(!menuClick.getIsPlaying()) menuClick.play();
+                }
+            }
+            else
+            {
+                ofSetColor(255,255,255);
+                ofRect(-250,100, 150, -40);
+                ofSetColor(10,10,10);
+                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+            }
+            break;
+        }
+        ofPopMatrix();
+    }
+
+
+    // hand postion indicator
+    int indicatorSize = 100;
+    ofSetColor(255,255,255, 160);
+    if(cursor->rightHandRaised) ofEllipse(x, y, indicatorSize, indicatorSize);
+
+    if(cursor->rightHand)
+    {
+        ofSetColor(0,200,100, 255);
+        ofEllipse(x, y, indicatorSize * 0.65, indicatorSize * 0.65);
+    }
+
+    ofDisableAlphaBlending();
+    ofPopMatrix();
+}
+
 void WorldView::drawInfo()
 {
     int previousHeight = 50;
@@ -529,6 +741,7 @@ void WorldView::drawSucher()
     ofFill();
 }
 
+
 void WorldView::drawBottomInterface()
 {
     ofFill();
@@ -556,7 +769,7 @@ void WorldView::drawBottomInterface()
     // right hand
     ofSetColor(255,255,255);
     ofEllipse(ofGetWidth()/2 + 50, ofGetHeight()- bottomDebugHeight, 50,50);
-    if(cursor->cursorDrag)
+    if(cursor->rightHand)
     {
         ofSetColor(200,255,200);
         ofEllipse(ofGetWidth()/2+ 50, ofGetHeight()- bottomDebugHeight, 45,45);
@@ -565,7 +778,7 @@ void WorldView::drawBottomInterface()
     // left hand
     ofSetColor(255,255,255);
     ofEllipse(ofGetWidth()/2 - 50,ofGetHeight()-  bottomDebugHeight, 50,50);
-    if(cursor->twoHands)
+    if(cursor->leftHand)
     {
         ofSetColor(200,255,200);
         ofEllipse(ofGetWidth()/2 - 50, ofGetHeight()- bottomDebugHeight, 45,45);
@@ -632,7 +845,8 @@ void WorldView::swipeGestureEvent(swipeGesturesEnum _swipeDirection)
 
 void WorldView::listenerZoomChange(CustomEvent &e)
 {
-
+    menuActive = false;
+    justZoomed = true;
     float zoomAmount = cameraHeight+500;
 
     if(gestureTimerZoom == 0)
@@ -650,10 +864,13 @@ void WorldView::listenerZoomChange(CustomEvent &e)
                 zoomLevel++;
                 currentCameraHeight +=  zoomAmount;
             }
-            else
-            {
-                cout << "---- Max Zoomout." << endl;
-            }
+        }
+
+        // zoomreset, back to beginning
+        if(e.zoomLevel == ZOOM_RESET)
+        {
+            zoomLevel = 3;
+            currentCameraHeight = cameraHeight;
         }
 
         // zoomin
@@ -668,13 +885,7 @@ void WorldView::listenerZoomChange(CustomEvent &e)
             {
                 zoomLevel--;
             }
-            else
-            {
-                cout << "---- Max Zoomin." << endl;
-            }
         }
-
-        cout << "---- ZoomLevel: " << ofToString(zoomLevel) << endl;
 
         // reset gesture timer
         gestureTimerZoom = gestureTimeout;
@@ -687,7 +898,7 @@ void WorldView::listenerZoomChange(CustomEvent &e)
         justArrived = true;
         break;
     case 2:
-        speedFactor = 0.7f;
+        speedFactor = 0.5f;
         break;
     case 3:
         speedFactor = 1.5f;
@@ -701,7 +912,7 @@ void WorldView::listenerZoomChange(CustomEvent &e)
 void WorldView::listenerSwipeGesture(CustomEvent &e)
 {
     // in overview
-    if(zoomLevel == 3 && !departmentChangedToLeft && !departmentChangedToRight && !cursor->twoHands)
+    if(zoomLevel == 3 && !departmentChangedToLeft && !departmentChangedToRight && !cursor->leftHand)
     {
         switch(e.swipeDirection)
         {
@@ -710,7 +921,6 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
             {
                 currentDeptNumber = -1;
             }
-            cout << "WorldView::listenerSwipeGesture. LEFT zoomLevel == 3" << endl;
             studentObjectsXPosFuture = -2000;
             departmentChangedToLeft = true;
             break;
@@ -719,7 +929,6 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
             {
                 currentDeptNumber = totalDeptNumber+1;
             }
-            cout << "WorldView::listenerSwipeGesture. RIGHT zoomLevel == 3" << endl;
             studentObjectsXPosFuture = 2000;
             departmentChangedToRight = true;
             break;
@@ -767,8 +976,6 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
             break;
         }
 
-//        cout << "cs: " << ofToString(currentStudent)  << "ns: " << ofToString(numberOfStudents) << endl;
-
         // reset gesture timer
         gestureTimerSwipe = gestureTimeout;
     }
@@ -776,21 +983,30 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
 
 void WorldView::kinectMove()
 {
-    if(cursor->cursorDrag)
+    if(cursor->rightHand)
     {
-        moveScreen(cursor->moveVector);
+        moveScreen();
     }
 }
 
-void WorldView::moveScreen(ofVec2f moveVector)
+void WorldView::moveScreen()
 {
-    // no scrolling in detail view
-    if(zoomLevel > 1 && zoomLevel < 3)
+    // no scrolling in detail view, move studentObjects
+    if(zoomLevel== 2 && !menuActive)
     {
         // X
         camera.truck(currentXDragSpeed);
-        // Y
+        // Y, not in overview
         camera.boom(currentYDragSpeed);
+    }
+
+    // only move studentObjects left/right
+    if(zoomLevel == 3 && !departmentChangedToLeft && !departmentChangedToRight && !menuActive)
+    {
+        float threshold = ofGetWidth()*0.13;
+        studentObjectsXPos -= currentXDragSpeed;
+        if(studentObjectsXPos < -threshold) swipeGestureEvent(SWIPE_LEFT);
+        if(studentObjectsXPos > threshold) swipeGestureEvent(SWIPE_RIGHT);
     }
 }
 
@@ -830,6 +1046,3 @@ string WorldView::wrapString(string text, int width)
     }
     return typeWrapped;
 }
-
-
-

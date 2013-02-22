@@ -10,8 +10,10 @@ void HandCursor::setup(float x, float y)
     xPos = x;
     yPos = y;
 
-    cursorDrag = false;
-    twoHands = false;
+    rightHand = false;
+    leftHand = false;
+    rightHandRaised = false;
+    leftHandRaised = false;
     isActiveUser = false;
     trackingHand = false;
     trackingHand = false;
@@ -21,24 +23,19 @@ void HandCursor::setup(float x, float y)
 
 }
 
-void HandCursor::update(float x, float y)
+void HandCursor::update(float rightX, float rightY, float leftX, float leftY)
 {
-    xPos = x;
-    yPos = y;
+    xPos = rightX;
+    yPos = rightY;
+
+    leftXPos = leftX;
+    leftYPos = leftY;
 
     calculatePos();
+    calculateLeftPos();
     calculateActiveUserMiddlePosX();
 
     moveVector.set(smoothRightXPos,smoothRightYPos);
-}
-
-void HandCursor::updateLeftHanded(float x, float y)
-{
-    leftXPos = x;
-    leftYPos = y;
-
-    calculateLeftPos();
-
     leftVector.set(smoothLeftXPos,smoothLeftYPos);
 }
 

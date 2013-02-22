@@ -37,6 +37,10 @@ public:
     int activeUserId;
     int numberOfMaxUsers;
 
+    // debug messages
+    bool debugGestures;
+    bool debugUsers;
+
     // cursor
     HandCursor cursor;
     float cursorXPos;
