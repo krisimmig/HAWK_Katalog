@@ -91,6 +91,7 @@ void testApp::update()
             if(activeUserPos < -150 || activeUserPos > 150 || activeUserPos == 0.0f)
             {
                 if(debugUsers) cout << "deactivate activeUser. activeUser pos outside range." << endl;
+                cursor.leftHand = cursor.leftHandRaised = cursor.rightHand = cursor.rightHandRaised = false;
                 activeUser = NULL;
                 isActiveUser = cursor.isActiveUser = false;
                 cursor.activeUserId = activeUserId = -1;
@@ -139,7 +140,7 @@ void testApp::kinectGestures()
     cursor.activeUserXpos = activeUser->getJoint(JOINT_TORSO).getWorldPosition().x;
 
     // set right hand drag
-    if( rightShoulder.z - rightHand.z > 0.7*armLength)
+    if( rightShoulder.z - rightHand.z > 0.73*armLength)
     {
         cursor.rightHand = true;
     }
@@ -149,7 +150,7 @@ void testApp::kinectGestures()
     }
 
     // set right hand raised
-    if(  rightShoulder.z - rightHand.z > 0.3*armLength)
+    if(  rightShoulder.z - rightHand.z > 0.45*armLength)
     {
         cursor.rightHandRaised = true;
     }

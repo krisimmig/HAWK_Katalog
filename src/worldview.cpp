@@ -10,9 +10,13 @@ WorldView::WorldView()
     ofAddListener(CustomEvent().zoomChange, this, &WorldView::listenerZoomChange);
     ofAddListener(CustomEvent().swipeGesture, this, &WorldView::listenerSwipeGesture);
 
-    HelveticaXL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 50);
-    HelveticaL.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 26);
-    HelveticaS.loadFont("fonts/HelveticaNeueLTStd-Cn.otf", 18);
+    fontXL.loadFont("fonts/MyriadPro-Regular_0.otf", 50, true, true);
+    fontLBold.loadFont("fonts/MyriadPro-Bold_0.otf", 26, true, true);
+    fontLLight.loadFont("fonts/MyriadPro-Light.otf", 26, true, true);
+    fontL.loadFont("fonts/MyriadPro-Regular_0.otf", 26, true, true);
+    fontS.loadFont("fonts/MyriadPro-Regular_0.otf", 18, true, true);
+    fontSLight.loadFont("fonts/MyriadPro-Light.otf", 18, true, true);
+    fontSLLight.loadFont("fonts/MyriadPro-Light.otf", 21, true, true);
     ofEnableSmoothing();
 
     // gestures
@@ -38,10 +42,10 @@ WorldView::WorldView()
     speedFactor = 1.5f;
 
     // currentDepartmentString setup
-    fachbereichArray = {FACHBEREICH_ALL,FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
+    fachbereichArray = {FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
     departmentChangedToLeft = departmentChangedToRight = false;
-    totalDeptNumber = 9; // 10 ?!?
-    currentDeptNumber = 5; // start at GD
+    totalDeptNumber = 8; // 10 ?!?
+    currentDeptNumber = 0; // start at AD
     currentDepartmentString = Students::convertFBEnumToString(fachbereichArray[currentDeptNumber]);
     numberOfStudents = Students::countAll(fachbereichArray[currentDeptNumber]);
     currentStudent = -1;
@@ -55,10 +59,9 @@ WorldView::WorldView()
 
     // info panel
     shakingTimer = 0;
-    justArrived = infoPanelToLeft = infoPanelToRight = false;
+    justArrived = infoPanelToLeft = infoPanelToRight = leavingInfoPanelView = studentSwitched = false;
     projectImagesYPosition = 0;
     currentProjectImagesYPosition = 0;
-    futureProjectImagesYPosition = 0;
     currentImageHeight = 0;
     currentImageNumber = 1;
     infoPanelWidth = 1100;
@@ -66,16 +69,34 @@ WorldView::WorldView()
     infoPanelResetPosition = infoPanelXPosition;
     infoPanelFinalYPosition = 0;
     infoPanelYPosition = 0;
+    totalImageColumnHeight = 0;
 
-    // left hand menu
+    // menu
     menuActivated = false;
     menuActive = false;
     justZoomed = false;
+    cursorPointer = cursorPointerTop = false;
 
-    // audio IMAGE_DIR "/" + file_project_01);
+    // load audio
     menuOpen.loadSound(AUDIO_DIR "/menuOpen.wav");
     menuClick.loadSound(AUDIO_DIR "/menuClick.wav");
     error.loadSound(AUDIO_DIR "/error.wav");
+
+    // load grafix
+    bottomInterface.loadImage(GRAFIX_DIR "/grafix_bottomInterface.png");
+    cursor_handClosed.loadImage(GRAFIX_DIR "/grafix_handClosed.png");
+    cursor_handOpened.loadImage(GRAFIX_DIR "/grafix_handOpened.png");
+    cursor_handPointer.loadImage(GRAFIX_DIR "/grafix_handPointer.png");
+    auswahlMitte.loadImage(GRAFIX_DIR "/grafix_auswahlMitte.png");
+    auswahlMitte_hover.loadImage(GRAFIX_DIR "/grafix_auswahlMitte_hover.png");
+    fachbereichTitel.loadImage(GRAFIX_DIR "/grafix_fachbereichTitel.png");
+    gridBackground.loadImage(GRAFIX_DIR "/grafix_gridBackground.png");
+    auswahlOben.loadImage(GRAFIX_DIR "/grafix_auswahlOben.png");
+    auswahlOben_hover.loadImage(GRAFIX_DIR "/grafix_auswahlOben_hover.png");
+    ubersichtOben.loadImage(GRAFIX_DIR "/grafix_ubersichtOben.png");
+    ubersichtOben_hover.loadImage(GRAFIX_DIR "/grafix_ubersichtOben_hover.png");
+    fachbereicheUnten.loadImage(GRAFIX_DIR "/grafix_fachbereicheUnten.png");
+    fachbereicheUnten_hover.loadImage(GRAFIX_DIR "/grafix_fachbereicheUnten_hover.png");
 }
 
 WorldView::~WorldView()
@@ -97,7 +118,7 @@ void WorldView::update(ofEventArgs &e)
     }
 
     // screen position
-    if(zoomLevel > 1) updateScreenPosition();
+    updateScreenPosition();
 
     // detail info panel view
     if(zoomLevel == 1)
@@ -111,12 +132,12 @@ void WorldView::update(ofEventArgs &e)
     updateZoomLevel();
 
     // menu activation
-    if(cursor->leftHand && !menuActive)
+    if(cursor->leftHand && !menuActive && cursor->rightHandRaised)
     {
         menuActivated = true;
         cursor->leftHand = false;
     }
-
+    else if(cursor->leftHand) cursor->leftHand = false;
 
     // zoom gesture timer
     if(gestureTimerZoom > 0)
@@ -211,56 +232,68 @@ void WorldView::updateDepartment()
                 int z = 0;
                 studentObjects[counter] = new Object3D();
                 studentObjects[counter]->setup(x,y,z, counter, studentIdArray[counter]);
-                studentObjects[counter]->setFont(HelveticaXL);
+                studentObjects[counter]->setFont(fontXL);
                 counter++;
             }
         }
     }
-
 }
 
 void WorldView::updateInfoPanelPosition()
 {
-    // coming from zoomin
+    // coming from zoomIN
     if(justArrived)
     {
         infoPanelYPosition = 2000;
         justArrived = false;
     }
+    if(infoPanelYPosition > 10 && !leavingInfoPanelView) infoPanelYPosition *= 0.8f;
 
-    if(infoPanelYPosition > 3.0f)
+    // leaving infopanelview
+    if(leavingInfoPanelView && infoPanelYPosition > -2000) infoPanelYPosition -= 100;
+    if(infoPanelYPosition <= -2000)
     {
-        infoPanelYPosition = infoPanelYPosition * 0.78f;
+        leavingInfoPanelView = false;
+        zoomLevel = 3;
+        currentCameraHeight = cameraHeight;
     }
 
-    // swipe up/down image position update
-    float distance = currentProjectImagesYPosition - futureProjectImagesYPosition;
+    // move project images on Y-axis
+    currentProjectImagesYPosition += currentYDragSpeed * 2.3f;
 
-    if(fabs(distance) > 1.5f)
-    {
-        currentProjectImagesYPosition -= distance * 0.2f;
-    }
+    // reset project images column Y position after scrolling too far UP
+    if(!cursor->rightHand && currentProjectImagesYPosition < ofGetHeight()*0.75f-totalImageColumnHeight || currentProjectImagesYPosition > 0) currentProjectImagesYPosition *= 0.9f;
+
+    // move infopanel on X-axis, only if xspeed high enough
+    if(cursor->rightHand && fabs(currentXDragSpeed) > 5.0f && !infoPanelToRight && !infoPanelToLeft) infoPanelXPosition -= currentXDragSpeed * 2.3f;
+
+    // infopanel not moving, not switching to new student & not in reset position -> reposition
+    float difference = infoPanelXPosition - infoPanelResetPosition;
+    if(!cursor->rightHand && !infoPanelToRight && !infoPanelToLeft && fabs(difference) > 1.0f)  infoPanelXPosition -= difference*0.2f;
+
+    // switch student
+    if(cursor->rightHand && difference < -200 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_LEFT);
+    if(cursor->rightHand && difference > 200 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_RIGHT);
 
     // swipe to left infopanel position
     if(infoPanelToLeft && !infoPanelToRight)
     {
-
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(infoPanelXPosition > - infoPanelWidth && infoPanelXPosition <= infoPanelResetPosition) infoPanelXPosition -= 150;
-        else if(infoPanelXPosition <= - infoPanelWidth )
+        else if(infoPanelXPosition <= - infoPanelWidth && !studentSwitched)
         {
             infoPanelXPosition = ofGetWidth() + infoPanelWidth;
             currentProjectImagesYPosition = 0;
-            futureProjectImagesYPosition = 0;
             currentImageNumber = 1;
             currentStudent++;
+            studentSwitched = true;
         }
 
         else if(distance > 2.5f) infoPanelXPosition -= distance * 0.2f;
         else
         {
             infoPanelXPosition = infoPanelResetPosition;
-            infoPanelToLeft = false;
+            infoPanelToLeft = studentSwitched = false;
         }
     }
 
@@ -270,20 +303,20 @@ void WorldView::updateInfoPanelPosition()
         float distance = infoPanelXPosition - infoPanelResetPosition;
         if(distance < 0) distance *= -1;
         if(infoPanelXPosition < ofGetWidth() && infoPanelXPosition >= infoPanelResetPosition) infoPanelXPosition += 150;
-        else if(infoPanelXPosition >= ofGetWidth() )
+        else if(infoPanelXPosition >= ofGetWidth()  && !studentSwitched)
         {
             infoPanelXPosition = -infoPanelWidth;
             currentProjectImagesYPosition = 0;
-            futureProjectImagesYPosition = 0;
             currentImageNumber = 1;
             currentStudent--;
+            studentSwitched = true;
         }
 
         else if(distance > 2.5f) infoPanelXPosition += distance * 0.2f;
         else
         {
             infoPanelXPosition = infoPanelResetPosition;
-            infoPanelToRight = false;
+            infoPanelToRight = studentSwitched = false;
         }
     }
 }
@@ -295,6 +328,17 @@ void WorldView::updateScreenPosition()
     {
         if(fabs(camera.getGlobalPosition().x) > 1.0f) camera.truck(-camera.getGlobalPosition().x * 0.1f);
         if(fabs(camera.getGlobalPosition().y) > 1.0f) camera.boom(camera.getGlobalPosition().y * 0.1f);
+    }
+
+    // change speed to new zoomlevel and activate justarrived bool
+    switch(zoomLevel)
+    {
+    case 2:
+        speedFactor = 0.5f;
+        break;
+    case 3:
+        speedFactor = 1.5f;
+        break;
     }
 
     // calcualte screen move speed
@@ -312,7 +356,7 @@ void WorldView::updateScreenPosition()
     pmouseX = cursor->smoothRightXPos;
     pmouseY = cursor->smoothRightYPos;
 
-    // calculate kinetic scrolling
+    // calculate kinetic scrolling (kinetic camera movement only in zoomLevel 2)
     // if dragSpeed slower than +-0.5, set to 0, else mulitply by 0.9
     if(!cursor->rightHand && zoomLevel != 3)
     {
@@ -320,7 +364,7 @@ void WorldView::updateScreenPosition()
         if(currentXDragSpeed < -0.5f || currentXDragSpeed > 0.5f)
         {
             currentXDragSpeed *= 0.9f;
-            camera.truck(currentXDragSpeed);
+            if(zoomLevel == 2) camera.truck(currentXDragSpeed);
         }
         else
         {
@@ -331,7 +375,7 @@ void WorldView::updateScreenPosition()
         if(currentYDragSpeed < -0.5f || currentYDragSpeed > 0.5f)
         {
             currentYDragSpeed *= 0.9f;
-            camera.boom(currentYDragSpeed);
+            if(zoomLevel == 2) camera.boom(currentYDragSpeed);
         }
         else currentYDragSpeed = 0.0f;
     }
@@ -392,33 +436,90 @@ void WorldView::updateZoomLevel()
 void WorldView::draw(ofEventArgs &e)
 {
     ofFill();
-    ofBackgroundGradient(ofColor(255), ofColor(175));
+    ofBackgroundGradient(ofColor(215), ofColor(165));
+
     camera.begin();
 
-    // draw all objects if not detail view
+    // draw grid background
     ofPushMatrix();
     ofTranslate(studentObjectsXPos, studentObjectsYPos);
+
+    ofEnableAlphaBlending();
+    int counter = 0;
+    int zusatz = 2;
+    int width = sqrt(numberOfStudents) * studentObjectAbstandX;
+    int height = sqrt(numberOfStudents) * studentObjectAbstandY;
+    for(int i = -zusatz; i < int(numberOfStudents/sqrt(numberOfStudents)+0.5f) + zusatz; i++)
+    {
+        for(int j = -zusatz; j < sqrt(numberOfStudents)+zusatz; j++)
+        {
+            int x = studentObjectAbstandX * j - width/2;
+            int y = studentObjectAbstandY * i - height/2;
+            int z = 0;
+            int rahmen = 6;
+
+            ofSetColor(255,255,255,5);
+            ofRect(x-rahmen,y-rahmen,z,114 + rahmen*2, 146 + rahmen*2);
+            ofNoFill();
+            ofSetColor(100,100,100,15);
+            ofRect(x-rahmen,y-rahmen,z,114 + rahmen*2, 146 + rahmen*2);
+            ofFill();
+        }
+    }
+
+    zusatz = 1;
+    for(int i = -zusatz; i < int(numberOfStudents/sqrt(numberOfStudents)+0.5f) + zusatz; i++)
+    {
+        for(int j = -zusatz; j < sqrt(numberOfStudents)+zusatz; j++)
+        {
+            int x = studentObjectAbstandX * j - width/2;
+            int y = studentObjectAbstandY * i - height/2;
+            int z = 0;
+            int rahmen = 6;
+
+            ofSetColor(255,255,255,5);
+            ofRect(x-rahmen,y-rahmen,z,114 + rahmen*2, 146 + rahmen*2);
+            ofNoFill();
+            ofSetColor(100,100,100,15);
+            ofRect(x-rahmen,y-rahmen,z,114 + rahmen*2, 146 + rahmen*2);
+            ofFill();
+        }
+    }
+
+    // draw all student portraits
+
     for(int i = 0; i < numberOfStudents; i++)
     {
         studentObjects[i]->draw();
     }
+
+
     ofPopMatrix();
     kinectMove();
-
+    ofDisableAlphaBlending();
     camera.end();
 
     drawInfo();
-    if(zoomLevel < 3 && zoomLevel > 1) drawSucher();
     drawBottomInterface();
-    if(!zooming) drawHandIndicator();
+
+    if(!zooming && cursor->isActiveUser) drawHandIndicator();
+
+
+    ofSetColor(10,10,10);
+    std::string umlaute = "1. äöü 2. ÄÖÜ Umlaute";
+    std::string umlaut = "ä";
+    cout << "ulaute " << ofToChar(umlaut) << endl;
+    ofDrawBitmapString(umlaute, 50,50);
+    fontL.drawString(umlaute, 50,100);
+
 }
 
 void WorldView::shakeInfoPanel()
 {
-    if(!error.getIsPlaying()) error.play();
     if(shakingTimer > 0)
     {
-        infoPanelYPosition += ofRandom(-15,15);
+        if(!error.getIsPlaying()) error.play();
+        infoPanelXPosition += ofRandom(-15,15);
         shakingTimer--;
     }
     else
@@ -446,9 +547,8 @@ void WorldView::drawHandIndicator()
         if(!menuOpen.getIsPlaying()) menuOpen.play();
     }
 
-    if(menuActive && menuMiddle.distance(cursor->moveVector) > 210)
+    if(menuActive && menuMiddle.distance(cursor->moveVector) > 280)
     {
-
         menuActive = false;
         cursor->rightHand = false;
     }
@@ -457,139 +557,141 @@ void WorldView::drawHandIndicator()
     {
         ofPushMatrix();
         ofTranslate(xPosLeftHandMenu, yPosLeftHandMenu);
-
-        ofSetColor(255,255,255,200);
-        ofNoFill();
-        ofEllipse(0, 0, 400,400);
-        ofFill();
-
-        ofSetColor(0,255,255,100);
-        ofEllipse(0, 0, 120,120);
+        int innerCircleRadius = 60;
+        int xCorrection = 10;
+        int yCorrection = 10;
 
         switch(zoomLevel)
         {
         case 3:
             if(x < xPosLeftHandMenu - 50)
             {
-                ofSetColor(10,10,10);
-                ofRect(-250,-5, 150,-40);
+                cursorPointer = true;
                 ofSetColor(255,255,255);
-                HelveticaL.drawString("AUSWÄHLEN", -250, -5);
+                auswahlMitte_hover.draw(-auswahlMitte_hover.getWidth() - innerCircleRadius,-auswahlMitte.getHeight()/2);
                 if(cursor->rightHand && !zooming)
                 {
                     changeZoomLevel(ZOOM_IN);
                     if(!menuClick.getIsPlaying()) menuClick.play();
+                    cursorPointer = false;
                 }
             }
             else
             {
+                cursorPointer = false;
                 ofSetColor(255,255,255);
-                ofRect(-250,-5, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("AUSWÄHLEN", -250, -5);
+                auswahlMitte.draw(-auswahlMitte.getWidth() - innerCircleRadius,-auswahlMitte.getHeight()/2);
             }
 
             break;
         case 2:
-            // upper butoon
-            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20)
+            // upper button -> detailansicht
+            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20 && y > yPosLeftHandMenu - auswahlOben_hover.getHeight() - 40  && currentStudent != -1)
             {
-                ofSetColor(10,10,10);
-                ofRect(-250,-50, 150,-40);
+                cursorPointerTop = true;
                 ofSetColor(255,255,255);
-                HelveticaL.drawString("AUSWÄHLEN", -250, -50);
+                auswahlOben_hover.draw(-auswahlOben_hover.getWidth() - innerCircleRadius + xCorrection,-auswahlOben_hover.getHeight() - yCorrection);
                 if(cursor->rightHand && !zooming)
                 {
                     changeZoomLevel(ZOOM_IN);
                     if(!menuClick.getIsPlaying()) menuClick.play();
+                    cursorPointerTop = false;
                 }
             }
             else
             {
+                cursorPointerTop = false;
                 ofSetColor(255,255,255);
-                ofRect(-250,-50, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("AUSWÄHLEN", -250, -50);
+                auswahlOben.draw(-auswahlOben.getWidth() - innerCircleRadius + xCorrection,-auswahlOben_hover.getHeight() - yCorrection);
             }
 
-            // lower button
-            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 50)
+            // lower button -> fachbereiche
+            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 20 && y < yPosLeftHandMenu + fachbereicheUnten.getHeight() + 40 )
             {
-                ofSetColor(10,10,10);
-                ofRect(-250,100, 150,-40);
+                cursorPointer = true;
                 ofSetColor(255,255,255);
-                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                fachbereicheUnten_hover.draw(-fachbereicheUnten_hover.getWidth() - innerCircleRadius + xCorrection,yCorrection);
                 if(cursor->rightHand && !zooming)
                 {
                     changeZoomLevel(ZOOM_OUT);
                     if(!menuClick.getIsPlaying()) menuClick.play();
+                    cursorPointer = false;
                 }
             }
             else
             {
+                cursorPointer = false;
                 ofSetColor(255,255,255);
-                ofRect(-250,100, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                fachbereicheUnten.draw(-fachbereicheUnten.getWidth() - innerCircleRadius + xCorrection,yCorrection);
             }
             break;
         case 1:
-            // upper butoon
-            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20)
+            // upper button -> detailansicht
+            if(x < xPosLeftHandMenu - 50 && y < yPosLeftHandMenu - 20 && y > yPosLeftHandMenu - ubersichtOben_hover.getHeight() - 40  && currentStudent != -1)
             {
-                ofSetColor(10,10,10);
-                ofRect(-250,-50, 150,-40);
+                cursorPointerTop = true;
                 ofSetColor(255,255,255);
-                HelveticaL.drawString("ÜBERSICHT", -250, -50);
+                ubersichtOben_hover.draw(-ubersichtOben_hover.getWidth() - innerCircleRadius + xCorrection,-ubersichtOben_hover.getHeight() - yCorrection);
                 if(cursor->rightHand && !zooming)
                 {
                     changeZoomLevel(ZOOM_OUT);
                     if(!menuClick.getIsPlaying()) menuClick.play();
+                    cursorPointerTop = false;
                 }
             }
             else
             {
+                cursorPointerTop = false;
                 ofSetColor(255,255,255);
-                ofRect(-250,-50, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("ÜBERSICHT", -250, -50);
+                ubersichtOben.draw(-ubersichtOben.getWidth() - innerCircleRadius + xCorrection,-ubersichtOben.getHeight() - yCorrection);
             }
 
-            // lower button
-            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 50)
+            // lower button -> fachbereiche
+            if(x < xPosLeftHandMenu - 50 && y > yPosLeftHandMenu + 20 && y < yPosLeftHandMenu + fachbereicheUnten.getHeight() + 40 )
             {
+                cursorPointer = true;
                 ofSetColor(255,255,255);
-                ofRect(-250,100, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                fachbereicheUnten_hover.draw(-fachbereicheUnten_hover.getWidth() - innerCircleRadius + xCorrection,yCorrection);
                 if(cursor->rightHand && !zooming)
                 {
                     changeZoomLevel(ZOOM_RESET);
                     if(!menuClick.getIsPlaying()) menuClick.play();
+                    cursorPointer = false;
                 }
             }
             else
             {
+                cursorPointer = false;
                 ofSetColor(255,255,255);
-                ofRect(-250,100, 150, -40);
-                ofSetColor(10,10,10);
-                HelveticaL.drawString("FACHBEREICHE", -250, 100);
+                fachbereicheUnten.draw(-fachbereicheUnten.getWidth() - innerCircleRadius + xCorrection,yCorrection);
             }
             break;
         }
+
+        // draw center circle
+        ofSetColor(255,255,255);
+        ofNoFill();
+        ofEllipse(0, 0, innerCircleRadius*2,innerCircleRadius*2);
+        ofEllipse(0, 0, innerCircleRadius*2+1,innerCircleRadius*2+1);
+        ofEllipse(0, 0, innerCircleRadius*2+2,innerCircleRadius*2+2);
+        ofEllipse(0, 0, innerCircleRadius*2+3,innerCircleRadius*2+3);
+        ofFill();
+        ofSetColor(255,255,255,100);
+        ofEllipse(0, 0, innerCircleRadius*2,innerCircleRadius*2);
+
         ofPopMatrix();
     }
 
 
-    // hand postion indicator
-    int indicatorSize = 100;
-    ofSetColor(255,255,255, 160);
-    if(cursor->rightHandRaised) ofEllipse(x, y, indicatorSize, indicatorSize);
+    // hand position indicator
+    ofSetColor(255,255,255,255);
+    if(cursor->rightHandRaised && !cursor->rightHand && cursorPointer || cursorPointerTop) cursor_handPointer.draw(x,y);
+    else if (cursor->rightHandRaised && !cursor->rightHand) cursor_handOpened.draw(x,y);
 
     if(cursor->rightHand)
     {
-        ofSetColor(0,200,100, 255);
-        ofEllipse(x, y, indicatorSize * 0.65, indicatorSize * 0.65);
+        if(cursorPointer || cursorPointerTop) cursor_handPointer.draw(x,y);
+        else cursor_handClosed.draw(x,y);
     }
 
     ofDisableAlphaBlending();
@@ -600,32 +702,27 @@ void WorldView::drawInfo()
 {
     int previousHeight = 50;
     int imageHeight = 0;
-    int totalImageColumnHeight = 0;
-
+    totalImageColumnHeight = 0;
     int abstandDeptLabels;
+    float nameBoxWidth;
+    std::string vorName;
+    std::string nachName;
+    std::string titel;
+
     switch(zoomLevel)
     {
         // student detail view
     case 1:
         // draw opaque background
         ofEnableAlphaBlending();
-        ofSetColor(170,170,170, 98);
+        ofSetColor(200,200,200, 230);
         ofRect(0,0,ofGetWidth(),ofGetHeight());
         ofDisableAlphaBlending();
+
         ofPushMatrix();
         ofTranslate(infoPanelXPosition, infoPanelYPosition);
 
-        // draw  left infocards
-        ofSetColor(255,255,255);
-        ofRect(25,25,350, 850);
-        // draw left infocard border
-        ofSetColor(170,170,170);
-        ofNoFill();
-        ofRect(25,25,350, 850);
         ofFill();
-
-        // draw portrait
-        studentObjects[currentStudent]->drawPortrait(60,70);
 
         // draw project images
         ofPushMatrix();
@@ -637,28 +734,50 @@ void WorldView::drawInfo()
             totalImageColumnHeight += studentObjects[currentStudent]->getProjectImageSize(i) + 30;
         }
         ofSetColor(255,255,255);
-        ofRect(475,25,750,totalImageColumnHeight);
+        ofRect(0,25,850,totalImageColumnHeight);
         // draw right infocard border
         ofSetColor(170,170,170);
         ofNoFill();
-        ofRect(475,25,750,totalImageColumnHeight);
+        ofRect(0,25,850,totalImageColumnHeight);
         ofFill();
         for(int i = 0; i < studentObjects[currentStudent]->totalNumberProjectImages; i++)
         {
             if(i > 0) imageHeight = studentObjects[currentStudent]->getProjectImageSize(i);
-            studentObjects[currentStudent]->drawProjectImage(500, imageHeight + previousHeight, i + 1);
+            studentObjects[currentStudent]->drawProjectImage(25, imageHeight + previousHeight, i + 1);
             previousHeight += imageHeight + 30;
         }
         ofPopMatrix();
 
         // prepare text
-        fullName = studentObjects[currentStudent]->getFullName();
-        description = wrapString(studentObjects[currentStudent]->description, 300);
+        vorName = studentObjects[currentStudent]->first_name;
+        nachName = " " + studentObjects[currentStudent]->last_name;
+        titel = wrapString(studentObjects[currentStudent]->titel, 450);
+        description = wrapString(studentObjects[currentStudent]->description, 450);
+
+        cout << "BUCHSTABEN ae: " << vorName << " oe: " << nachName << " ue: " << description << endl;
+
+        // draw portrait
+        ofPushMatrix();
+        ofTranslate(infoPanelWidth - 150, infoPanelYPosition + 20);
+        ofSetColor(255,255,255);
+        ofRect(0,0,studentObjects[currentStudent]->portraitWidth*2.5f +20, studentObjects[currentStudent]->portraitHeight*2.5f+20);
+        studentObjects[currentStudent]->image_portrait.draw(10,10, studentObjects[currentStudent]->portraitWidth*2.5f, studentObjects[currentStudent]->portraitHeight*2.5f );
+
         // draw text
         ofSetColor(10,10,10);
-        HelveticaL.drawString(fullName, 60,250);
-        HelveticaS.drawString(description, 60, 300);
+        nameBoxWidth = fontLBold.stringWidth(vorName) + fontLBold.stringWidth(nachName);
+        ofSetColor(237,188,0);
+        ofRect(-5, studentObjects[currentStudent]->portraitHeight*2.5f + 110, nameBoxWidth + 20, -fontLBold.stringHeight(vorName)-20);
 
+        ofSetColor(255,255,255);
+        fontLBold.drawString(vorName,0, studentObjects[currentStudent]->portraitHeight*2.5f + 100);
+        fontL.drawString(nachName,fontLBold.stringWidth(vorName), studentObjects[currentStudent]->portraitHeight*2.5f + 100);
+
+        ofSetColor(10,10,10);
+        fontSLLight.drawString(ofToUpper(titel),0,studentObjects[currentStudent]->portraitHeight*2.5f + 170);
+        fontSLight.drawString(description,0,studentObjects[currentStudent]->portraitHeight*2.5f + 170 + fontS.stringHeight(titel) + 15);
+
+        ofPopMatrix();
         ofPopMatrix();
         break;
         // name view
@@ -684,11 +803,16 @@ void WorldView::drawInfo()
                 }
             }
         }
+
+        // draw active student name & short info
         for(int i = 0; i < numberOfStudents; i++)
         {
             if(studentObjects[i]->getClosestToCamera())
             {
+//                fullName = studentObjects[i]->getFullName();
                 fullName = studentObjects[i]->getFullName();
+                vorName = studentObjects[i]->first_name;
+                nachName = " " + studentObjects[i]->last_name;
 
                 ofVec3f worldXYZ = studentObjects[i]->getPosition();
                 ofVec3f screenXYZ = camera.worldToScreen(worldXYZ, ofGetCurrentViewport());
@@ -696,36 +820,28 @@ void WorldView::drawInfo()
                 int x = screenXYZ.x + 47;
                 int y = screenXYZ.y + 10;
 
-                ofSetColor(10,10,10);
-                ofRectangle infoRect = HelveticaL.getStringBoundingBox(fullName, 0,0);
+                ofSetColor(237,188,0);
+                ofRectangle infoRect = fontL.getStringBoundingBox(fullName, 0,0);
                 ofRect(x - 5, y - infoRect.height - 5, infoRect.width + 10, infoRect.height +10);
                 ofSetColor(255,255,255);
-                HelveticaL.drawString(fullName, x, y);
+                fontLBold.drawString(vorName, x, y);
+                fontL.drawString(nachName, x + fontLBold.stringWidth(vorName), y);
             }
         }
         break;
         // choose currentDepartmentString
     case 3:
         ofEnableAlphaBlending();
-        ofSetColor(255,255,255,200);
-        ofRect(0,0,ofGetWidth(), 80);
-        ofDisableAlphaBlending();
-        abstandDeptLabels = 120;
-        ofPushMatrix();
-        ofSetColor(10,10,10);
-        ofRect(0,80, ofGetWidth(), 1);
-        ofTranslate(ofGetWidth()/2-((totalDeptNumber*abstandDeptLabels)/2),65,10);
 
-        for(int i = 0; i <= totalDeptNumber; i++)
-        {
-            ofRect(15-abstandDeptLabels/2 + abstandDeptLabels*currentDeptNumber,17, abstandDeptLabels,4);
-            currentDepartmentString = Students::convertFBEnumToString(fachbereichArray[i]);
-            if(i == currentDeptNumber) ofSetColor(10,10,10);
-            else ofSetColor(100,100,100);
-            HelveticaL.drawString(currentDepartmentString, abstandDeptLabels*i, 0);
-            ofSetColor(10,10,10);
-        }
-        ofPopMatrix();
+        currentDepartmentString = Students::convertFBEnumToString(fachbereichArray[currentDeptNumber]);
+        ofSetColor(255,255,255);
+        fachbereichTitel.draw(ofGetWidth()/2 - fachbereichTitel.getWidth()/2, 150-fachbereichTitel.getWidth()/2);
+        ofSetColor(237,188,0);
+        float stringWidth = fontLBold.stringWidth(currentDepartmentString);
+        float stringHeight = fontLBold.stringHeight(currentDepartmentString);
+        fontLBold.drawString(currentDepartmentString, ofGetWidth()/2 - stringWidth/2, 150 + stringHeight/2);
+
+        ofDisableAlphaBlending();
         break;
     }
 }
@@ -745,44 +861,51 @@ void WorldView::drawSucher()
 void WorldView::drawBottomInterface()
 {
     ofFill();
-    int bottomDebugHeight = 80;
+    int bottomDebugHeight = 84;
     int inactiveUserIndicatorSize = 15;
     int activeUserIndicatorSize = inactiveUserIndicatorSize * 1.8;
 
     // draw bottom interface background
+    ofEnableAlphaBlending();
     ofSetColor(255,255,255);
-    ofRect(0,ofGetHeight()- bottomDebugHeight, ofGetWidth(), bottomDebugHeight);
+    bottomInterface.draw(ofGetWidth()/2 - bottomInterface.getWidth()/2,ofGetHeight()-159);
 
-    // draw top line
-    ofSetColor(10,10,10);
-    ofRect(0,ofGetHeight() - bottomDebugHeight, ofGetWidth(), 1);
+    // draw indicators outlines
+    ofNoFill();
+    ofSetColor(237,188,0,255);
+    ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 64,64);
+    ofEllipse(ofGetWidth()/2 + 68, ofGetHeight()- bottomDebugHeight, 26,26);
+    ofEllipse(ofGetWidth()/2 - 68, ofGetHeight()- bottomDebugHeight, 26,26);
 
+    // with fill (transparent)
+    ofFill();
+    ofSetColor(237,188,0, 80);
+    ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 64,64);
+    ofEllipse(ofGetWidth()/2 + 68, ofGetHeight()- bottomDebugHeight, 26,26);
+    ofEllipse(ofGetWidth()/2 - 68, ofGetHeight()- bottomDebugHeight, 26,26);
+
+    ofDisableAlphaBlending();
     // active user indicator
-    ofSetColor(255,255,255);
-    ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 80,80);
     if(cursor->isActiveUser)
     {
-        ofSetColor(200,255,200);
-        ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 75,75);
+        ofSetColor(237,188,0);
+        ofEllipse(ofGetWidth()/2, ofGetHeight()- bottomDebugHeight, 64,64);
     }
 
     // right hand
-    ofSetColor(255,255,255);
-    ofEllipse(ofGetWidth()/2 + 50, ofGetHeight()- bottomDebugHeight, 50,50);
-    if(cursor->rightHand)
+    if(cursor->rightHandRaised)
     {
-        ofSetColor(200,255,200);
-        ofEllipse(ofGetWidth()/2+ 50, ofGetHeight()- bottomDebugHeight, 45,45);
+        ofSetColor(237,188,0);
+        ofEllipse(ofGetWidth()/2 + 68, ofGetHeight()- bottomDebugHeight, 26,26);
     }
 
     // left hand
-    ofSetColor(255,255,255);
-    ofEllipse(ofGetWidth()/2 - 50,ofGetHeight()-  bottomDebugHeight, 50,50);
     if(cursor->leftHand)
     {
-        ofSetColor(200,255,200);
-        ofEllipse(ofGetWidth()/2 - 50, ofGetHeight()- bottomDebugHeight, 45,45);
+        ofSetColor(237,188,0);
+        ofEllipse(ofGetWidth()/2 - 68, ofGetHeight()- bottomDebugHeight, 26,26);
     }
+
 }
 
 void WorldView::keyReleased(ofKeyEventArgs &e)
@@ -794,6 +917,9 @@ void WorldView::keyReleased(ofKeyEventArgs &e)
         break;
     case 'q':
         changeZoomLevel(ZOOM_OUT);
+        break;
+    case 'x':
+        changeZoomLevel(ZOOM_RESET);
         break;
     }
 }
@@ -826,6 +952,7 @@ void WorldView::keyPressed(ofKeyEventArgs &e)
     case 'k':
         swipeGestureEvent(SWIPE_RIGHT);
         break;
+
     }
 }
 
@@ -869,8 +996,7 @@ void WorldView::listenerZoomChange(CustomEvent &e)
         // zoomreset, back to beginning
         if(e.zoomLevel == ZOOM_RESET)
         {
-            zoomLevel = 3;
-            currentCameraHeight = cameraHeight;
+            leavingInfoPanelView = true;
         }
 
         // zoomin
@@ -884,28 +1010,12 @@ void WorldView::listenerZoomChange(CustomEvent &e)
             else if(zoomLevel == 2)
             {
                 zoomLevel--;
+                justArrived = true;
             }
         }
 
         // reset gesture timer
         gestureTimerZoom = gestureTimeout;
-    }
-
-    // change speed to new zoomlevel and activate justarrived bool
-    switch(zoomLevel)
-    {
-    case 1:
-        justArrived = true;
-        break;
-    case 2:
-        speedFactor = 0.5f;
-        break;
-    case 3:
-        speedFactor = 1.5f;
-        break;
-    case 4:
-        speedFactor = 1.5f;
-        break;
     }
 }
 
@@ -941,41 +1051,25 @@ void WorldView::listenerSwipeGesture(CustomEvent &e)
         switch(e.swipeDirection)
         {
         case SWIPE_LEFT:
-            if(currentStudent < numberOfStudents-1 && !infoPanelToRight)
+            if(currentStudent+1 < numberOfStudents && !infoPanelToRight)
             {
+                cout << "swipe left" << endl;
                 infoPanelToRight = false;
                 infoPanelToLeft = true;
             }
             else shakingTimer = 12;
             break;
         case SWIPE_RIGHT:
-            if(currentStudent > 1 && !infoPanelToLeft)
+            if(currentStudent-1 >= 0 && !infoPanelToLeft)
             {
+                cout << "swipe right" << endl;
                 infoPanelToLeft = false;
                 infoPanelToRight = true;
+
             }
             else shakingTimer = 12;
             break;
-
-        case SWIPE_UP:
-            if(currentImageNumber < studentObjects[currentStudent]->totalNumberProjectImages)
-            {
-                currentImageHeight = studentObjects[currentStudent]->getProjectImageSize(currentImageNumber);
-                futureProjectImagesYPosition -= currentImageHeight + 30;
-                currentImageNumber++;
-            }
-            break;
-
-        case SWIPE_DOWN:
-            if(currentImageNumber > 1)
-            {
-                currentImageHeight = studentObjects[currentStudent]->getProjectImageSize(currentImageNumber - 1);
-                futureProjectImagesYPosition += currentImageHeight + 30;
-                currentImageNumber--;
-            }
-            break;
         }
-
         // reset gesture timer
         gestureTimerSwipe = gestureTimeout;
     }
@@ -998,6 +1092,7 @@ void WorldView::moveScreen()
         camera.truck(currentXDragSpeed);
         // Y, not in overview
         camera.boom(currentYDragSpeed);
+
     }
 
     // only move studentObjects left/right
@@ -1031,7 +1126,7 @@ string WorldView::wrapString(string text, int width)
             tempString += " ";
         }
         tempString += wrd;
-        int stringwidth = HelveticaS.stringWidth(tempString);
+        int stringwidth = fontS.stringWidth(tempString);
         if(stringwidth >= width)
         {
             typeWrapped += "\n";

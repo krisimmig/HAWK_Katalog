@@ -116,25 +116,53 @@ private:
     bool infoPanelToRight;
     int currentImageNumber;
     int currentImageHeight;
+    float totalImageColumnHeight;
+    bool leavingInfoPanelView;
+    bool studentSwitched;
 
-    // left hand menu
+    // cursor & menu
     int xPosLeftHandMenu;
     int yPosLeftHandMenu;
     bool menuActivated;
     bool menuActive;
     bool justZoomed;
+    bool cursorPointerTop;
+    bool cursorPointer;
     ofVec2f menuMiddle;
 
-
     // fonts
-    ofTrueTypeFont HelveticaXL;
-    ofTrueTypeFont HelveticaL;
-    ofTrueTypeFont HelveticaS;
+    ofTrueTypeFont fontXL;
+    ofTrueTypeFont fontL;
+    ofTrueTypeFont fontLBold;
+    ofTrueTypeFont fontLLight;
+    ofTrueTypeFont fontS;
+    ofTrueTypeFont fontSLight;
+    ofTrueTypeFont fontSLLight;
 
     // audio
     ofSoundPlayer menuOpen;
     ofSoundPlayer menuClick;
     ofSoundPlayer error;
+
+    // grafix
+    ofImage bottomInterface;
+    ofImage cursor_handClosed;
+    ofImage cursor_handOpened;
+    ofImage cursor_handPointer;
+    ofImage auswahlMitte;
+    ofImage auswahlMitte_hover;
+
+    ofImage auswahlOben;
+    ofImage auswahlOben_hover;
+    ofImage ubersichtOben;
+    ofImage ubersichtOben_hover;
+
+    ofImage fachbereicheUnten;
+    ofImage fachbereicheUnten_hover;
+
+    ofImage fachbereichTitel;
+    ofImage gridBackground;
+
 
 };
 

@@ -2,7 +2,8 @@
 
 Object3D::Object3D()
 {
-
+    portraitWidth = 114;
+    portraitHeight = 146;
 }
 Object3D::~Object3D()
 {
@@ -29,7 +30,6 @@ void Object3D::setup(int _x, int _y, int _z, int _number, int _id)
                               .where("id", id);
 
     dbQuery.execute().begin();
-
     // process query result, store names
     first_name = dbQuery.getString(0);
     last_name = dbQuery.getString(1);
@@ -92,14 +92,15 @@ void Object3D::draw()
     // highlight portrait
     if(closestToCamera)
     {
-        ofSetColor(10,10,10);
-        ofRect(x-5,y-5,z,image_portrait.getWidth()+10, image_portrait.getHeight()+10);
+        ofSetColor(237,188,0);
+        int rahmen = 10;
+        ofRect(x-rahmen,y-rahmen,z,portraitWidth+rahmen*2, portraitHeight+rahmen*2);
     }
     // draw image
     ofSetColor(255,255,255);
 
-    ofRect(x-rahmen,y-rahmen,z,image_portrait.getWidth() + rahmen*2, image_portrait.getHeight() + rahmen*2);
-    image_portrait.draw(x,y,z);
+    ofRect(x-rahmen,y-rahmen,z,portraitWidth + rahmen*2, portraitHeight + rahmen*2);
+    image_portrait.draw(x,y,z, portraitWidth, portraitHeight);
     ofSetColor(10,10,10);
     ofDrawBitmapString(ofToString(number), x + 20 , y + 20);
 }
@@ -139,13 +140,12 @@ void Object3D::drawPortrait(int _x, int _y)
     int portraitPosY = _y;
     // draw image
     ofSetColor(255,255,255);
-    image_portrait.draw(portraitPosX,portraitPosY,z);
-    ofSetColor(10,10,10);
-    ofDrawBitmapString(ofToString(number), portraitPosX + 20 , portraitPosY + 20);
-}
+    image_portrait.draw(portraitPosX,portraitPosY,z, portraitWidth, portraitHeight);
+    }
 
 std::string Object3D::getFullName()
 {
+
     return fullName;
 }
 
@@ -172,6 +172,6 @@ bool Object3D::getClosestToCamera()
 ofVec3f Object3D::getPosition()
 {
     ofVec3f pos;
-    pos.set(x + image_portrait.getWidth()/2, y + image_portrait.getHeight()/2 , z);
+    pos.set(x + portraitWidth/2, y + portraitHeight/2 , z);
     return pos;
 }

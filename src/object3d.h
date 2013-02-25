@@ -23,6 +23,9 @@ public:
     bool getClosestToCamera();
     std::string getFullName();
 
+    int portraitWidth;
+    int portraitHeight;
+
     ofVec3f getPosition();
     int id;
     int number;
@@ -30,6 +33,9 @@ public:
     std::string letter;
     std::string titel;
     std::string description;
+
+    std::string first_name;
+    std::string last_name;
 
 
     std::string fachbereich;
@@ -52,8 +58,7 @@ private:
 
     ofTrueTypeFont *font1;
 
-    std::string first_name;
-    std::string last_name;
+
     std::string fullName;
     std::string image_01;
     std::string file_project_01;

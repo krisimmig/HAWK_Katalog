@@ -2,6 +2,7 @@
 #define CONSTANTS_H_INCLUDED
 
 #define DB_NAME "katalog.db"
+#define GRAFIX_DIR "../grafix"
 #define IMAGE_DIR "../images"
 #define AUDIO_DIR "../audio"
 #define PORTRAITS_DIR "../portraits"
@@ -12,3 +13,5 @@ enum zoomLevelEnum { ZOOM_IN, ZOOM_OUT, ZOOM_RESET };
 enum fachbereichEnum {FACHBEREICH_ALL,FACHBEREICH_AD,FACHBEREICH_CICD,FACHBEREICH_DM,FACHBEREICH_FG,FACHBEREICH_GD,FACHBEREICH_IAID,FACHBEREICH_LD,FACHBEREICH_MG,FACHBEREICH_PD};
 
 #endif // CONSTANTS_H_INCLUDED
+
+// gelb ofSetColor(237,188,0);
