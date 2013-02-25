@@ -3598,7 +3598,7 @@
 	"customevent.h"
 	"students.h"
 
-1361807881 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
+1361829426 c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.h
 	"ofMain.h"
 	"constants.h"
 	"customevent.h"
@@ -3617,7 +3617,7 @@
 	"ofMain.h"
 	"constants.h"
 
-1361809508 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
+1361833148 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\object3d.cpp
 	"object3d.h"
 
 1360178688 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\overview.cpp
@@ -3643,7 +3643,7 @@
 1359916220 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\viewmanager.cpp
 	"viewmanager.h"
 
-1361809071 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
+1361830563 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\worldview.cpp
 	"worldview.h"
 
 1359316792 source:c:\openframework\of_v0072\apps\myapps\hawk_katalog\src\mycamera.cpp

@@ -30,17 +30,27 @@ void Object3D::setup(int _x, int _y, int _z, int _number, int _id)
                               .where("id", id);
 
     dbQuery.execute().begin();
+
     // process query result, store names
-    first_name = dbQuery.getString(0);
-    last_name = dbQuery.getString(1);
-    fachbereich = dbQuery.getString(2);
-    titel = dbQuery.getString(3);
-    description = dbQuery.getString(4);
-    image_01 = dbQuery.getString(5);
-    file_project_01 = dbQuery.getString(6);
-    file_project_02 = dbQuery.getString(7);
-    file_project_03 = dbQuery.getString(8);
-    file_project_04 = dbQuery.getString(9);
+    replaceChars(first_name = dbQuery.getString(0));
+
+    replaceChars(last_name = dbQuery.getString(1));
+    replaceChars(fachbereich = dbQuery.getString(2));
+    replaceChars(titel = dbQuery.getString(3));
+    replaceChars(description = dbQuery.getString(4));
+    replaceChars(image_01 = dbQuery.getString(5));
+    replaceChars(file_project_01 = dbQuery.getString(6));
+    replaceChars(file_project_02 = dbQuery.getString(7));
+    replaceChars(file_project_03 = dbQuery.getString(8));
+    replaceChars(file_project_04 = dbQuery.getString(9));
+
+    // count project images
+    totalNumberProjectImages = 0;
+    if(file_project_01 != "null") totalNumberProjectImages++;
+    if(file_project_02 != "null") totalNumberProjectImages++;
+    if(file_project_03 != "null") totalNumberProjectImages++;
+    if(file_project_04 != "null") totalNumberProjectImages++;
+
 
     fullName = first_name + " " + last_name;
     // load image
@@ -54,7 +64,21 @@ void Object3D::setup(int _x, int _y, int _z, int _number, int _id)
 
     isMaster = false;
     projectImagesLoaded = false;
-    totalNumberProjectImages = ofRandom(3, 4);
+}
+
+void Object3D::replaceChars(std::string &inputString)
+{
+    ofStringReplace(inputString, "Ã¤", "ä");
+    ofStringReplace(inputString, "Ã„", "Ä");
+    ofStringReplace(inputString, "Ã¶", "ö");
+    ofStringReplace(inputString, "Ã–", "Ö");
+    ofStringReplace(inputString, "Ã¼", "ü");
+    ofStringReplace(inputString, "Ãœ", "Ü");
+    ofStringReplace(inputString, "ÃŸ", "ß");
+    ofStringReplace(inputString, "â€“", "-");
+    ofStringReplace(inputString, "â€ž", "\"");
+    ofStringReplace(inputString, "â€?", "\"");
+    ofStringReplace(inputString, "â€œ", "\"");
 }
 
 void Object3D::loadProjectImages()
@@ -68,19 +92,16 @@ void Object3D::loadProjectImages()
 
 int Object3D::getProjectImageSize(int imageNumber)
 {
-    if(imageNumber <= totalNumberProjectImages)
+    switch(imageNumber)
     {
-        switch(imageNumber)
-        {
-        case 1:
-            return image_project_01.getHeight();
-        case 2:
-            return image_project_02.getHeight();
-        case 3:
-            return image_project_03.getHeight();
-        case 4:
-            return image_project_04.getHeight();
-        }
+    case 1:
+        return image_project_01.getHeight();
+    case 2:
+        return image_project_02.getHeight();
+    case 3:
+        return image_project_03.getHeight();
+    case 4:
+        return image_project_04.getHeight();
     }
 }
 
@@ -141,7 +162,7 @@ void Object3D::drawPortrait(int _x, int _y)
     // draw image
     ofSetColor(255,255,255);
     image_portrait.draw(portraitPosX,portraitPosY,z, portraitWidth, portraitHeight);
-    }
+}
 
 std::string Object3D::getFullName()
 {

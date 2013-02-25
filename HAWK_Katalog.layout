@@ -85,11 +85,11 @@
 	<File name="src\mycamera.h" open="0" top="0" tabpos="3">
 		<Cursor position="991" topLine="30" />
 	</File>
-	<File name="src\object3d.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="1055" topLine="16" />
+	<File name="src\object3d.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="1341" topLine="18" />
 	</File>
 	<File name="src\object3d.h" open="1" top="0" tabpos="4">
-		<Cursor position="1470" topLine="30" />
+		<Cursor position="1573" topLine="30" />
 	</File>
 	<File name="src\overview.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="699" topLine="0" />
@@ -127,10 +127,10 @@
 	<File name="src\viewmanager.h" open="0" top="0" tabpos="6">
 		<Cursor position="446" topLine="0" />
 	</File>
-	<File name="src\worldview.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1107" topLine="0" />
+	<File name="src\worldview.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="8160" topLine="203" />
 	</File>
 	<File name="src\worldview.h" open="1" top="0" tabpos="2">
-		<Cursor position="3511" topLine="0" />
+		<Cursor position="3514" topLine="111" />
 	</File>
 </CodeBlocks_layout_file>

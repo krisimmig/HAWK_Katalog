@@ -66,6 +66,7 @@ private:
     std::string file_project_03;
     std::string file_project_04;
     std::string file_portrait;
+    void replaceChars(std::string &inputString);
 
     int size;
     int zoomLevel;

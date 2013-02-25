@@ -17,6 +17,7 @@ WorldView::WorldView()
     fontS.loadFont("fonts/MyriadPro-Regular_0.otf", 18, true, true);
     fontSLight.loadFont("fonts/MyriadPro-Light.otf", 18, true, true);
     fontSLLight.loadFont("fonts/MyriadPro-Light.otf", 21, true, true);
+
     ofEnableSmoothing();
 
     // gestures
@@ -504,14 +505,6 @@ void WorldView::draw(ofEventArgs &e)
 
     if(!zooming && cursor->isActiveUser) drawHandIndicator();
 
-
-    ofSetColor(10,10,10);
-    std::string umlaute = "1. הצü 2. ִײÜ Umlaute";
-    std::string umlaut = "ה";
-    cout << "ulaute " << ofToChar(umlaut) << endl;
-    ofDrawBitmapString(umlaute, 50,50);
-    fontL.drawString(umlaute, 50,100);
-
 }
 
 void WorldView::shakeInfoPanel()
@@ -754,8 +747,6 @@ void WorldView::drawInfo()
         titel = wrapString(studentObjects[currentStudent]->titel, 450);
         description = wrapString(studentObjects[currentStudent]->description, 450);
 
-        cout << "BUCHSTABEN ae: " << vorName << " oe: " << nachName << " ue: " << description << endl;
-
         // draw portrait
         ofPushMatrix();
         ofTranslate(infoPanelWidth - 150, infoPanelYPosition + 20);
@@ -774,7 +765,7 @@ void WorldView::drawInfo()
         fontL.drawString(nachName,fontLBold.stringWidth(vorName), studentObjects[currentStudent]->portraitHeight*2.5f + 100);
 
         ofSetColor(10,10,10);
-        fontSLLight.drawString(ofToUpper(titel),0,studentObjects[currentStudent]->portraitHeight*2.5f + 170);
+        fontSLLight.drawString(titel,0,studentObjects[currentStudent]->portraitHeight*2.5f + 170);
         fontSLight.drawString(description,0,studentObjects[currentStudent]->portraitHeight*2.5f + 170 + fontS.stringHeight(titel) + 15);
 
         ofPopMatrix();
