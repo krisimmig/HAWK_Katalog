@@ -66,8 +66,7 @@ WorldView::WorldView()
     currentImageHeight = 0;
     currentImageNumber = 1;
     infoPanelWidth = 1100;
-    infoPanelXPosition = infoPanelFinalXPosition = ofGetWidth()/2 - infoPanelWidth * 0.25;
-    infoPanelResetPosition = infoPanelXPosition;
+    infoPanelXPosition = infoPanelFinalXPosition = infoPanelResetPosition = 250;
     infoPanelFinalYPosition = 0;
     infoPanelYPosition = 0;
     totalImageColumnHeight = 0;
@@ -133,12 +132,18 @@ void WorldView::update(ofEventArgs &e)
     updateZoomLevel();
 
     // menu activation
-    if(cursor->leftHand && !menuActive && cursor->rightHandRaised)
+//    if(cursor->leftHand && !menuActive && cursor->rightHandRaised)
+    if(cursor->leftHand && !menuActive)
     {
         menuActivated = true;
         cursor->leftHand = false;
     }
-    else if(cursor->leftHand) cursor->leftHand = false;
+    else if(cursor->leftHand)
+    {
+      cursor->leftHand = false;
+      menuActive = false;
+    }
+
 
     // zoom gesture timer
     if(gestureTimerZoom > 0)
@@ -273,8 +278,8 @@ void WorldView::updateInfoPanelPosition()
     if(!cursor->rightHand && !infoPanelToRight && !infoPanelToLeft && fabs(difference) > 1.0f)  infoPanelXPosition -= difference*0.2f;
 
     // switch student
-    if(cursor->rightHand && difference < -200 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_LEFT);
-    if(cursor->rightHand && difference > 200 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_RIGHT);
+    if(cursor->rightHand && difference < -120 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_LEFT);
+    if(cursor->rightHand && difference > 120 && !infoPanelToRight && !infoPanelToLeft) swipeGestureEvent(SWIPE_RIGHT);
 
     // swipe to left infopanel position
     if(infoPanelToLeft && !infoPanelToRight)
@@ -290,7 +295,7 @@ void WorldView::updateInfoPanelPosition()
             studentSwitched = true;
         }
 
-        else if(distance > 2.5f) infoPanelXPosition -= distance * 0.2f;
+        else if(distance > 2.8f) infoPanelXPosition -= distance * 0.2f;
         else
         {
             infoPanelXPosition = infoPanelResetPosition;
@@ -313,7 +318,7 @@ void WorldView::updateInfoPanelPosition()
             studentSwitched = true;
         }
 
-        else if(distance > 2.5f) infoPanelXPosition += distance * 0.2f;
+        else if(distance > 2.8f) infoPanelXPosition += distance * 0.2f;
         else
         {
             infoPanelXPosition = infoPanelResetPosition;
@@ -524,7 +529,7 @@ void WorldView::shakeInfoPanel()
 void WorldView::drawHandIndicator()
 {
     ofPushMatrix();
-    ofTranslate(ofGetWidth() * 0.4 , ofGetHeight() * 0.9);
+    ofTranslate(ofGetWidth() * 0.4 , ofGetHeight() * 0.75);
     ofEnableAlphaBlending();
     float x = cursor->smoothRightXPos;
     float y = -cursor->smoothRightYPos;
@@ -532,19 +537,22 @@ void WorldView::drawHandIndicator()
     // active menu
     if(menuActivated)
     {
-        xPosLeftHandMenu = x;
-        yPosLeftHandMenu = y;
+//        xPosLeftHandMenu = x;
+//        yPosLeftHandMenu = y;
+
+        xPosLeftHandMenu = -(ofGetWidth() * 0.4) + ofGetWidth()/2;
+        yPosLeftHandMenu = -(ofGetHeight() * 0.75) + ofGetHeight()*0.35f;
         menuMiddle.set(xPosLeftHandMenu, -yPosLeftHandMenu);
         menuActivated = false;
         menuActive = true;
         if(!menuOpen.getIsPlaying()) menuOpen.play();
     }
 
-    if(menuActive && menuMiddle.distance(cursor->moveVector) > 280)
-    {
-        menuActive = false;
-        cursor->rightHand = false;
-    }
+//    if(menuActive && menuMiddle.distance(cursor->moveVector) > 280)
+//    {
+//        menuActive = false;
+//        cursor->rightHand = false;
+//    }
 
     if(menuActive)
     {
@@ -662,12 +670,16 @@ void WorldView::drawHandIndicator()
         }
 
         // draw center circle
-        ofSetColor(255,255,255);
+//        ofSetColor(255,255,255);
+        ofSetColor(10,10,10);
         ofNoFill();
         ofEllipse(0, 0, innerCircleRadius*2,innerCircleRadius*2);
         ofEllipse(0, 0, innerCircleRadius*2+1,innerCircleRadius*2+1);
+        ofSetColor(255,255,255);
         ofEllipse(0, 0, innerCircleRadius*2+2,innerCircleRadius*2+2);
+        ofSetColor(10,10,10);
         ofEllipse(0, 0, innerCircleRadius*2+3,innerCircleRadius*2+3);
+        ofEllipse(0, 0, innerCircleRadius*2+3,innerCircleRadius*2+4);
         ofFill();
         ofSetColor(255,255,255,100);
         ofEllipse(0, 0, innerCircleRadius*2,innerCircleRadius*2);
@@ -1083,13 +1095,12 @@ void WorldView::moveScreen()
         camera.truck(currentXDragSpeed);
         // Y, not in overview
         camera.boom(currentYDragSpeed);
-
     }
 
     // only move studentObjects left/right
     if(zoomLevel == 3 && !departmentChangedToLeft && !departmentChangedToRight && !menuActive)
     {
-        float threshold = ofGetWidth()*0.13;
+        float threshold = ofGetWidth()*0.08;
         studentObjectsXPos -= currentXDragSpeed;
         if(studentObjectsXPos < -threshold) swipeGestureEvent(SWIPE_LEFT);
         if(studentObjectsXPos > threshold) swipeGestureEvent(SWIPE_RIGHT);

@@ -140,7 +140,7 @@ void testApp::kinectGestures()
     cursor.activeUserXpos = activeUser->getJoint(JOINT_TORSO).getWorldPosition().x;
 
     // set right hand drag
-    if( rightShoulder.z - rightHand.z > 0.73*armLength)
+    if( rightShoulder.z - rightHand.z > 0.74 *armLength)
     {
         cursor.rightHand = true;
     }
@@ -150,7 +150,7 @@ void testApp::kinectGestures()
     }
 
     // set right hand raised
-    if(  rightShoulder.z - rightHand.z > 0.45*armLength)
+    if(  rightShoulder.z - rightHand.z > 0.34*armLength)
     {
         cursor.rightHandRaised = true;
     }
@@ -163,14 +163,14 @@ void testApp::kinectGestures()
     float heightDifference = leftHand.y - leftElbow.y;
 
     // set left hand
-    if( heightDifference > 200 && !cursor.leftHandRaised)
+    if( heightDifference > 300 && !cursor.leftHandRaised)
     {
         (cursor.leftHand) ? cursor.leftHand = false : cursor.leftHand = true;
         cursor.leftHandRaised = true;
     }
 
     // set left hand raised
-    if( heightDifference < -200)
+    if( heightDifference < 100)
     {
         cursor.leftHandRaised = false;
     }

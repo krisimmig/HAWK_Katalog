@@ -2,8 +2,11 @@
 
 Object3D::Object3D()
 {
+//    portraitWidth = 114 * 0.5f;
+//    portraitHeight = 146 * 0.5f;
+
     portraitWidth = 114;
-    portraitHeight = 146;
+    portraitHeight = 146 ;
 }
 Object3D::~Object3D()
 {

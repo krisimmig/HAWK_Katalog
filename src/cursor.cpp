@@ -19,7 +19,7 @@ void HandCursor::setup(float x, float y)
     trackingHand = false;
 
     activeUserId = -1;
-    listSize = 8;
+    listSize = 4;
 
 }
 
