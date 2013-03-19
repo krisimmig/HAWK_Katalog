@@ -90,7 +90,8 @@ WorldView::WorldView()
     auswahlMitte.loadImage(GRAFIX_DIR "/grafix_auswahlMitte.png");
     auswahlMitte_hover.loadImage(GRAFIX_DIR "/grafix_auswahlMitte_hover.png");
     fachbereichTitel.loadImage(GRAFIX_DIR "/grafix_fachbereichTitel.png");
-    gridBackground.loadImage(GRAFIX_DIR "/grafix_gridBackground.png");
+    arrowLeft.loadImage(GRAFIX_DIR "/grafix_arrowLeft.png");
+    arrowRight.loadImage(GRAFIX_DIR "/grafix_arrowRight.png");
     auswahlOben.loadImage(GRAFIX_DIR "/grafix_auswahlOben.png");
     auswahlOben_hover.loadImage(GRAFIX_DIR "/grafix_auswahlOben_hover.png");
     ubersichtOben.loadImage(GRAFIX_DIR "/grafix_ubersichtOben.png");
@@ -140,8 +141,8 @@ void WorldView::update(ofEventArgs &e)
     }
     else if(cursor->leftHand)
     {
-      cursor->leftHand = false;
-      menuActive = false;
+        cursor->leftHand = false;
+        menuActive = false;
     }
 
 
@@ -499,13 +500,23 @@ void WorldView::draw(ofEventArgs &e)
         studentObjects[i]->draw();
     }
 
-
     ofPopMatrix();
     kinectMove();
     ofDisableAlphaBlending();
     camera.end();
 
     drawInfo();
+
+    // draw arrows
+    if(zoomLevel == 3 || zoomLevel == 1)
+    {
+        cout << "arrows" << endl;
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255,100);
+        arrowLeft.draw(arrowLeft.getWidth()*0.5, ofGetHeight()/2 - arrowLeft.getHeight()/2);
+        arrowRight.draw(ofGetWidth() -  arrowRight.getWidth()*1.5, ofGetHeight()/2 - arrowRight.getHeight()/2);
+        ofDisableAlphaBlending();
+    }
     drawBottomInterface();
 
     if(!zooming && cursor->isActiveUser) drawHandIndicator();
@@ -537,22 +548,13 @@ void WorldView::drawHandIndicator()
     // active menu
     if(menuActivated)
     {
-//        xPosLeftHandMenu = x;
-//        yPosLeftHandMenu = y;
-
         xPosLeftHandMenu = -(ofGetWidth() * 0.4) + ofGetWidth()/2;
-        yPosLeftHandMenu = -(ofGetHeight() * 0.75) + ofGetHeight()*0.35f;
+        yPosLeftHandMenu = -(ofGetHeight() * 0.75) + ofGetHeight()*0.5f;
         menuMiddle.set(xPosLeftHandMenu, -yPosLeftHandMenu);
         menuActivated = false;
         menuActive = true;
         if(!menuOpen.getIsPlaying()) menuOpen.play();
     }
-
-//    if(menuActive && menuMiddle.distance(cursor->moveVector) > 280)
-//    {
-//        menuActive = false;
-//        cursor->rightHand = false;
-//    }
 
     if(menuActive)
     {

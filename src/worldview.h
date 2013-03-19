@@ -161,7 +161,8 @@ private:
     ofImage fachbereicheUnten_hover;
 
     ofImage fachbereichTitel;
-    ofImage gridBackground;
+    ofImage arrowLeft;
+    ofImage arrowRight;
 
 
 };

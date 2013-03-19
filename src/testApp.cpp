@@ -160,17 +160,17 @@ void testApp::kinectGestures()
     }
 
     ofVec3f leftElbow = activeUser->getJoint(JOINT_LEFT_ELBOW).getWorldPosition();
-    float heightDifference = leftHand.y - leftElbow.y;
+    float heightDifference = leftHand.y - leftShoulder.y;
 
     // set left hand
-    if( heightDifference > 300 && !cursor.leftHandRaised)
+    if( heightDifference > 150 && !cursor.leftHandRaised)
     {
         (cursor.leftHand) ? cursor.leftHand = false : cursor.leftHand = true;
         cursor.leftHandRaised = true;
     }
 
     // set left hand raised
-    if( heightDifference < 100)
+    if( heightDifference < -300)
     {
         cursor.leftHandRaised = false;
     }
